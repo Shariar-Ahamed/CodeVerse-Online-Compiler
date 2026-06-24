@@ -878,7 +878,8 @@ const DOM = {
   hero: document.getElementById("hero"),
   heroSpotlight: document.getElementById("hero-spotlight"),
   maintenanceModal: document.getElementById("maintenance-modal"),
-  closeMaintenanceBtn: document.getElementById("close-maintenance-btn")
+  closeMaintenanceBtn: document.getElementById("close-maintenance-btn"),
+  closeMaintenanceX: document.getElementById("close-maintenance-x")
 };
 
 // --- Monaco Editor Initialization ---
@@ -1008,19 +1009,10 @@ function initMonaco() {
 
 // --- Theme Management ---
 function initTheme() {
-  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const storedTheme = localStorage.getItem("codeverse_theme");
-  
-  // Default to dark theme if not saved
-  const isLight = storedTheme === "light" || (storedTheme === null && !systemPrefersDark);
-  
-  if (isLight) {
-    document.documentElement.classList.add("light");
-    DOM.themeIcon.className = "fas fa-moon"; // Show moon in light mode (to click and go dark)
-  } else {
-    document.documentElement.classList.remove("light");
-    DOM.themeIcon.className = "fas fa-sun"; // Show sun in dark mode
-  }
+  // Light theme is under maintenance, force dark theme on launch
+  localStorage.setItem("codeverse_theme", "dark");
+  document.documentElement.classList.remove("light");
+  DOM.themeIcon.className = "fas fa-sun";
 }
 
 function toggleTheme() {
@@ -1055,6 +1047,17 @@ function closeMaintenanceWarning() {
     DOM.maintenanceModal.classList.remove("flex");
     DOM.maintenanceModal.classList.add("hidden");
   }
+  
+  // Revert back to Dracula dark theme since light mode is under maintenance
+  document.documentElement.classList.remove("light");
+  localStorage.setItem("codeverse_theme", "dark");
+  
+  if (editor) {
+    monaco.editor.setTheme('dracula');
+  }
+  
+  DOM.themeIcon.className = "fas fa-sun";
+  showToast("Reverted to Dracula Theme", "info");
 }
 
 // --- Dynamic Badge Helper ---
@@ -1554,6 +1557,9 @@ function registerEventListeners() {
   // Maintenance Warning Modal Listeners
   if (DOM.closeMaintenanceBtn) {
     DOM.closeMaintenanceBtn.addEventListener("click", closeMaintenanceWarning);
+  }
+  if (DOM.closeMaintenanceX) {
+    DOM.closeMaintenanceX.addEventListener("click", closeMaintenanceWarning);
   }
   if (DOM.maintenanceModal) {
     DOM.maintenanceModal.addEventListener("click", (e) => {

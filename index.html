@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -26,7 +26,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Custom Styling override sheet (Dark/Light Variables) -->
-    <link rel="stylesheet" href="css/style.css?v=12" />
+    <link rel="stylesheet" href="css/style.css?v=13" />
   </head>
   <body
     class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]"
@@ -1585,14 +1585,23 @@ Write code and click 'Run Code' to execute.
       class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
     >
       <div
-        class="glass-panel w-full max-w-sm rounded-2xl border border-amber-500/20 overflow-hidden shadow-2xl shadow-amber-500/5 p-6 text-center animate-fade-in-up flex flex-col items-center gap-4"
+        class="w-full max-w-sm rounded-2xl border border-amber-500/25 bg-slate-900/95 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 p-6 text-center animate-fade-in-up flex flex-col items-center gap-4 relative"
       >
+        <!-- Close button (X) -->
+        <button
+          id="close-maintenance-x"
+          class="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none"
+          title="Close and revert to Dark Mode"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
         <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xl animate-pulse">
           <i class="fas fa-triangle-exclamation"></i>
         </div>
         <div>
           <h3 class="text-base font-bold text-white mb-2">Under Maintenance</h3>
-          <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+          <p class="text-xs text-slate-300 leading-relaxed">
             Light Mode is currently undergoing optimization maintenance. We recommend using our premium Dracula Dark Theme for best performance and code rendering!
           </p>
         </div>
@@ -1799,6 +1808,6 @@ Write code and click 'Run Code' to execute.
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
     <!-- Core Logic Javascript Script -->
-    <script src="js/script.js?v=31"></script>
+    <script src="js/script.js?v=32"></script>
   </body>
 </html>

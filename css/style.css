@@ -48,10 +48,13 @@
 }
 
 /* General Layout Adjustments */
+body, button, input, select, textarea {
+  font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   transition: var(--transition-smooth);
   overflow-x: hidden;
 }
