@@ -1,971 +1,1683 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeVerse Online Compiler - Live IDE Editor</title>
-  
-  <!-- FontAwesome Icons for modern UI buttons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
-  <!-- Google Fonts for sleek developer experience -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS Play CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Custom Styling override sheet (Dark/Light Variables) -->
-  <link rel="stylesheet" href="css/style.css?v=3">
-</head>
-<body class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeVerse Online Compiler - Live IDE Editor</title>
 
-  <!-- ==================== HEADER / NAVBAR ==================== -->
-  <header class="w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 sticky top-0 z-30 backdrop-blur-md transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <!-- Brand Logo & Name -->
-      <div id="brand-logo" class="flex items-center gap-3 cursor-pointer select-none">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <i class="fas fa-cubes text-white text-lg animate-pulse"></i>
+    <!-- FontAwesome Icons for modern UI buttons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Google Fonts for sleek developer experience -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styling override sheet (Dark/Light Variables) -->
+    <link rel="stylesheet" href="css/style.css?v=3" />
+  </head>
+  <body
+    class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]"
+  >
+    <!-- ==================== HEADER / NAVBAR ==================== -->
+    <header
+      class="w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 sticky top-0 z-30 backdrop-blur-md transition-all duration-300"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+      >
+        <!-- Brand Logo & Name -->
+        <div
+          id="brand-logo"
+          class="flex items-center gap-3 cursor-pointer select-none"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20"
+          >
+            <i class="fas fa-cubes text-white text-lg animate-pulse"></i>
+          </div>
+          <div>
+            <h1
+              class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
+            >
+              CodeVerse
+            </h1>
+            <p
+              class="text-[10px] text-[var(--text-secondary)] font-medium -mt-1 tracking-wider uppercase"
+            >
+              Online Compiler
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-            CodeVerse
-          </h1>
-          <p class="text-[10px] text-[var(--text-secondary)] font-medium -mt-1 tracking-wider uppercase">
-            Online Compiler
-          </p>
+
+        <!-- Navigation Links (Hidden on mobile) -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a
+            href="#hero"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Home</a
+          >
+          <a
+            href="#languages"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Languages</a
+          >
+          <a
+            href="#features"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Features</a
+          >
+          <a
+            href="#about"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >About</a
+          >
+          <a
+            href="#contact"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Contact</a
+          >
+        </nav>
+
+        <!-- Quick Action Navigation Toolbar -->
+        <div class="flex items-center gap-3">
+          <!-- CTA Button in Header -->
+          <button
+            id="nav-cta-btn"
+            class="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+          >
+            <i class="fas fa-terminal"></i>
+            <span>Launch IDE</span>
+          </button>
+
+          <!-- Settings Modal Trigger -->
+          <button
+            id="settings-btn"
+            class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            title="API Credentials Configuration"
+          >
+            <i class="fas fa-sliders text-sm"></i>
+          </button>
+
+          <!-- Theme Toggle Switch -->
+          <button
+            id="theme-toggle"
+            class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            title="Toggle Light/Dark Theme"
+          >
+            <i id="theme-icon" class="fas fa-sun text-sm"></i>
+          </button>
+
+          <!-- Mobile Menu Trigger -->
+          <button
+            id="mobile-menu-btn"
+            class="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          >
+            <i class="fas fa-bars text-sm"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Navigation Links (Hidden on mobile) -->
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-        <a href="#hero" class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">Home</a>
-        <a href="#languages" class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">Languages</a>
-        <a href="#features" class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">Features</a>
-        <a href="#about" class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">About</a>
-        <a href="#contact" class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">Contact</a>
-      </nav>
-
-      <!-- Quick Action Navigation Toolbar -->
-      <div class="flex items-center gap-3">
-        <!-- CTA Button in Header -->
-        <button id="nav-cta-btn" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200">
+      <!-- Mobile Navigation Panel (Collapsible) -->
+      <div
+        id="mobile-nav"
+        class="hidden md:hidden border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 flex flex-col gap-3 text-sm font-medium"
+      >
+        <a
+          href="#hero"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Home</a
+        >
+        <a
+          href="#languages"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Languages</a
+        >
+        <a
+          href="#features"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Features</a
+        >
+        <a
+          href="#about"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >About</a
+        >
+        <a
+          href="#contact"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Contact</a
+        >
+        <button
+          id="mobile-nav-cta"
+          class="w-full flex items-center justify-center gap-1.5 py-2 mt-2 rounded-lg text-xs font-bold text-white bg-indigo-600"
+        >
           <i class="fas fa-terminal"></i>
           <span>Launch IDE</span>
         </button>
-
-        <!-- Settings Modal Trigger -->
-        <button id="settings-btn" class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200" title="API Credentials Configuration">
-          <i class="fas fa-sliders text-sm"></i>
-        </button>
-
-        <!-- Theme Toggle Switch -->
-        <button id="theme-toggle" class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200" title="Toggle Light/Dark Theme">
-          <i id="theme-icon" class="fas fa-sun text-sm"></i>
-        </button>
-
-        <!-- Mobile Menu Trigger -->
-        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-          <i class="fas fa-bars text-sm"></i>
-        </button>
       </div>
-      
-    </div>
+    </header>
 
-    <!-- Mobile Navigation Panel (Collapsible) -->
-    <div id="mobile-nav" class="hidden md:hidden border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 flex flex-col gap-3 text-sm font-medium">
-      <a href="#hero" class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block">Home</a>
-      <a href="#languages" class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block">Languages</a>
-      <a href="#features" class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block">Features</a>
-      <a href="#about" class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block">About</a>
-      <a href="#contact" class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block">Contact</a>
-      <button id="mobile-nav-cta" class="w-full flex items-center justify-center gap-1.5 py-2 mt-2 rounded-lg text-xs font-bold text-white bg-indigo-600">
-        <i class="fas fa-terminal"></i>
-        <span>Launch IDE</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ==================== HOME VIEW ==================== -->
-  <div id="home-view" class="flex-grow flex flex-col">
-     <!-- Hero Section -->
-     <section id="hero" class="relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-primary)] border-b border-[var(--border-color)]">
+    <!-- ==================== HOME VIEW ==================== -->
+    <div id="home-view" class="flex-grow flex flex-col">
+      <!-- Hero Section -->
+      <section
+        id="hero"
+        class="relative overflow-hidden py-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-primary)] border-b border-[var(--border-color)]"
+      >
         <!-- Background Blur Circles -->
-        <div class="absolute top-10 left-1/4 w-72 h-72 rounded-full bg-indigo-500/10 blur-[100px] animate-pulse"></div>
-        <div class="absolute bottom-10 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px]"></div>
-        
-        <div class="max-w-5xl mx-auto text-center relative z-10 flex flex-col items-center">
-           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-400 mb-6 animate-bounce">
-              <i class="fas fa-sparkles"></i>
-              <span>Next-Gen Editor Platform</span>
-           </div>
-           
-           <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight text-white mb-6">
-              Write, Compile & Run Code <br>
-              <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Instantly in Any Language</span>
-           </h2>
-           
-           <p class="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mb-10 leading-relaxed">
-              Experience CodeVerse — a lightning-fast, premium online IDE and interactive web development playground. Execute backend scripts and design modern frontend layouts instantly in your browser.
-           </p>
-           
-           <div class="flex flex-col sm:flex-row items-center gap-4">
-              <button id="hero-start-btn" class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-                 <i class="fas fa-play text-xs"></i>
-                 <span>Start Coding Free</span>
-              </button>
-              <a href="#languages" class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200 flex items-center justify-center gap-2">
-                 <span>Explore Languages</span>
-                 <i class="fas fa-chevron-down text-xs"></i>
-              </a>
-           </div>
+        <div
+          class="absolute top-10 left-1/4 w-72 h-72 rounded-full bg-indigo-500/10 blur-[100px] animate-pulse"
+        ></div>
+        <div
+          class="absolute bottom-10 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px]"
+        ></div>
+
+        <div
+          class="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center"
+        >
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-400 mb-5 animate-bounce"
+          >
+            <i class="fas fa-sparkles"></i>
+            <span>Next-Gen Editor Platform</span>
+          </div>
+
+          <h2
+            class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white mb-5"
+          >
+            Write, Compile & Run Code <br />
+            <span
+              class="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+              >Instantly in Any Language</span
+            >
+          </h2>
+
+          <p
+            class="text-sm sm:text-base text-[var(--text-secondary)] max-w-xl mb-8 leading-relaxed"
+          >
+            Experience CodeVerse — a lightning-fast, premium online IDE and
+            interactive web development playground. Execute backend scripts and
+            design modern frontend layouts instantly in your browser.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              id="hero-start-btn"
+              class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-play text-xs"></i>
+              <span>Start Coding Free</span>
+            </button>
+            <a
+              href="#languages"
+              class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <span>Explore Languages</span>
+              <i class="fas fa-chevron-down text-xs"></i>
+            </a>
+          </div>
         </div>
-     </section>
+      </section>
 
-     <!-- Supported Languages Section -->
-     <section id="languages" class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative animate-fade-in-up">
+      <!-- Supported Languages Section -->
+      <section
+        id="languages"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative animate-fade-in-up"
+      >
         <div class="max-w-7xl mx-auto">
-           <div class="text-center mb-16">
-              <h2 class="text-3xl font-extrabold tracking-tight text-white">Supported Languages & Workspaces</h2>
-              <p class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
-                 Choose your stack. CodeVerse offers dedicated compiler environments and full interactive visual preview sandboxes.
-              </p>
-           </div>
-                       <!-- Grid of Languages -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              <!-- HTML/CSS/JS Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300" data-lang="html">
-                 <div class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-html5"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">HTML/CSS/JS</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">Web Lab Preview</p>
-                 </div>
+          <div class="text-center mb-16">
+            <h2 class="text-3xl font-extrabold tracking-tight text-white">
+              Supported Languages & Workspaces
+            </h2>
+            <p
+              class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto"
+            >
+              Choose your stack. CodeVerse offers dedicated compiler
+              environments and full interactive visual preview sandboxes.
+            </p>
+          </div>
+          <!-- Grid of Languages -->
+          <div
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
+          >
+            <!-- HTML/CSS/JS Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="html"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-html5"></i>
               </div>
-
-              <!-- C Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300" data-lang="c">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">C</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">GCC 9.2.0</p>
-                 </div>
-              </div>
-              
-              <!-- C++ Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300" data-lang="cpp">
-                 <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">C++</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">GCC 9.2.0</p>
-                 </div>
-              </div>
-
-              <!-- C# Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-400/50 cursor-pointer group transition-all duration-300" data-lang="csharp">
-                 <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-hashtag"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">C#</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">Mono 6.6.0</p>
-                 </div>
-              </div>
-
-              <!-- Go Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-cyan-500/50 cursor-pointer group transition-all duration-300" data-lang="go">
-                 <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-golang"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Go</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">1.13.5 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- Rust Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-orange-600/50 cursor-pointer group transition-all duration-300" data-lang="rust">
-                 <div class="w-9 h-9 rounded-lg bg-orange-600/10 border border-orange-600/20 flex items-center justify-center text-orange-600 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-rust"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Rust</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">1.40.0 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- Python Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-amber-500/50 cursor-pointer group transition-all duration-300" data-lang="python">
-                 <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-python"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Python 3</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">3.8.1 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Javascript Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-yellow-500/50 cursor-pointer group transition-all duration-300" data-lang="javascript">
-                 <div class="w-9 h-9 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-js"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">JavaScript</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">NodeJS 12.14</p>
-                 </div>
-              </div>
-
-              <!-- TypeScript Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300" data-lang="typescript">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-js text-blue-400"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">TypeScript</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">3.7.4 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- Java Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300" data-lang="java">
-                 <div class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-java"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Java</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">OpenJDK 13.0.1</p>
-                 </div>
-              </div>
-
-              <!-- Kotlin Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300" data-lang="kotlin">
-                 <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Kotlin</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">1.3.70 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- PHP Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300" data-lang="php">
-                 <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-php"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">PHP</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">7.4.1 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Ruby Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300" data-lang="ruby">
-                 <div class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-gem"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Ruby</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">2.7.0 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Swift Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-orange-500/50 cursor-pointer group transition-all duration-300" data-lang="swift">
-                 <div class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fab fa-swift"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Swift</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">5.2.3 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- Bash Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-emerald-500/50 cursor-pointer group transition-all duration-300" data-lang="bash">
-                 <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-terminal"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Bash</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">5.0.0 Shell</p>
-                 </div>
-              </div>
-
-              <!-- SQL Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-sky-500/50 cursor-pointer group transition-all duration-300" data-lang="sql">
-                 <div class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-database"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">SQL</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">SQLite 3.27.2</p>
-                 </div>
-              </div>
-
-              <!-- Scala Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300" data-lang="scala">
-                 <div class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Scala</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">2.13.2 Compiler</p>
-                 </div>
-              </div>
-
-              <!-- Objective-C Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300" data-lang="objectivec">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Objective-C</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">Clang 7.0.1</p>
-                 </div>
-              </div>
-
-              <!-- Haskell Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300" data-lang="haskell">
-                 <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Haskell</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">GHC 8.8.1</p>
-                 </div>
-              </div>
-
-              <!-- Pascal Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-teal-500/50 cursor-pointer group transition-all duration-300" data-lang="pascal">
-                 <div class="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Pascal</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">FPC 3.0.4</p>
-                 </div>
-              </div>
-
-              <!-- Perl Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300" data-lang="perl">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Perl</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">5.28.1 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- R Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-400/50 cursor-pointer group transition-all duration-300" data-lang="r">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-chart-line"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">R</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">4.0.0 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Lisp Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-amber-500/50 cursor-pointer group transition-all duration-300" data-lang="lisp">
-                 <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Lisp</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">SBCL 2.0.0</p>
-                 </div>
-              </div>
-
-              <!-- Fortran Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300" data-lang="fortran">
-                 <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Fortran</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">GFortran 9.2.0</p>
-                 </div>
-              </div>
-
-              <!-- Lua Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-400/50 cursor-pointer group transition-all duration-300" data-lang="lua">
-                 <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Lua</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">5.3.5 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Assembly Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-slate-500/50 cursor-pointer group transition-all duration-300" data-lang="assembly">
-                 <div class="w-9 h-9 rounded-lg bg-slate-500/10 border border-slate-500/20 flex items-center justify-center text-slate-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-microchip"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Assembly</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">NASM 2.14.02</p>
-                 </div>
-              </div>
-
-              <!-- Elixir Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-600/50 cursor-pointer group transition-all duration-300" data-lang="elixir">
-                 <div class="w-9 h-9 rounded-lg bg-purple-600/10 border border-purple-600/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Elixir</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">1.9.4 Interpreter</p>
-                 </div>
-              </div>
-
-              <!-- Erlang Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300" data-lang="erlang">
-                 <div class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Erlang</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">OTP 22.2 Runtime</p>
-                 </div>
-              </div>
-
-              <!-- Clojure Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-emerald-500/50 cursor-pointer group transition-all duration-300" data-lang="clojure">
-                 <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">Clojure</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">1.10.1 Workspace</p>
-                 </div>
-              </div>
-
-              <!-- D Card -->
-              <div class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300" data-lang="d">
-                 <div class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-code"></i>
-                 </div>
-                 <div>
-                    <h3 class="font-bold text-white text-xs">D</h3>
-                    <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">DMD 2.089.1</p>
-                 </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">HTML/CSS/JS</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  Web Lab Preview
+                </p>
               </div>
             </div>
-         </div>
-     </section>
 
-     <!-- Live Demo Typing Section -->
-     <section id="live-demo" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)]">
-        <div class="max-w-7xl mx-auto">
-           <div class="text-center mb-16">
-              <h2 class="text-3xl font-extrabold tracking-tight text-white">See CodeVerse in Action</h2>
-              <p class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
-                 Watch as code typing processes and standard input displays translate directly to console rendering in real time.
-              </p>
-           </div>
-           
-           <!-- Mock IDE Container -->
-           <div class="glass-panel rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl max-w-4xl mx-auto">
-              <!-- Header -->
-              <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/45 flex items-center justify-between px-4">
-                 <div class="flex items-center gap-4">
-                    <div class="flex gap-1.5">
-                       <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                       <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                       <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    </div>
-                    <span id="demo-tab-name" class="text-xs font-mono text-[var(--text-secondary)]">main.cpp</span>
-                 </div>
-                 <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Auto Running</span>
+            <!-- C Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="c"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
               </div>
-              
-              <!-- Content split grid -->
-              <div class="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-[var(--border-color)] min-h-[280px]">
-                 <!-- Editor Mock -->
-                 <div class="md:col-span-3 p-4 bg-[#1e1e2e]/60 font-mono text-xs text-slate-300 leading-relaxed overflow-hidden relative">
-                    <pre class="relative z-10 select-none"><code id="demo-editor-text">#include &lt;iostream&gt;
+              <div>
+                <h3 class="font-bold text-white text-xs">C</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  GCC 9.2.0
+                </p>
+              </div>
+            </div>
+
+            <!-- C++ Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="cpp"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">C++</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  GCC 9.2.0
+                </p>
+              </div>
+            </div>
+
+            <!-- C# Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-400/50 cursor-pointer group transition-all duration-300"
+              data-lang="csharp"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-hashtag"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">C#</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  Mono 6.6.0
+                </p>
+              </div>
+            </div>
+
+            <!-- Go Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-cyan-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="go"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-golang"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Go</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  1.13.5 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- Rust Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-orange-600/50 cursor-pointer group transition-all duration-300"
+              data-lang="rust"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-orange-600/10 border border-orange-600/20 flex items-center justify-center text-orange-600 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-rust"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Rust</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  1.40.0 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- Python Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-amber-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="python"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-python"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Python 3</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  3.8.1 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Javascript Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-yellow-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="javascript"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-js"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">JavaScript</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  NodeJS 12.14
+                </p>
+              </div>
+            </div>
+
+            <!-- TypeScript Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="typescript"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-js text-blue-400"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">TypeScript</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  3.7.4 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- Java Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="java"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-java"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Java</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  OpenJDK 13.0.1
+                </p>
+              </div>
+            </div>
+
+            <!-- Kotlin Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="kotlin"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Kotlin</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  1.3.70 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- PHP Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-indigo-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="php"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-php"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">PHP</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  7.4.1 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Ruby Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="ruby"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-gem"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Ruby</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  2.7.0 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Swift Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-orange-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="swift"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fab fa-swift"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Swift</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  5.2.3 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- Bash Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-emerald-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="bash"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-terminal"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Bash</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  5.0.0 Shell
+                </p>
+              </div>
+            </div>
+
+            <!-- SQL Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-sky-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="sql"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-database"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">SQL</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  SQLite 3.27.2
+                </p>
+              </div>
+            </div>
+
+            <!-- Scala Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="scala"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Scala</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  2.13.2 Compiler
+                </p>
+              </div>
+            </div>
+
+            <!-- Objective-C Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="objectivec"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Objective-C</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  Clang 7.0.1
+                </p>
+              </div>
+            </div>
+
+            <!-- Haskell Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="haskell"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Haskell</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  GHC 8.8.1
+                </p>
+              </div>
+            </div>
+
+            <!-- Pascal Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-teal-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="pascal"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Pascal</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  FPC 3.0.4
+                </p>
+              </div>
+            </div>
+
+            <!-- Perl Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="perl"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Perl</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  5.28.1 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- R Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-400/50 cursor-pointer group transition-all duration-300"
+              data-lang="r"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">R</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  4.0.0 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Lisp Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-amber-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="lisp"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Lisp</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  SBCL 2.0.0
+                </p>
+              </div>
+            </div>
+
+            <!-- Fortran Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="fortran"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Fortran</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  GFortran 9.2.0
+                </p>
+              </div>
+            </div>
+
+            <!-- Lua Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-blue-400/50 cursor-pointer group transition-all duration-300"
+              data-lang="lua"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Lua</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  5.3.5 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Assembly Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-slate-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="assembly"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-slate-500/10 border border-slate-500/20 flex items-center justify-center text-slate-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-microchip"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Assembly</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  NASM 2.14.02
+                </p>
+              </div>
+            </div>
+
+            <!-- Elixir Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-purple-600/50 cursor-pointer group transition-all duration-300"
+              data-lang="elixir"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-purple-600/10 border border-purple-600/20 flex items-center justify-center text-purple-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Elixir</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  1.9.4 Interpreter
+                </p>
+              </div>
+            </div>
+
+            <!-- Erlang Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="erlang"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Erlang</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  OTP 22.2 Runtime
+                </p>
+              </div>
+            </div>
+
+            <!-- Clojure Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-emerald-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="clojure"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">Clojure</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  1.10.1 Workspace
+                </p>
+              </div>
+            </div>
+
+            <!-- D Card -->
+            <div
+              class="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 hover:border-red-500/50 cursor-pointer group transition-all duration-300"
+              data-lang="d"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-base group-hover:scale-110 transition-transform duration-300"
+              >
+                <i class="fas fa-code"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-xs">D</h3>
+                <p class="text-[9px] text-[var(--text-secondary)] mt-0.5">
+                  DMD 2.089.1
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Demo Typing Section -->
+      <section
+        id="live-demo"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)]"
+      >
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl font-extrabold tracking-tight text-white">
+              See CodeVerse in Action
+            </h2>
+            <p
+              class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto"
+            >
+              Watch as code typing processes and standard input displays
+              translate directly to console rendering in real time.
+            </p>
+          </div>
+
+          <!-- Mock IDE Container -->
+          <div
+            class="glass-panel rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl max-w-4xl mx-auto"
+          >
+            <!-- Header -->
+            <div
+              class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/45 flex items-center justify-between px-4"
+            >
+              <div class="flex items-center gap-4">
+                <div class="flex gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                </div>
+                <span
+                  id="demo-tab-name"
+                  class="text-xs font-mono text-[var(--text-secondary)]"
+                  >main.cpp</span
+                >
+              </div>
+              <span
+                class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                >Auto Running</span
+              >
+            </div>
+
+            <!-- Content split grid -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-[var(--border-color)] min-h-[280px]"
+            >
+              <!-- Editor Mock -->
+              <div
+                class="md:col-span-3 p-4 bg-[#1e1e2e]/60 font-mono text-xs text-slate-300 leading-relaxed overflow-hidden relative"
+              >
+                <pre
+                  class="relative z-10 select-none"
+                ><code id="demo-editor-text">#include &lt;iostream&gt;
 int main() {
     std::cout &lt;&lt; "Hello World!" &lt;&lt; std::endl;
 }</code><span class="terminal-cursor"></span></pre>
-                 </div>
-                 <!-- Output Console Mock -->
-                 <div class="md:col-span-2 p-4 bg-[#0a0c10] font-mono text-xs flex flex-col justify-between">
-                    <div>
-                       <div class="text-[var(--text-muted)] text-[9px] uppercase tracking-wider mb-2 font-bold flex items-center gap-1">
-                          <i class="fas fa-terminal"></i>
-                          <span>Terminal Output</span>
-                       </div>
-                       <pre id="demo-console-text" class="text-emerald-400 whitespace-pre-wrap select-none">Hello World!</pre>
-                    </div>
-                    
-                    <div class="pt-4 border-t border-[var(--border-color)]/30 flex items-center justify-between text-[9px] text-[var(--text-muted)]">
-                       <span>Status: Accepted</span>
-                       <span>Time: 0.04s</span>
-                    </div>
-                 </div>
               </div>
-           </div>
-        </div>
-     </section>
+              <!-- Output Console Mock -->
+              <div
+                class="md:col-span-2 p-4 bg-[#0a0c10] font-mono text-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div
+                    class="text-[var(--text-muted)] text-[9px] uppercase tracking-wider mb-2 font-bold flex items-center gap-1"
+                  >
+                    <i class="fas fa-terminal"></i>
+                    <span>Terminal Output</span>
+                  </div>
+                  <pre
+                    id="demo-console-text"
+                    class="text-emerald-400 whitespace-pre-wrap select-none"
+                  >
+Hello World!</pre
+                  >
+                </div>
 
-     <!-- Features Section -->
-     <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]">
-        <div class="max-w-7xl mx-auto">
-           <div class="text-center mb-16">
-              <h2 class="text-3xl font-extrabold tracking-tight text-white">Full-Featured Coding Workspaces</h2>
-              <p class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
-                 We bring professional desktop-grade compilers and frontend previews directly to your modern web browser.
-              </p>
-           </div>
-           
-           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <!-- Feature 1 -->
-              <div class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-                 <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg">
-                    <i class="fas fa-keyboard"></i>
-                 </div>
-                 <h3 class="font-bold text-white text-base">VS Code Core (Monaco)</h3>
-                 <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Powered by Monaco Editor. Customize settings, theme configurations, automatic auto-saving, and tab switching layouts.
-                 </p>
+                <div
+                  class="pt-4 border-t border-[var(--border-color)]/30 flex items-center justify-between text-[9px] text-[var(--text-muted)]"
+                >
+                  <span>Status: Accepted</span>
+                  <span>Time: 0.04s</span>
+                </div>
               </div>
-
-              <!-- Feature 2 -->
-              <div class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-                 <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg">
-                    <i class="fas fa-eye"></i>
-                 </div>
-                 <h3 class="font-bold text-white text-base">Live Web Sandbox</h3>
-                 <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Write interactive templates using HTML, CSS, and JS. Render web pages inside the iframe preview and monitor output logs.
-                 </p>
-              </div>
-
-              <!-- Feature 3 -->
-              <div class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg">
-                    <i class="fas fa-bolt"></i>
-                 </div>
-                 <h3 class="font-bold text-white text-base">Low-latency Execution</h3>
-                 <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Execute scripts instantly on pre-configured sandboxed backend endpoints without setup parameters.
-                 </p>
-              </div>
-
-              <!-- Feature 4 -->
-              <div class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-                 <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
-                    <i class="fas fa-sun"></i>
-                 </div>
-                 <h3 class="font-bold text-white text-base">Dracula & Light Theme</h3>
-                 <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Toggle active dark theme settings with standard Dracula syntax highlighting rules and minimal light modes instantly.
-                 </p>
-              </div>
-           </div>
-        </div>
-     </section>
-
-     <!-- About Section -->
-     <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)]">
-        <div class="max-w-4xl mx-auto text-center">
-           <h2 class="text-3xl font-extrabold tracking-tight text-white mb-6">About CodeVerse</h2>
-           <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
-              CodeVerse was built with a vision to make programming compiler resources free, fast, and accessible for everyone without requiring complicated downloads or configurations. We bypass whitelisted/private API limits using community engines like Judge0 CE, giving developers a sandboxed space for writing algorithms, executing backend logical tests, and designing quick web applications.
-           </p>
-           <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
-              Whether you are testing a Rust snippet, calculating output parameters in Python, or sketching a frontend component, CodeVerse ensures a seamless, modern developer experience.
-           </p>
-        </div>
-     </section>
-
-     <!-- Contact Section -->
-     <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]">
-        <div class="max-w-xl mx-auto">
-           <div class="text-center mb-12">
-              <h2 class="text-3xl font-extrabold tracking-tight text-white">Get in Touch</h2>
-              <p class="text-sm text-[var(--text-secondary)] mt-2">
-                 Have feedback, suggestions, or API connection issues? Drop us a message.
-              </p>
-           </div>
-           
-           <!-- Glassmorphic Form -->
-           <form id="contact-form" class="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl">
-              <div>
-                 <label class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Full Name</label>
-                 <input type="text" required class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200" placeholder="John Doe">
-              </div>
-              
-              <div>
-                 <label class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Email Address</label>
-                 <input type="email" required class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200" placeholder="john@example.com">
-              </div>
-              
-              <div>
-                 <label class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Message</label>
-                 <textarea required rows="4" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none" placeholder="Enter your comments or questions..."></textarea>
-              </div>
-              
-              <button type="submit" class="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200">
-                 Send Message
-              </button>
-           </form>
-        </div>
-     </section>
-  </div>
-
-  <!-- ==================== EDITOR VIEW ==================== -->
-  <div id="editor-view" class="hidden flex-grow flex flex-col bg-[var(--bg-primary)]">
-     <!-- Return navigation button bar -->
-     <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 flex items-center justify-between">
-        <button id="back-home-btn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-           <i class="fas fa-chevron-left"></i>
-           <span>Back to Home</span>
-        </button>
-        <span class="text-xs font-bold text-[var(--text-muted)] font-mono">Workspace Code Editor</span>
-     </div>
-
-     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-6">
-    
-    <!-- ==================== COMPILER CONTROLS PANEL ==================== -->
-    <div class="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
-      
-      <!-- Selection of Language with Dynamic Icon badge -->
-      <div class="flex items-center gap-3">
-        <label for="language-select" class="text-sm font-semibold text-[var(--text-secondary)]">Language:</label>
-        <div class="relative">
-          <select id="language-select" class="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200">
-            <option value="html">HTML/CSS/JS (Web Lab)</option>
-            <option value="c">C (GCC 9.2.0)</option>
-            <option value="cpp">C++ (GCC 9.2.0)</option>
-            <option value="csharp">C# (Mono 6.6.0)</option>
-            <option value="go">Go (1.13.5)</option>
-            <option value="rust">Rust (1.40.0)</option>
-            <option value="python">Python 3 (3.8.1)</option>
-            <option value="javascript">JavaScript (NodeJS 12.14.0)</option>
-            <option value="typescript">TypeScript (3.7.4)</option>
-            <option value="java">Java (OpenJDK 13.0.1)</option>
-            <option value="kotlin">Kotlin (1.3.70)</option>
-            <option value="php">PHP (7.4.1)</option>
-            <option value="ruby">Ruby (2.7.0)</option>
-            <option value="swift">Swift (5.2.3)</option>
-            <option value="bash">Bash Shell (5.0.0)</option>
-            <option value="sql">SQL (SQLite 3.27.2)</option>
-            <option value="scala">Scala (2.13.2)</option>
-            <option value="objectivec">Objective-C (Clang 7.0.1)</option>
-            <option value="haskell">Haskell (GHC 8.8.1)</option>
-            <option value="pascal">Pascal (FPC 3.0.4)</option>
-            <option value="perl">Perl (5.28.1)</option>
-            <option value="r">R (4.0.0)</option>
-            <option value="lisp">Lisp (SBCL 2.0.0)</option>
-            <option value="fortran">Fortran (GFortran 9.2.0)</option>
-            <option value="lua">Lua (5.3.5)</option>
-            <option value="assembly">Assembly (NASM 2.14.02)</option>
-            <option value="elixir">Elixir (1.9.4)</option>
-            <option value="erlang">Erlang (OTP 22.2)</option>
-            <option value="clojure">Clojure (1.10.1)</option>
-            <option value="d">D (DMD 2.089.1)</option>
-          </select>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
-            <i class="fas fa-chevron-down text-[10px]"></i>
+            </div>
           </div>
         </div>
-        <span id="lang-badge" class="px-2 py-0.5 rounded text-xs font-semibold badge-cpp">C++</span>
-      </div>
+      </section>
 
-      <!-- Action Button Controls -->
-      <div class="flex flex-wrap items-center gap-2">
-        <!-- Clear Console Output Button -->
-        <button id="clear-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-          <i class="fas fa-eraser"></i>
-          <span>Clear</span>
-        </button>
+      <!-- Features Section -->
+      <section
+        id="features"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]"
+      >
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl font-extrabold tracking-tight text-white">
+              Full-Featured Coding Workspaces
+            </h2>
+            <p
+              class="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto"
+            >
+              We bring professional desktop-grade compilers and frontend
+              previews directly to your modern web browser.
+            </p>
+          </div>
 
-        <!-- Copy Code to Clipboard Button -->
-        <button id="copy-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-          <i class="fas fa-copy"></i>
-          <span>Copy</span>
-        </button>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Feature 1 -->
+            <div
+              class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4"
+            >
+              <div
+                class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg"
+              >
+                <i class="fas fa-keyboard"></i>
+              </div>
+              <h3 class="font-bold text-white text-base">
+                VS Code Core (Monaco)
+              </h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Powered by Monaco Editor. Customize settings, theme
+                configurations, automatic auto-saving, and tab switching
+                layouts.
+              </p>
+            </div>
 
-        <!-- Download Code File Button -->
-        <button id="download-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-          <i class="fas fa-download"></i>
-          <span>Download</span>
-        </button>
+            <!-- Feature 2 -->
+            <div
+              class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4"
+            >
+              <div
+                class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg"
+              >
+                <i class="fas fa-eye"></i>
+              </div>
+              <h3 class="font-bold text-white text-base">Live Web Sandbox</h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Write interactive templates using HTML, CSS, and JS. Render web
+                pages inside the iframe preview and monitor output logs.
+              </p>
+            </div>
 
-        <!-- Execute / Run Code Trigger Button -->
-        <button id="run-btn" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200">
-          <i id="run-icon" class="fas fa-play text-xs"></i>
-          <div id="run-spinner" class="spinner hidden"></div>
-          <span id="run-text">Run Code</span>
-        </button>
-      </div>
+            <!-- Feature 3 -->
+            <div
+              class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4"
+            >
+              <div
+                class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg"
+              >
+                <i class="fas fa-bolt"></i>
+              </div>
+              <h3 class="font-bold text-white text-base">
+                Low-latency Execution
+              </h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Execute scripts instantly on pre-configured sandboxed backend
+                endpoints without setup parameters.
+              </p>
+            </div>
 
+            <!-- Feature 4 -->
+            <div
+              class="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4"
+            >
+              <div
+                class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg"
+              >
+                <i class="fas fa-sun"></i>
+              </div>
+              <h3 class="font-bold text-white text-base">
+                Dracula & Light Theme
+              </h3>
+              <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Toggle active dark theme settings with standard Dracula syntax
+                highlighting rules and minimal light modes instantly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section
+        id="about"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)]"
+      >
+        <div class="max-w-4xl mx-auto text-center">
+          <h2 class="text-3xl font-extrabold tracking-tight text-white mb-6">
+            About CodeVerse
+          </h2>
+          <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
+            CodeVerse was built with a vision to make programming compiler
+            resources free, fast, and accessible for everyone without requiring
+            complicated downloads or configurations. We bypass
+            whitelisted/private API limits using community engines like Judge0
+            CE, giving developers a sandboxed space for writing algorithms,
+            executing backend logical tests, and designing quick web
+            applications.
+          </p>
+          <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+            Whether you are testing a Rust snippet, calculating output
+            parameters in Python, or sketching a frontend component, CodeVerse
+            ensures a seamless, modern developer experience.
+          </p>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section
+        id="contact"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]"
+      >
+        <div class="max-w-xl mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold tracking-tight text-white">
+              Get in Touch
+            </h2>
+            <p class="text-sm text-[var(--text-secondary)] mt-2">
+              Have feedback, suggestions, or API connection issues? Drop us a
+              message.
+            </p>
+          </div>
+
+          <!-- Glassmorphic Form -->
+          <form
+            id="contact-form"
+            class="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl"
+          >
+            <div>
+              <label
+                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                required
+                class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="John Doe"
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                >Email Address</label
+              >
+              <input
+                type="email"
+                required
+                class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="john@example.com"
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                >Message</label
+              >
+              <textarea
+                required
+                rows="4"
+                class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
+                placeholder="Enter your comments or questions..."
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+            >
+              Send Message
+            </button>
+          </form>
+        </div>
+      </section>
     </div>
 
-    <!-- ==================== SPLIT EDITOR AND TERMINAL SECTION ==================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow">
-      
-      <!-- Monaco Code Editor Area (Occupies 2 columns on large displays) -->
-      <div class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
-        
-        <!-- Tab Bar Header -->
-        <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-          <div class="flex items-center gap-4">
-            <div id="editor-title-container" class="flex items-center gap-2">
-              <i class="fas fa-code text-indigo-400 text-xs"></i>
-              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
-            </div>
-            <!-- Web Lab Editor Tabs -->
-            <div id="web-editor-tabs" class="hidden flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border-color)]">
-              <button id="tab-html" class="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-600 text-white transition-all duration-200" data-tab="html">index.html</button>
-              <button id="tab-css" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="css">style.css</button>
-              <button id="tab-js" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="js">script.js</button>
-            </div>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
-          </div>
-        </div>
-
-        <!-- Monaco Editor Div wrapper -->
-        <div class="flex-grow min-h-[450px] relative">
-          <div id="editor-container" class="absolute inset-0 w-full h-full"></div>
-        </div>
-
-        <!-- Editor Status bar -->
-        <div class="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-4 text-[10px] text-[var(--text-muted)] font-mono">
-          <div>Status: Ready to edit</div>
-          <div>Shortcut: Ctrl + Enter to run</div>
-        </div>
-
+    <!-- ==================== EDITOR VIEW ==================== -->
+    <div
+      id="editor-view"
+      class="hidden flex-grow flex flex-col bg-[var(--bg-primary)]"
+    >
+      <!-- Return navigation button bar -->
+      <div
+        class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 flex items-center justify-between"
+      >
+        <button
+          id="back-home-btn"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+        >
+          <i class="fas fa-chevron-left"></i>
+          <span>Back to Home</span>
+        </button>
+        <span class="text-xs font-bold text-[var(--text-muted)] font-mono"
+          >Workspace Code Editor</span
+        >
       </div>
 
-      <!-- Input Stdin / Console Output Panel (Occupies 1 column) -->
-      <div class="flex flex-col gap-6">
-        
-        <!-- Standard Input (Stdin) Area -->
-        <div id="stdin-container" class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
-          <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-            <div class="flex items-center gap-2">
-              <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
-              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Standard Input (Stdin)</span>
+      <main
+        class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-6"
+      >
+        <!-- ==================== COMPILER CONTROLS PANEL ==================== -->
+        <div
+          class="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300"
+        >
+          <!-- Selection of Language with Dynamic Icon badge -->
+          <div class="flex items-center gap-3">
+            <label
+              for="language-select"
+              class="text-sm font-semibold text-[var(--text-secondary)]"
+              >Language:</label
+            >
+            <div class="relative">
+              <select
+                id="language-select"
+                class="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+              >
+                <option value="html">HTML/CSS/JS (Web Lab)</option>
+                <option value="c">C (GCC 9.2.0)</option>
+                <option value="cpp">C++ (GCC 9.2.0)</option>
+                <option value="csharp">C# (Mono 6.6.0)</option>
+                <option value="go">Go (1.13.5)</option>
+                <option value="rust">Rust (1.40.0)</option>
+                <option value="python">Python 3 (3.8.1)</option>
+                <option value="javascript">JavaScript (NodeJS 12.14.0)</option>
+                <option value="typescript">TypeScript (3.7.4)</option>
+                <option value="java">Java (OpenJDK 13.0.1)</option>
+                <option value="kotlin">Kotlin (1.3.70)</option>
+                <option value="php">PHP (7.4.1)</option>
+                <option value="ruby">Ruby (2.7.0)</option>
+                <option value="swift">Swift (5.2.3)</option>
+                <option value="bash">Bash Shell (5.0.0)</option>
+                <option value="sql">SQL (SQLite 3.27.2)</option>
+                <option value="scala">Scala (2.13.2)</option>
+                <option value="objectivec">Objective-C (Clang 7.0.1)</option>
+                <option value="haskell">Haskell (GHC 8.8.1)</option>
+                <option value="pascal">Pascal (FPC 3.0.4)</option>
+                <option value="perl">Perl (5.28.1)</option>
+                <option value="r">R (4.0.0)</option>
+                <option value="lisp">Lisp (SBCL 2.0.0)</option>
+                <option value="fortran">Fortran (GFortran 9.2.0)</option>
+                <option value="lua">Lua (5.3.5)</option>
+                <option value="assembly">Assembly (NASM 2.14.02)</option>
+                <option value="elixir">Elixir (1.9.4)</option>
+                <option value="erlang">Erlang (OTP 22.2)</option>
+                <option value="clojure">Clojure (1.10.1)</option>
+                <option value="d">D (DMD 2.089.1)</option>
+              </select>
+              <div
+                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]"
+              >
+                <i class="fas fa-chevron-down text-[10px]"></i>
+              </div>
             </div>
-            <span class="text-[10px] text-[var(--text-muted)] font-mono">Optional</span>
+            <span
+              id="lang-badge"
+              class="px-2 py-0.5 rounded text-xs font-semibold badge-cpp"
+              >C++</span
+            >
           </div>
-          <textarea id="stdin-area" class="w-full h-24 p-3 bg-[var(--console-bg)] text-[var(--text-primary)] border-none resize-none focus:outline-none focus:ring-0 font-mono text-xs placeholder:text-[var(--text-muted)] placeholder:italic" placeholder="If your code requires inputs (e.g. scanf, cin, input()), enter them here before clicking 'Run Code' (one input per line)..."></textarea>
+
+          <!-- Action Button Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Clear Console Output Button -->
+            <button
+              id="clear-btn"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i class="fas fa-eraser"></i>
+              <span>Clear</span>
+            </button>
+
+            <!-- Copy Code to Clipboard Button -->
+            <button
+              id="copy-btn"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i class="fas fa-copy"></i>
+              <span>Copy</span>
+            </button>
+
+            <!-- Download Code File Button -->
+            <button
+              id="download-btn"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i class="fas fa-download"></i>
+              <span>Download</span>
+            </button>
+
+            <!-- Execute / Run Code Trigger Button -->
+            <button
+              id="run-btn"
+              class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200"
+            >
+              <i id="run-icon" class="fas fa-play text-xs"></i>
+              <div id="run-spinner" class="spinner hidden"></div>
+              <span id="run-text">Run Code</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Output Terminal Panel -->
-        <div class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
-          
-          <!-- Terminal Header Bar -->
-          <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-            <div class="flex items-center gap-2">
-              <i id="console-header-icon" class="fas fa-terminal text-emerald-400 text-xs"></i>
-              <span id="console-header-title" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
+        <!-- ==================== SPLIT EDITOR AND TERMINAL SECTION ==================== -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow"
+        >
+          <!-- Monaco Code Editor Area (Occupies 2 columns on large displays) -->
+          <div
+            class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300"
+          >
+            <!-- Tab Bar Header -->
+            <div
+              class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  id="editor-title-container"
+                  class="flex items-center gap-2"
+                >
+                  <i class="fas fa-code text-indigo-400 text-xs"></i>
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]"
+                    >Source Code Editor</span
+                  >
+                </div>
+                <!-- Web Lab Editor Tabs -->
+                <div
+                  id="web-editor-tabs"
+                  class="hidden flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border-color)]"
+                >
+                  <button
+                    id="tab-html"
+                    class="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-600 text-white transition-all duration-200"
+                    data-tab="html"
+                  >
+                    index.html
+                  </button>
+                  <button
+                    id="tab-css"
+                    class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200"
+                    data-tab="css"
+                  >
+                    style.css
+                  </button>
+                  <button
+                    id="tab-js"
+                    class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200"
+                    data-tab="js"
+                  >
+                    script.js
+                  </button>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
+              </div>
             </div>
-            <!-- Dynamic Status Badge -->
-            <span id="status-badge" class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30">Idle</span>
+
+            <!-- Monaco Editor Div wrapper -->
+            <div class="flex-grow min-h-[450px] relative">
+              <div
+                id="editor-container"
+                class="absolute inset-0 w-full h-full"
+              ></div>
+            </div>
+
+            <!-- Editor Status bar -->
+            <div
+              class="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-4 text-[10px] text-[var(--text-muted)] font-mono"
+            >
+              <div>Status: Ready to edit</div>
+              <div>Shortcut: Ctrl + Enter to run</div>
+            </div>
           </div>
 
-          <!-- Stdin Output Console Text display box -->
-          <div id="console-output-container" class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
-            <pre id="output-console" class="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
+          <!-- Input Stdin / Console Output Panel (Occupies 1 column) -->
+          <div class="flex flex-col gap-6">
+            <!-- Standard Input (Stdin) Area -->
+            <div
+              id="stdin-container"
+              class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300"
+            >
+              <div
+                class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4"
+              >
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]"
+                    >Standard Input (Stdin)</span
+                  >
+                </div>
+                <span class="text-[10px] text-[var(--text-muted)] font-mono"
+                  >Optional</span
+                >
+              </div>
+              <textarea
+                id="stdin-area"
+                class="w-full h-24 p-3 bg-[var(--console-bg)] text-[var(--text-primary)] border-none resize-none focus:outline-none focus:ring-0 font-mono text-xs placeholder:text-[var(--text-muted)] placeholder:italic"
+                placeholder="If your code requires inputs (e.g. scanf, cin, input()), enter them here before clicking 'Run Code' (one input per line)..."
+              ></textarea>
+            </div>
+
+            <!-- Output Terminal Panel -->
+            <div
+              class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300"
+            >
+              <!-- Terminal Header Bar -->
+              <div
+                class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4"
+              >
+                <div class="flex items-center gap-2">
+                  <i
+                    id="console-header-icon"
+                    class="fas fa-terminal text-emerald-400 text-xs"
+                  ></i>
+                  <span
+                    id="console-header-title"
+                    class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]"
+                    >Output Console</span
+                  >
+                </div>
+                <!-- Dynamic Status Badge -->
+                <span
+                  id="status-badge"
+                  class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                  >Idle</span
+                >
+              </div>
+
+              <!-- Stdin Output Console Text display box -->
+              <div
+                id="console-output-container"
+                class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative"
+              >
+                <pre
+                  id="output-console"
+                  class="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed"
+                >
 CodeVerse Online Terminal.
 Write code and click 'Run Code' to execute.
 <span class="terminal-cursor"></span></pre>
-          </div>
+              </div>
 
-          <!-- Live Preview Iframe Container (Web Lab) -->
-          <div id="preview-container" class="hidden flex-grow flex flex-col min-h-[300px] bg-white relative">
-             <iframe id="preview-frame" class="flex-grow w-full border-none bg-white" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
-             <!-- Web Dev Console Logs Panel -->
-             <div id="web-console" class="h-32 border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden">
-                <div class="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
-                   <div class="flex items-center gap-1.5">
+              <!-- Live Preview Iframe Container (Web Lab) -->
+              <div
+                id="preview-container"
+                class="hidden flex-grow flex flex-col min-h-[300px] bg-white relative"
+              >
+                <iframe
+                  id="preview-frame"
+                  class="flex-grow w-full border-none bg-white"
+                  sandbox="allow-scripts allow-modals allow-same-origin"
+                ></iframe>
+                <!-- Web Dev Console Logs Panel -->
+                <div
+                  id="web-console"
+                  class="h-32 border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden"
+                >
+                  <div
+                    class="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider"
+                  >
+                    <div class="flex items-center gap-1.5">
                       <i class="fas fa-bug text-rose-500/80"></i>
                       <span>Console Logs</span>
-                   </div>
-                   <button id="clear-web-console" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200" title="Clear Console">
+                    </div>
+                    <button
+                      id="clear-web-console"
+                      class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200"
+                      title="Clear Console"
+                    >
                       <i class="fas fa-trash-can"></i>
-                   </button>
+                    </button>
+                  </div>
+                  <div
+                    id="web-console-logs"
+                    class="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1 select-text scrollbar-thin"
+                  >
+                    <div class="text-[var(--text-muted)] italic">
+                      No console logs yet. Press Run to execute code.
+                    </div>
+                  </div>
                 </div>
-                <div id="web-console-logs" class="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1 select-text scrollbar-thin">
-                   <div class="text-[var(--text-muted)] italic">No console logs yet. Press Run to execute code.</div>
+              </div>
+
+              <!-- Execution metadata footer metrics -->
+              <div
+                class="h-10 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 grid grid-cols-2 divide-x divide-[var(--border-color)] text-[10px] font-mono text-[var(--text-muted)]"
+              >
+                <div class="flex items-center justify-center gap-1">
+                  <i class="fas fa-clock text-indigo-400/70"></i>
+                  <span>Time: </span>
+                  <span
+                    id="time-indicator"
+                    class="font-bold text-[var(--text-secondary)]"
+                    >-</span
+                  >
                 </div>
-             </div>
-          </div>
-
-          <!-- Execution metadata footer metrics -->
-          <div class="h-10 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 grid grid-cols-2 divide-x divide-[var(--border-color)] text-[10px] font-mono text-[var(--text-muted)]">
-            <div class="flex items-center justify-center gap-1">
-              <i class="fas fa-clock text-indigo-400/70"></i>
-              <span>Time: </span>
-              <span id="time-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
-            </div>
-            <div class="flex items-center justify-center gap-1">
-              <i class="fas fa-memory text-cyan-400/70"></i>
-              <span>Memory: </span>
-              <span id="memory-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
+                <div class="flex items-center justify-center gap-1">
+                  <i class="fas fa-memory text-cyan-400/70"></i>
+                  <span>Memory: </span>
+                  <span
+                    id="memory-indicator"
+                    class="font-bold text-[var(--text-secondary)]"
+                    >-</span
+                  >
+                </div>
+              </div>
             </div>
           </div>
-
         </div>
-
-      </div>
-
+      </main>
     </div>
 
-  </main>
-</div>
-
-  <!-- ==================== SETTINGS MODAL ==================== -->
-  <div id="settings-modal" class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden">
-    <div class="glass-panel w-full max-w-md rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl animate-fade-in-up">
-      
-      <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i class="fas fa-sliders text-indigo-400"></i>
-          <h3 class="font-bold text-[var(--text-primary)]">Compiler Settings</h3>
-        </div>
-        <button id="close-settings" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body Form -->
-      <div class="p-6 flex flex-col gap-4">
-        <div>
-          <label for="api-url-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Judge0 API Base URL</label>
-          <input type="text" id="api-url-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="https://ce.judge0.com">
-          <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
-            By default we use the Judge0 Community Edition testing instance. You can replace this with your self-hosted Docker URL or RapidAPI proxy.
-          </p>
+    <!-- ==================== SETTINGS MODAL ==================== -->
+    <div
+      id="settings-modal"
+      class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
+    >
+      <div
+        class="glass-panel w-full max-w-md rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl animate-fade-in-up"
+      >
+        <!-- Modal Header -->
+        <div
+          class="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-2">
+            <i class="fas fa-sliders text-indigo-400"></i>
+            <h3 class="font-bold text-[var(--text-primary)]">
+              Compiler Settings
+            </h3>
+          </div>
+          <button
+            id="close-settings"
+            class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
 
-        <div>
-          <label for="api-key-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">RapidAPI Host Key (x-rapidapi-key)</label>
-          <input type="password" id="api-key-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="••••••••••••••••••••••••••••••••">
-          <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
-            Only required if pointing to RapidAPI endpoint (e.g. <code>https://judge0-ce.p.rapidapi.com</code>). Leave empty for self-hosted instances.
-          </p>
+        <!-- Modal Body Form -->
+        <div class="p-6 flex flex-col gap-4">
+          <div>
+            <label
+              for="api-url-input"
+              class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+              >Judge0 API Base URL</label
+            >
+            <input
+              type="text"
+              id="api-url-input"
+              class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+              placeholder="https://ce.judge0.com"
+            />
+            <p
+              class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed"
+            >
+              By default we use the Judge0 Community Edition testing instance.
+              You can replace this with your self-hosted Docker URL or RapidAPI
+              proxy.
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="api-key-input"
+              class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+              >RapidAPI Host Key (x-rapidapi-key)</label
+            >
+            <input
+              type="password"
+              id="api-key-input"
+              class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+              placeholder="••••••••••••••••••••••••••••••••"
+            />
+            <p
+              class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed"
+            >
+              Only required if pointing to RapidAPI endpoint (e.g.
+              <code>https://judge0-ce.p.rapidapi.com</code>). Leave empty for
+              self-hosted instances.
+            </p>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div
+          class="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex justify-end gap-3"
+        >
+          <button
+            id="save-settings"
+            class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+          >
+            Save Configuration
+          </button>
         </div>
       </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex justify-end gap-3">
-        <button id="save-settings" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200">
-          Save Configuration
-        </button>
-      </div>
-
     </div>
-  </div>
 
-  <!-- ==================== FOOTER ==================== -->
-  <footer class="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/80 pt-16 pb-8 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12">
+    <!-- ==================== FOOTER ==================== -->
+    <footer
+      class="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/80 pt-16 pb-8 transition-all duration-300"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12">
           <!-- Col 1: Brand -->
           <div class="flex flex-col gap-4">
-             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-md">
-                   <i class="fas fa-cubes text-white text-sm"></i>
-                </div>
-                <span class="text-md font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">CodeVerse</span>
-             </div>
-             <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
-                An advanced online programming compiler and interactive web development playground built for developers worldwide.
-             </p>
-             <div class="flex items-center gap-3 mt-2">
-                <a href="https://github.com/judge0/judge0" target="_blank" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-                   <i class="fab fa-github text-sm"></i>
-                </a>
-                <a href="#" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-                   <i class="fab fa-twitter text-sm"></i>
-                </a>
-                <a href="#" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
-                   <i class="fab fa-discord text-sm"></i>
-                </a>
-             </div>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-md"
+              >
+                <i class="fas fa-cubes text-white text-sm"></i>
+              </div>
+              <span
+                class="text-md font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
+                >CodeVerse</span
+              >
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              An advanced online programming compiler and interactive web
+              development playground built for developers worldwide.
+            </p>
+            <div class="flex items-center gap-3 mt-2">
+              <a
+                href="https://github.com/judge0/judge0"
+                target="_blank"
+                class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              >
+                <i class="fab fa-github text-sm"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              >
+                <i class="fab fa-twitter text-sm"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-indigo-500/50 bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              >
+                <i class="fab fa-discord text-sm"></i>
+              </a>
+            </div>
           </div>
-          
+
           <!-- Col 2: Quick Links -->
           <div class="flex flex-col gap-3">
-             <h4 class="text-xs uppercase font-bold text-white tracking-wider mb-2">Platform</h4>
-             <a href="#hero" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Home</a>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Languages</a>
-             <a href="#features" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Features</a>
-             <a href="#about" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">About</a>
-             <a href="#contact" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Contact Us</a>
+            <h4
+              class="text-xs uppercase font-bold text-white tracking-wider mb-2"
+            >
+              Platform
+            </h4>
+            <a
+              href="#hero"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Home</a
+            >
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Languages</a
+            >
+            <a
+              href="#features"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Features</a
+            >
+            <a
+              href="#about"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >About</a
+            >
+            <a
+              href="#contact"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Contact Us</a
+            >
           </div>
 
           <!-- Col 3: Languages -->
           <div class="flex flex-col gap-3">
-             <h4 class="text-xs uppercase font-bold text-white tracking-wider mb-2">Popular Langs</h4>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">HTML / CSS / JS</a>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">C++ Compiler</a>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Python 3 Environment</a>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">JavaScript Node Workspace</a>
-             <a href="#languages" class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200">Rust Cargo Compiler</a>
+            <h4
+              class="text-xs uppercase font-bold text-white tracking-wider mb-2"
+            >
+              Popular Langs
+            </h4>
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >HTML / CSS / JS</a
+            >
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >C++ Compiler</a
+            >
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Python 3 Environment</a
+            >
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >JavaScript Node Workspace</a
+            >
+            <a
+              href="#languages"
+              class="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200"
+              >Rust Cargo Compiler</a
+            >
           </div>
 
           <!-- Col 4: Contact info -->
           <div class="flex flex-col gap-3">
-             <h4 class="text-xs uppercase font-bold text-white tracking-wider mb-2">Contact Info</h4>
-             <span class="text-xs text-[var(--text-secondary)] flex items-center gap-2">
-                <i class="fas fa-envelope text-indigo-400"></i>
-                <span>support@codeverse.dev</span>
-             </span>
-             <span class="text-xs text-[var(--text-secondary)] flex items-center gap-2">
-                <i class="fas fa-map-marker-alt text-indigo-400"></i>
-                <span>Global Workspace Server</span>
-             </span>
-             <span class="text-xs text-[var(--text-secondary)] flex items-center gap-2">
-                <i class="fas fa-shield-halved text-indigo-400"></i>
-                <span>Secure Sandbox Server</span>
-             </span>
+            <h4
+              class="text-xs uppercase font-bold text-white tracking-wider mb-2"
+            >
+              Contact Info
+            </h4>
+            <span
+              class="text-xs text-[var(--text-secondary)] flex items-center gap-2"
+            >
+              <i class="fas fa-envelope text-indigo-400"></i>
+              <span>support@codeverse.dev</span>
+            </span>
+            <span
+              class="text-xs text-[var(--text-secondary)] flex items-center gap-2"
+            >
+              <i class="fas fa-map-marker-alt text-indigo-400"></i>
+              <span>Global Workspace Server</span>
+            </span>
+            <span
+              class="text-xs text-[var(--text-secondary)] flex items-center gap-2"
+            >
+              <i class="fas fa-shield-halved text-indigo-400"></i>
+              <span>Secure Sandbox Server</span>
+            </span>
           </div>
-       </div>
+        </div>
 
-       <!-- Copyright section -->
-       <div class="border-t border-[var(--border-color)] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-[var(--text-muted)] font-mono">
+        <!-- Copyright section -->
+        <div
+          class="border-t border-[var(--border-color)] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-[var(--text-muted)] font-mono"
+        >
           <div>
-             &copy; 2026 CodeVerse IDE. Created for developers worldwide.
+            &copy; 2026 CodeVerse IDE. Created for developers worldwide.
           </div>
           <div class="flex items-center gap-4">
-             <span>Powered by <a href="https://judge0.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Judge0 API</a></span>
-             <span>Built with <a href="https://tailwindcss.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Tailwind Play</a></span>
+            <span
+              >Powered by
+              <a
+                href="https://judge0.com"
+                target="_blank"
+                class="hover:underline text-[var(--text-secondary)]"
+                >Judge0 API</a
+              ></span
+            >
+            <span
+              >Built with
+              <a
+                href="https://tailwindcss.com"
+                target="_blank"
+                class="hover:underline text-[var(--text-secondary)]"
+                >Tailwind Play</a
+              ></span
+            >
           </div>
-       </div>
-    </div>
-  </footer>
+        </div>
+      </div>
+    </footer>
 
-  <!-- ==================== LOAD SCRIPTS ==================== -->
-  <!-- Monaco Editor AMD loader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
-  
-  <!-- Core Logic Javascript Script -->
-  <script src="js/script.js?v=5"></script>
+    <!-- ==================== LOAD SCRIPTS ==================== -->
+    <!-- Monaco Editor AMD loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
-</body>
+    <!-- Core Logic Javascript Script -->
+    <script src="js/script.js?v=5"></script>
+  </body>
 </html>
