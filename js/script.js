@@ -585,7 +585,7 @@ if (btn) {
 
 // --- Application State ---
 let editor = null;
-let currentLanguage = localStorage.getItem("codeverse_lang") || "cpp";
+let currentLanguage = localStorage.getItem("codeverse_lang") || "html";
 let apiEndpoint = localStorage.getItem("codeverse_api_url") || DEFAULT_API_URL;
 let apiKey = localStorage.getItem("codeverse_api_key") || "";
 let isExecuting = false;
@@ -689,7 +689,7 @@ function switchWebTab(tabName) {
 }
 
 // --- Platform Routing and Views ---
-function showEditorView(langKey = "cpp") {
+function showEditorView(langKey = "html") {
   if (DOM.homeView) DOM.homeView.classList.add("hidden");
   if (DOM.editorView) DOM.editorView.classList.remove("hidden");
   
