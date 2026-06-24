@@ -688,6 +688,119 @@ function switchWebTab(tabName) {
   updateWebTabUI();
 }
 
+// --- Platform Routing and Views ---
+function showEditorView(langKey = "cpp") {
+  if (DOM.homeView) DOM.homeView.classList.add("hidden");
+  if (DOM.editorView) DOM.editorView.classList.remove("hidden");
+  
+  if (langKey && LANGUAGES[langKey]) {
+    DOM.langSelect.value = langKey;
+    handleLanguageChange({ target: { value: langKey } });
+  }
+  
+  if (editor) {
+    editor.layout();
+  }
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showHomeView(targetSectionId = null) {
+  if (DOM.editorView) DOM.editorView.classList.add("hidden");
+  if (DOM.homeView) DOM.homeView.classList.remove("hidden");
+  
+  if (targetSectionId) {
+    const el = document.getElementById(targetSectionId);
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+      return;
+    }
+  }
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// --- Live Auto-Typing Simulation Engine ---
+const DEMO_SNIPPETS = [
+  {
+    tab: "main.cpp",
+    code: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, CodeVerse C++!" << std::endl;\n    return 0;\n}`,
+    console: "Hello, CodeVerse C++!\n\n[Process completed with exit code 0]",
+    status: "Accepted",
+    time: "0.04s"
+  },
+  {
+    tab: "script.py",
+    code: `# Python Factorial function\ndef factorial(n):\n    return 1 if n <= 1 else n * factorial(n - 1)\n\nprint("Factorial of 5:", factorial(5))`,
+    console: "Factorial of 5: 120\n\n[Process completed with exit code 0]",
+    status: "Accepted",
+    time: "0.02s"
+  },
+  {
+    tab: "index.html",
+    code: `<!-- Live Web Layout Preview -->\n<div style="background:#4f46e5;color:white;padding:15px;border-radius:10px">\n   <h3>HTML Visual workbench</h3>\n   <p>Interactive preview render works!</p>\n</div>`,
+    console: "Web Sandbox Loaded.\nViewport: Rendered HTML/CSS/JS Sandbox Visuals successfully.",
+    status: "Web Sandbox",
+    time: "0.00s"
+  }
+];
+
+let currentDemoIndex = 0;
+let demoTypingInterval = null;
+
+function startDemoAnimation() {
+  const demoTabName = document.getElementById("demo-tab-name");
+  const demoEditorText = document.getElementById("demo-editor-text");
+  const demoConsoleText = document.getElementById("demo-console-text");
+  
+  if (!demoTabName || !demoEditorText || !demoConsoleText) return;
+  
+  function typeNextSnippet() {
+    const snippet = DEMO_SNIPPETS[currentDemoIndex];
+    demoTabName.textContent = snippet.tab;
+    demoEditorText.textContent = "";
+    demoConsoleText.textContent = "Compiling processes...";
+    
+    let charIndex = 0;
+    clearInterval(demoTypingInterval);
+    
+    demoTypingInterval = setInterval(() => {
+      if (charIndex < snippet.code.length) {
+        demoEditorText.textContent += snippet.code.charAt(charIndex);
+        charIndex++;
+      } else {
+        clearInterval(demoTypingInterval);
+        setTimeout(() => {
+          demoConsoleText.textContent = snippet.console;
+          setTimeout(() => {
+            eraseSnippet();
+          }, 4000);
+        }, 800);
+      }
+    }, 30);
+  }
+  
+  function eraseSnippet() {
+    let currentText = demoEditorText.textContent;
+    clearInterval(demoTypingInterval);
+    
+    demoTypingInterval = setInterval(() => {
+      if (currentText.length > 0) {
+        currentText = currentText.substring(0, currentText.length - 1);
+        demoEditorText.textContent = currentText;
+      } else {
+        clearInterval(demoTypingInterval);
+        currentDemoIndex = (currentDemoIndex + 1) % DEMO_SNIPPETS.length;
+        setTimeout(typeNextSnippet, 500);
+      }
+    }, 15);
+  }
+  
+  typeNextSnippet();
+}
+
 // Safe UTF-8 Base64 Encoding and Decoding Helpers
 function encodeBase64(str) {
   try {
@@ -749,7 +862,19 @@ const DOM = {
   webConsoleLogs: document.getElementById("web-console-logs"),
   clearWebConsoleBtn: document.getElementById("clear-web-console"),
   consoleHeaderTitle: document.getElementById("console-header-title"),
-  consoleHeaderIcon: document.getElementById("console-header-icon")
+  consoleHeaderIcon: document.getElementById("console-header-icon"),
+  
+  // Landing Page DOM Elements
+  homeView: document.getElementById("home-view"),
+  editorView: document.getElementById("editor-view"),
+  brandLogo: document.getElementById("brand-logo"),
+  navCtaBtn: document.getElementById("nav-cta-btn"),
+  mobileMenuBtn: document.getElementById("mobile-menu-btn"),
+  mobileNav: document.getElementById("mobile-nav"),
+  heroStartBtn: document.getElementById("hero-start-btn"),
+  backHomeBtn: document.getElementById("back-home-btn"),
+  mobileNavCta: document.getElementById("mobile-nav-cta"),
+  contactForm: document.getElementById("contact-form")
 };
 
 // --- Monaco Editor Initialization ---
@@ -832,7 +957,7 @@ function initMonaco() {
           verticalScrollbarSize: 8,
           horizontalScrollbarSize: 8
         },
-        cursorBlinking: 'blink',
+        cursorBlinking: 'smooth',
         cursorSmoothCaretAnimation: 'on',
         padding: { top: 12, bottom: 12 },
         roundedSelection: true,
@@ -862,7 +987,7 @@ function initMonaco() {
           verticalScrollbarSize: 8,
           horizontalScrollbarSize: 8
         },
-        cursorBlinking: 'blink',
+        cursorBlinking: 'smooth',
         cursorSmoothCaretAnimation: 'on',
         padding: { top: 12, bottom: 12 },
         roundedSelection: true,
@@ -1419,6 +1544,57 @@ function registerEventListeners() {
     }
   });
 
+  // Platform Navigation & View Controls
+  if (DOM.brandLogo) DOM.brandLogo.addEventListener("click", () => showHomeView());
+  if (DOM.navCtaBtn) DOM.navCtaBtn.addEventListener("click", () => showEditorView("cpp"));
+  if (DOM.heroStartBtn) DOM.heroStartBtn.addEventListener("click", () => showEditorView("cpp"));
+  if (DOM.backHomeBtn) DOM.backHomeBtn.addEventListener("click", () => showHomeView());
+  if (DOM.mobileNavCta) {
+    DOM.mobileNavCta.addEventListener("click", () => {
+      if (DOM.mobileNav) DOM.mobileNav.classList.add("hidden");
+      showEditorView("cpp");
+    });
+  }
+
+  // Mobile Hamburger toggler
+  if (DOM.mobileMenuBtn) {
+    DOM.mobileMenuBtn.addEventListener("click", () => {
+      if (DOM.mobileNav) DOM.mobileNav.classList.toggle("hidden");
+    });
+  }
+
+  // Language Cards Clicking Logic
+  const langCards = document.querySelectorAll(".lang-card");
+  langCards.forEach(card => {
+    card.addEventListener("click", () => {
+      const langKey = card.getAttribute("data-lang");
+      showEditorView(langKey);
+    });
+  });
+
+  // Scroll links for Landing page navigation links
+  const navLinks = document.querySelectorAll(".nav-link, .mobile-nav-link");
+  navLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetSectionId = link.getAttribute("href").substring(1);
+      
+      // Close mobile menu if open
+      if (DOM.mobileNav) DOM.mobileNav.classList.add("hidden");
+      
+      showHomeView(targetSectionId);
+    });
+  });
+
+  // Contact Form Submission
+  if (DOM.contactForm) {
+    DOM.contactForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Thank you! Your feedback has been sent.", "success");
+      DOM.contactForm.reset();
+    });
+  }
+
   // Setup Hotkeys (Ctrl+Enter to run code)
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -1487,6 +1663,9 @@ function initApp() {
   
   // Set initial selected value in dropdown matching local storage
   DOM.langSelect.value = currentLanguage;
+
+  // Start typing demo loop
+  startDemoAnimation();
 
   console.log(`${REPO_NAME} Initialized Successfully!`);
 }

@@ -305,3 +305,38 @@ body {
   color: #b45309;
   background-color: rgba(217, 119, 6, 0.05);
 }
+
+/* Platform Landing Animations & Custom Controls */
+html {
+  scroll-behavior: smooth;
+}
+
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--accent-primary);
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.lang-card {
+  transition: var(--transition-smooth);
+}
+.lang-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+}
+
+.light .lang-card:hover {
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.08);
+}
+
