@@ -26,7 +26,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Custom Styling override sheet (Dark/Light Variables) -->
-    <link rel="stylesheet" href="css/style.css?v=4" />
+    <link rel="stylesheet" href="css/style.css?v=5" />
   </head>
   <body
     class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]"
@@ -1046,82 +1046,111 @@ Hello World!</pre
           class="absolute inset-0 pointer-events-none z-0"
         ></canvas>
 
-        <!-- Glowing Background Mesh for Contact Card -->
-        <div
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-tr from-indigo-500/10 via-purple-500/5 to-cyan-500/10 blur-[100px] pointer-events-none z-0"
-        ></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <!-- Left Column: Contact details and support options -->
+            <div class="flex flex-col gap-8 text-left">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-[10px] font-semibold text-indigo-400 mb-4">
+                  <i class="fas fa-headset text-[9px]"></i>
+                  <span>24/7 Developer Support</span>
+                </span>
+                <h2 class="text-3xl font-extrabold tracking-tight text-white mb-4">
+                  Get in Touch
+                </h2>
+                <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+                  Have feedback, suggestions, or API connection issues? Drop us a
+                  message. Our compiler status monitors ensure logical sandbox resources stay up 24/7.
+                </p>
+              </div>
 
-        <div class="max-w-xl mx-auto relative z-10">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl font-extrabold tracking-tight text-white">
-              Get in Touch
-            </h2>
-            <p class="text-sm text-[var(--text-secondary)] mt-2">
-              Have feedback, suggestions, or API connection issues? Drop us a
-              message.
-            </p>
-          </div>
+              <!-- Quick Info Cards -->
+              <div class="flex flex-col gap-4">
+                <!-- Email Support Card -->
+                <div class="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-all duration-300">
+                  <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base">
+                    <i class="fas fa-envelope"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-white text-xs">Direct Support</h4>
+                    <p class="text-[10px] text-[var(--text-secondary)] mt-0.5">support@codeverse.dev</p>
+                  </div>
+                </div>
 
-          <!-- Glassmorphic Form -->
-          <form
-            id="contact-form"
-            class="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl"
-          >
-            <div>
-              <label
-                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
-                >Full Name</label
-              >
-              <div class="contact-input-wrapper">
+                <!-- Community Card -->
+                <div class="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-cyan-500/30 transition-all duration-300">
+                  <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base">
+                    <i class="fab fa-discord"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-white text-xs">Developer Discord</h4>
+                    <p class="text-[10px] text-[var(--text-secondary)] mt-0.5">discord.gg/codeverse</p>
+                  </div>
+                </div>
+
+                <!-- Active Status Indicator -->
+                <div class="flex items-center gap-2 px-1 text-xs text-[var(--text-secondary)] font-medium">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>All compiler sandboxes fully operational</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Glassmorphic Form -->
+            <form
+              id="contact-form"
+              class="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl text-left"
+            >
+              <div>
+                <label
+                  class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                  >Full Name</label
+                >
                 <input
                   type="text"
                   required
-                  class="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none transition-all duration-200 contact-input-field"
+                  class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
                   placeholder="John Doe"
                 />
-                <i class="fas fa-user"></i>
               </div>
-            </div>
 
-            <div>
-              <label
-                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
-                >Email Address</label
-              >
-              <div class="contact-input-wrapper">
+              <div>
+                <label
+                  class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                  >Email Address</label
+                >
                 <input
                   type="email"
                   required
-                  class="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none transition-all duration-200 contact-input-field"
+                  class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
                   placeholder="john@example.com"
                 />
-                <i class="fas fa-envelope"></i>
               </div>
-            </div>
 
-            <div>
-              <label
-                class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
-                >Message</label
-              >
-              <div class="contact-input-wrapper">
+              <div>
+                <label
+                  class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2"
+                  >Message</label
+                >
                 <textarea
                   required
                   rows="4"
-                  class="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none transition-all duration-200 resize-none contact-input-field"
+                  class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
                   placeholder="Enter your comments or questions..."
                 ></textarea>
-                <i class="fas fa-comment"></i>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              class="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
-            >
-              Send Message
-            </button>
-          </form>
+              <button
+                type="submit"
+                class="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
         </div>
       </section>
     </div>
@@ -1737,6 +1766,6 @@ Write code and click 'Run Code' to execute.
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
     <!-- Core Logic Javascript Script -->
-    <script src="js/script.js?v=22"></script>
+    <script src="js/script.js?v=23"></script>
   </body>
 </html>
