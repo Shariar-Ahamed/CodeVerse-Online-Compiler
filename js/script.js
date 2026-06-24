@@ -1546,6 +1546,13 @@ function registerEventListeners() {
     }
   });
 
+  // Handle Monaco Editor resize responsiveness
+  window.addEventListener("resize", () => {
+    if (editor) {
+      editor.layout();
+    }
+  });
+
   // Platform Navigation & View Controls
   if (DOM.brandLogo) DOM.brandLogo.addEventListener("click", () => showHomeView());
   if (DOM.navCtaBtn) DOM.navCtaBtn.addEventListener("click", () => showEditorView("cpp"));
