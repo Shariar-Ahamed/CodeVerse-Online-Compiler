@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeVerse Online Compiler - Live IDE Editor</title>
+  
+  <!-- FontAwesome Icons for modern UI buttons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Google Fonts for sleek developer experience -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Styling override sheet (Dark/Light Variables) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]">
+
+  <!-- ==================== HEADER / NAVBAR ==================== -->
+  <header class="w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 sticky top-0 z-30 backdrop-blur-md transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo & Name -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fas fa-cubes text-white text-lg animate-pulse"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            CodeVerse
+          </h1>
+          <p class="text-[10px] text-[var(--text-secondary)] font-medium -mt-1 tracking-wider uppercase">
+            Online Compiler
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Navigation Toolbar -->
+      <div class="flex items-center gap-3">
+        <!-- Settings Modal Trigger -->
+        <button id="settings-btn" class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200" title="API Credentials Configuration">
+          <i class="fas fa-sliders text-sm"></i>
+        </button>
+
+        <!-- Theme Toggle Switch -->
+        <button id="theme-toggle" class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200" title="Toggle Light/Dark Theme">
+          <i id="theme-icon" class="fas fa-sun text-sm"></i>
+        </button>
+
+        <!-- Help Info Link -->
+        <a href="https://github.com/judge0/judge0" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+          <i class="fab fa-github"></i>
+          <span>Docs</span>
+        </a>
+      </div>
+      
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE CONTAINER ==================== -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
+    
+    <!-- ==================== COMPILER CONTROLS PANEL ==================== -->
+    <div class="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
+      
+      <!-- Selection of Language with Dynamic Icon badge -->
+      <div class="flex items-center gap-3">
+        <label for="language-select" class="text-sm font-semibold text-[var(--text-secondary)]">Language:</label>
+        <div class="relative">
+          <select id="language-select" class="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200">
+            <option value="c">C (GCC 9.2.0)</option>
+            <option value="cpp">C++ (GCC 9.2.0)</option>
+            <option value="python">Python 3 (3.8.1)</option>
+            <option value="javascript">JavaScript (NodeJS 12.14.0)</option>
+            <option value="java">Java (OpenJDK 13.0.1)</option>
+            <option value="php">PHP (7.4.1)</option>
+            <option value="bash">Bash Shell (5.0.0)</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
+            <i class="fas fa-chevron-down text-[10px]"></i>
+          </div>
+        </div>
+        <span id="lang-badge" class="px-2 py-0.5 rounded text-xs font-semibold badge-cpp">C++</span>
+      </div>
+
+      <!-- Action Button Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Clear Console Output Button -->
+        <button id="clear-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+          <i class="fas fa-eraser"></i>
+          <span>Clear</span>
+        </button>
+
+        <!-- Copy Code to Clipboard Button -->
+        <button id="copy-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+          <i class="fas fa-copy"></i>
+          <span>Copy</span>
+        </button>
+
+        <!-- Download Code File Button -->
+        <button id="download-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+          <i class="fas fa-download"></i>
+          <span>Download</span>
+        </button>
+
+        <!-- Execute / Run Code Trigger Button -->
+        <button id="run-btn" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200">
+          <i id="run-icon" class="fas fa-play text-xs"></i>
+          <div id="run-spinner" class="spinner hidden"></div>
+          <span id="run-text">Run Code</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== SPLIT EDITOR AND TERMINAL SECTION ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow">
+      
+      <!-- Monaco Code Editor Area (Occupies 2 columns on large displays) -->
+      <div class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+        
+        <!-- Tab Bar Header -->
+        <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-code text-indigo-400 text-xs"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
+          </div>
+        </div>
+
+        <!-- Monaco Editor Div wrapper -->
+        <div class="flex-grow min-h-[450px] relative">
+          <div id="editor-container" class="absolute inset-0 w-full h-full"></div>
+        </div>
+
+        <!-- Editor Status bar -->
+        <div class="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-4 text-[10px] text-[var(--text-muted)] font-mono">
+          <div>Status: Ready to edit</div>
+          <div>Shortcut: Ctrl + Enter to run</div>
+        </div>
+
+      </div>
+
+      <!-- Input Stdin / Console Output Panel (Occupies 1 column) -->
+      <div class="flex flex-col gap-6">
+        
+        <!-- Standard Input (Stdin) Area -->
+        <div class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
+          <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Standard Input (Stdin)</span>
+            </div>
+            <span class="text-[10px] text-[var(--text-muted)] font-mono">Optional</span>
+          </div>
+          <textarea id="stdin-area" class="w-full h-24 p-3 bg-[var(--console-bg)] text-[var(--text-primary)] border-none resize-none focus:outline-none focus:ring-0 font-mono text-xs placeholder:text-[var(--text-muted)] placeholder:italic" placeholder="Enter input arguments for your script run here..."></textarea>
+        </div>
+
+        <!-- Output Terminal Panel -->
+        <div class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+          
+          <!-- Terminal Header Bar -->
+          <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-terminal text-emerald-400 text-xs"></i>
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
+            </div>
+            <!-- Dynamic Status Badge -->
+            <span id="status-badge" class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30">Idle</span>
+          </div>
+
+          <!-- Stdin Output Console Text display box -->
+          <div class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
+            <pre id="output-console" class="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
+CodeVerse Online Terminal.
+Write code and click 'Run Code' to execute.
+<span class="terminal-cursor"></span></pre>
+          </div>
+
+          <!-- Execution metadata footer metrics -->
+          <div class="h-10 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 grid grid-cols-2 divide-x divide-[var(--border-color)] text-[10px] font-mono text-[var(--text-muted)]">
+            <div class="flex items-center justify-center gap-1">
+              <i class="fas fa-clock text-indigo-400/70"></i>
+              <span>Time: </span>
+              <span id="time-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
+            </div>
+            <div class="flex items-center justify-center gap-1">
+              <i class="fas fa-memory text-cyan-400/70"></i>
+              <span>Memory: </span>
+              <span id="memory-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== SETTINGS MODAL ==================== -->
+  <div id="settings-modal" class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden">
+    <div class="glass-panel w-full max-w-md rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl animate-fade-in-up">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-sliders text-indigo-400"></i>
+          <h3 class="font-bold text-[var(--text-primary)]">Compiler Settings</h3>
+        </div>
+        <button id="close-settings" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body Form -->
+      <div class="p-6 flex flex-col gap-4">
+        <div>
+          <label for="api-url-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Judge0 API Base URL</label>
+          <input type="text" id="api-url-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="https://ce.judge0.com">
+          <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+            By default we use the Judge0 Community Edition testing instance. You can replace this with your self-hosted Docker URL or RapidAPI proxy.
+          </p>
+        </div>
+
+        <div>
+          <label for="api-key-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">RapidAPI Host Key (x-rapidapi-key)</label>
+          <input type="password" id="api-key-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="••••••••••••••••••••••••••••••••">
+          <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+            Only required if pointing to RapidAPI endpoint (e.g. <code>https://judge0-ce.p.rapidapi.com</code>). Leave empty for self-hosted instances.
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex justify-end gap-3">
+        <button id="save-settings" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200">
+          Save Configuration
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50 py-4 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-[var(--text-muted)] font-mono">
+      <div>
+        &copy; 2026 CodeVerse IDE. Created for developers worldwide.
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Powered by <a href="https://judge0.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Judge0 API</a></span>
+        <span>Built with <a href="https://tailwindcss.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Tailwind Play</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== LOAD SCRIPTS ==================== -->
+  <!-- Monaco Editor AMD loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+  
+  <!-- Core Logic Javascript Script -->
+  <script src="js/script.js"></script>
+
+</body>
+</html>
