@@ -244,8 +244,31 @@ function initMonaco() {
   require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
   
   require(['vs/editor/editor.main'], function() {
-    // Custom VS-like Dark/Light themes can be registered if wanted, 
-    // but the built-in 'vs-dark' and 'vs' are excellent.
+    // Define Dracula theme for Monaco Editor
+    monaco.editor.defineTheme('dracula', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '6272a4', fontStyle: 'italic' },
+        { token: 'keyword', foreground: 'ff79c6' },
+        { token: 'identifier', foreground: 'f8f8f2' },
+        { token: 'string', foreground: 'f1fa8c' },
+        { token: 'number', foreground: 'bd93f9' },
+        { token: 'operator', foreground: 'ff79c6' },
+        { token: 'type', foreground: '8be9fd', fontStyle: 'italic' },
+        { token: 'class', foreground: '50fa7b' },
+        { token: 'function', foreground: '50fa7b' }
+      ],
+      colors: {
+        'editor.background': '#282a36',
+        'editor.foreground': '#f8f8f2',
+        'editor.lineHighlightBackground': '#44475a',
+        'editorCursor.foreground': '#f8f8f2',
+        'editor.selectionBackground': '#44475a',
+        'editor.inactiveSelectionBackground': '#44475a44',
+        'editor.lineHighlightBorder': '#282a36'
+      }
+    });
     
     // Retrieve saved code or set default
     const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`);
@@ -254,9 +277,10 @@ function initMonaco() {
     editor = monaco.editor.create(document.getElementById('editor-container'), {
       value: initialCode,
       language: LANGUAGES[currentLanguage].monacoId,
-      theme: document.documentElement.classList.contains('light') ? 'vs' : 'vs-dark',
+      theme: document.documentElement.classList.contains('light') ? 'vs' : 'dracula',
       fontSize: 14,
-      fontFamily: 'JetBrains Mono, Fira Code, monospace',
+      fontFamily: 'Fira Code, JetBrains Mono, monospace',
+      fontLigatures: true,
       automaticLayout: true,
       minimap: { enabled: true },
       scrollbar: {
@@ -305,13 +329,13 @@ function toggleTheme() {
   
   // Toggle Monaco Theme
   if (editor) {
-    monaco.editor.setTheme(isLight ? 'vs' : 'vs-dark');
+    monaco.editor.setTheme(isLight ? 'vs' : 'dracula');
   }
   
   // Toggle icons
   DOM.themeIcon.className = isLight ? "fas fa-moon" : "fas fa-sun";
   
-  showToast(isLight ? "Light Mode Active" : "Dark Mode Active");
+  showToast(isLight ? "Light Mode Active" : "Dracula Theme Active");
 }
 
 // --- Dynamic Badge Helper ---
