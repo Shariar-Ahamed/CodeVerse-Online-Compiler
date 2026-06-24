@@ -340,3 +340,9 @@ html {
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.08);
 }
 
+/* Monaco Editor Cursor Custom Color */
+.monaco-editor .cursors-layer .cursor {
+  background-color: #08CB00 !important;
+  border-color: #08CB00 !important;
+}
+
