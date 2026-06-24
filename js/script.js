@@ -874,7 +874,9 @@ const DOM = {
   heroStartBtn: document.getElementById("hero-start-btn"),
   backHomeBtn: document.getElementById("back-home-btn"),
   mobileNavCta: document.getElementById("mobile-nav-cta"),
-  contactForm: document.getElementById("contact-form")
+  contactForm: document.getElementById("contact-form"),
+  hero: document.getElementById("hero"),
+  heroSpotlight: document.getElementById("hero-spotlight")
 };
 
 // --- Monaco Editor Initialization ---
@@ -1592,6 +1594,449 @@ function registerEventListeners() {
       e.preventDefault();
       showToast("Thank you! Your feedback has been sent.", "success");
       DOM.contactForm.reset();
+    });
+  }
+
+  // ==================== MULTIPLE INTERACTIVE CURSOR SECTIONS ====================
+
+  // 1. Option 4: Interactive Background Grid on Hero Section
+  const heroEl = document.getElementById("hero");
+  const heroCanvas = document.getElementById("hero-particles");
+  if (heroEl && heroCanvas) {
+    const ctx = heroCanvas.getContext("2d");
+    let gridPoints = [];
+    let animationFrameId = null;
+    let mouse = { x: null, y: null, active: false };
+
+    function initGrid() {
+      gridPoints = [];
+      const rect = heroEl.getBoundingClientRect();
+      heroCanvas.width = rect.width;
+      heroCanvas.height = rect.height;
+
+      const spacing = 35;
+      for (let y = spacing / 2; y < heroCanvas.height; y += spacing) {
+        for (let x = spacing / 2; x < heroCanvas.width; x += spacing) {
+          gridPoints.push({
+            x: x,
+            y: y,
+            originX: x,
+            originY: y,
+            color: "rgba(129, 140, 248, 0.25)"
+          });
+        }
+      }
+    }
+
+    initGrid();
+    window.addEventListener("resize", initGrid);
+
+    function animateGrid() {
+      ctx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+      let needsUpdating = false;
+
+      for (let i = 0; i < gridPoints.length; i++) {
+        const pt = gridPoints[i];
+        let dx = 0, dy = 0, dist = Infinity;
+
+        if (mouse.active && mouse.x !== null && mouse.y !== null) {
+          dx = mouse.x - pt.originX;
+          dy = mouse.y - pt.originY;
+          dist = Math.sqrt(dx * dx + dy * dy);
+        }
+
+        const maxDist = 100;
+        let targetX = pt.originX;
+        let targetY = pt.originY;
+        let size = 1.2;
+        let opacity = 0.25;
+
+        if (dist < maxDist) {
+          const force = (maxDist - dist) / maxDist;
+          const angle = Math.atan2(dy, dx);
+          targetX = pt.originX - Math.cos(angle) * force * 15;
+          targetY = pt.originY - Math.sin(angle) * force * 15;
+          size = 1.2 + force * 1.5;
+          opacity = 0.25 + force * 0.55;
+          pt.color = `rgba(34, 211, 238, ${opacity})`;
+        } else {
+          pt.color = `rgba(129, 140, 248, 0.25)`;
+        }
+
+        const diffX = targetX - pt.x;
+        const diffY = targetY - pt.y;
+        pt.x += diffX * 0.15;
+        pt.y += diffY * 0.15;
+
+        if (Math.abs(diffX) > 0.05 || Math.abs(diffY) > 0.05) {
+          needsUpdating = true;
+        }
+
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = pt.color;
+        ctx.fill();
+      }
+
+      if (mouse.active || needsUpdating) {
+        animationFrameId = requestAnimationFrame(animateGrid);
+      } else {
+        animationFrameId = null;
+      }
+    }
+
+    heroEl.addEventListener("mousemove", (e) => {
+      const rect = heroEl.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.active = true;
+      if (!animationFrameId) animateGrid();
+    });
+
+    heroEl.addEventListener("mouseenter", () => {
+      mouse.active = true;
+      if (!animationFrameId) animateGrid();
+    });
+
+    heroEl.addEventListener("mouseleave", () => {
+      mouse.active = false;
+      mouse.x = null;
+      mouse.y = null;
+      if (!animationFrameId) animateGrid();
+    });
+  }
+
+  // 2. Option 3: Swirling Galaxy / Vortex Helper (Initialized on both Languages & About Sections)
+  function initGalaxyEffect(elementId, canvasId) {
+    const parentEl = document.getElementById(elementId);
+    const canvas = document.getElementById(canvasId);
+    if (!parentEl || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let animationFrameId = null;
+
+    const colors = [
+      "rgba(99, 102, 241, ",  // Indigo
+      "rgba(168, 85, 247, ",  // Purple
+      "rgba(34, 211, 238, ",  // Cyan
+      "rgba(8, 203, 0, ",     // Neon Green
+      "rgba(255, 121, 198, "  // Hot Pink
+    ];
+
+    function resizeCanvas() {
+      const rect = parentEl.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    class GalaxyParticle {
+      constructor(x, y) {
+        this.startX = x;
+        this.startY = y;
+        this.angle = Math.random() * Math.PI * 2;
+        this.spinSpeed = (Math.random() * 0.08 + 0.04) * (Math.random() > 0.5 ? 1 : -1);
+        this.radius = Math.random() * 4 + 2;
+        this.radiusExpansion = Math.random() * 1.2 + 0.6;
+        this.size = Math.random() * 2 + 0.8;
+        this.colorPrefix = colors[Math.floor(Math.random() * colors.length)];
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.02 + 0.015;
+      }
+
+      update() {
+        this.angle += this.spinSpeed;
+        this.radius += this.radiusExpansion;
+        this.x = this.startX + Math.cos(this.angle) * this.radius;
+        this.y = this.startY + Math.sin(this.angle) * this.radius;
+        this.alpha -= this.decay;
+        if (this.size > 0.1) this.size -= 0.01;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.colorPrefix + this.alpha + ")";
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.colorPrefix + "1)";
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function animateGalaxy() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        if (p.alpha <= 0 || p.size <= 0.1) {
+          particles.splice(i, 1);
+        } else {
+          p.draw();
+        }
+      }
+
+      if (particles.length > 0) {
+        animationFrameId = requestAnimationFrame(animateGalaxy);
+      } else {
+        animationFrameId = null;
+      }
+    }
+
+    parentEl.addEventListener("mousemove", (e) => {
+      const rect = parentEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (particles.length < 150) {
+        for (let i = 0; i < 3; i++) {
+          particles.push(new GalaxyParticle(x, y));
+        }
+      }
+
+      if (!animationFrameId) {
+        animateGalaxy();
+      }
+    });
+  }
+
+  // Bind Swirling Galaxy to both Supported Languages & About sections
+  initGalaxyEffect("languages", "languages-particles");
+  initGalaxyEffect("about", "about-particles");
+
+  // 3. Option 2: Sparkler with Gravity in Features Section
+  const featEl = document.getElementById("features");
+  const featCanvas = document.getElementById("features-particles");
+  if (featEl && featCanvas) {
+    const ctx = featCanvas.getContext("2d");
+    let particles = [];
+    let animationFrameId = null;
+
+    const colors = [
+      "rgba(251, 191, 36, ",  // Amber/Gold
+      "rgba(251, 146, 60, ",  // Orange
+      "rgba(244, 63, 94, ",   // Rose
+      "rgba(168, 85, 247, ",  // Purple
+      "rgba(34, 211, 238, "   // Cyan
+    ];
+
+    function resizeFeatCanvas() {
+      const rect = featEl.getBoundingClientRect();
+      featCanvas.width = rect.width;
+      featCanvas.height = rect.height;
+    }
+
+    resizeFeatCanvas();
+    window.addEventListener("resize", resizeFeatCanvas);
+
+    class SparklerParticle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 2.5 + 1;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 1.5 + 0.5;
+        this.speedX = Math.cos(angle) * speed;
+        this.speedY = Math.sin(angle) * speed - 0.6;
+        this.colorPrefix = colors[Math.floor(Math.random() * colors.length)];
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.02 + 0.015;
+        this.gravity = 0.045;
+      }
+
+      update() {
+        this.speedY += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+        if (this.size > 0.1) this.size -= 0.02;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.colorPrefix + this.alpha + ")";
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.colorPrefix + "1)";
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function animateSparkler() {
+      ctx.clearRect(0, 0, featCanvas.width, featCanvas.height);
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        if (p.alpha <= 0 || p.size <= 0.1) {
+          particles.splice(i, 1);
+        } else {
+          p.draw();
+        }
+      }
+
+      if (particles.length > 0) {
+        animationFrameId = requestAnimationFrame(animateSparkler);
+      } else {
+        animationFrameId = null;
+      }
+    }
+
+    featEl.addEventListener("mousemove", (e) => {
+      const rect = featEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (particles.length < 120) {
+        for (let i = 0; i < 3; i++) {
+          particles.push(new SparklerParticle(x, y));
+        }
+      }
+
+      if (!animationFrameId) {
+        animateSparkler();
+      }
+    });
+  }
+
+  // 4. Option 1: Constellation Mesh Helper (Initialized on both Live Demo & Contact Sections)
+  function initConstellationEffect(elementId, canvasId) {
+    const parentEl = document.getElementById(elementId);
+    const canvas = document.getElementById(canvasId);
+    if (!parentEl || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let animationFrameId = null;
+
+    const colors = [
+      "rgba(99, 102, 241, ",  // Indigo
+      "rgba(168, 85, 247, ",  // Purple
+      "rgba(34, 211, 238, ",  // Cyan
+      "rgba(8, 203, 0, ",     // Neon Green
+      "rgba(255, 121, 198, "  // Hot Pink
+    ];
+
+    function resizeCanvas() {
+      const rect = parentEl.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    class ConstellationParticle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 1.5;
+        this.speedY = (Math.random() - 0.5) * 1.5;
+        this.colorPrefix = colors[Math.floor(Math.random() * colors.length)];
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.015 + 0.01;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.colorPrefix + this.alpha + ")";
+        ctx.fill();
+      }
+    }
+
+    function animateConstellation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      ctx.save();
+      const maxDistance = 75;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < maxDistance) {
+            const avgAlpha = (particles[i].alpha + particles[j].alpha) / 2;
+            const lineAlpha = (1 - dist / maxDistance) * avgAlpha * 0.45;
+            
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(129, 140, 248, ${lineAlpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
+      }
+
+      if (particles.length > 0) {
+        animationFrameId = requestAnimationFrame(animateConstellation);
+      } else {
+        animationFrameId = null;
+      }
+    }
+
+    parentEl.addEventListener("mousemove", (e) => {
+      const rect = parentEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (particles.length < 80) {
+        for (let i = 0; i < 2; i++) {
+          particles.push(new ConstellationParticle(x, y));
+        }
+      }
+
+      if (!animationFrameId) {
+        animateConstellation();
+      }
+    });
+  }
+
+  // Bind Constellation Mesh to both See CodeVerse in Action & Get in Touch sections
+  initConstellationEffect("live-demo", "live-demo-particles");
+  initConstellationEffect("contact", "contact-particles");
+  // Back to Top button scroll and click listener
+  const backToTopBtn = document.getElementById("back-to-top");
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.remove("translate-y-20", "opacity-0", "pointer-events-none");
+        backToTopBtn.classList.add("translate-y-0", "opacity-100");
+      } else {
+        backToTopBtn.classList.add("translate-y-20", "opacity-0", "pointer-events-none");
+        backToTopBtn.classList.remove("translate-y-0", "opacity-100");
+      }
+    });
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
 

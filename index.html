@@ -185,6 +185,12 @@
           class="absolute bottom-10 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px]"
         ></div>
 
+        <!-- Interactive Canvas for Particle Trail -->
+        <canvas
+          id="hero-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
         <div
           class="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center"
         >
@@ -237,7 +243,13 @@
         id="languages"
         class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative animate-fade-in-up"
       >
-        <div class="max-w-7xl mx-auto">
+        <!-- Interactive Canvas for Swirling Galaxy -->
+        <canvas
+          id="languages-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
+        <div class="max-w-7xl mx-auto relative z-10">
           <div class="text-center mb-16">
             <h2 class="text-3xl font-extrabold tracking-tight text-white">
               Supported Languages & Workspaces
@@ -799,9 +811,15 @@
       <!-- Live Demo Typing Section -->
       <section
         id="live-demo"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)]"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] relative"
       >
-        <div class="max-w-7xl mx-auto">
+        <!-- Interactive Canvas for Constellation Mesh -->
+        <canvas
+          id="live-demo-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
+        <div class="max-w-7xl mx-auto relative z-10">
           <div class="text-center mb-16">
             <h2 class="text-3xl font-extrabold tracking-tight text-white">
               See CodeVerse in Action
@@ -889,9 +907,15 @@ Hello World!</pre
       <!-- Features Section -->
       <section
         id="features"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative"
       >
-        <div class="max-w-7xl mx-auto">
+        <!-- Interactive Canvas for Sparkler -->
+        <canvas
+          id="features-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
+        <div class="max-w-7xl mx-auto relative z-10">
           <div class="text-center mb-16">
             <h2 class="text-3xl font-extrabold tracking-tight text-white">
               Full-Featured Coding Workspaces
@@ -982,9 +1006,15 @@ Hello World!</pre
       <!-- About Section -->
       <section
         id="about"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)]"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)] relative"
       >
-        <div class="max-w-4xl mx-auto text-center">
+        <!-- Interactive Canvas for Swirling Galaxy -->
+        <canvas
+          id="about-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
           <h2 class="text-3xl font-extrabold tracking-tight text-white mb-6">
             About CodeVerse
           </h2>
@@ -1008,9 +1038,15 @@ Hello World!</pre
       <!-- Contact Section -->
       <section
         id="contact"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)]"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative"
       >
-        <div class="max-w-xl mx-auto">
+        <!-- Interactive Canvas for Constellation Mesh -->
+        <canvas
+          id="contact-particles"
+          class="absolute inset-0 pointer-events-none z-0"
+        ></canvas>
+
+        <div class="max-w-xl mx-auto relative z-10">
           <div class="text-center mb-12">
             <h2 class="text-3xl font-extrabold tracking-tight text-white">
               Get in Touch
@@ -1673,11 +1709,20 @@ Write code and click 'Run Code' to execute.
       </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button
+      id="back-to-top"
+      class="fixed bottom-6 right-6 p-3.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)]/80 text-[var(--text-secondary)] hover:text-white shadow-lg shadow-black/20 backdrop-blur-md translate-y-20 opacity-0 pointer-events-none transition-all duration-300 z-50 hover:border-indigo-500/50 hover:bg-indigo-600/10 active:scale-95 flex items-center justify-center"
+      title="Go to Top"
+    >
+      <i class="fas fa-arrow-up text-sm"></i>
+    </button>
+
     <!-- ==================== LOAD SCRIPTS ==================== -->
     <!-- Monaco Editor AMD loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
     <!-- Core Logic Javascript Script -->
-    <script src="js/script.js?v=5"></script>
+    <script src="js/script.js?v=19"></script>
   </body>
 </html>
