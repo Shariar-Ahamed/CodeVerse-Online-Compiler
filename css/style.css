@@ -223,6 +223,7 @@ body {
 .badge-erlang { background-color: rgba(239, 68, 68, 0.15); color: #ff5555; border: 1px solid rgba(239, 68, 68, 0.3); }
 .badge-clojure { background-color: rgba(16, 185, 129, 0.15); color: #50fa7b; border: 1px solid rgba(16, 185, 129, 0.3); }
 .badge-d { background-color: rgba(239, 68, 68, 0.15); color: #ff5555; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-html { background-color: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
 
 /* Animation Utility: Fade In Up */
 .animate-fade-in-up {
@@ -244,4 +245,63 @@ body {
 .modal-overlay {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* Web Console Custom Logging Styles */
+#web-console-logs::-webkit-scrollbar {
+  width: 4px;
+}
+#web-console-logs::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.console-log-item {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  word-break: break-all;
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+}
+.light .console-log-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.console-log-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.console-log-body {
+  padding-left: 14px;
+  white-space: pre-wrap;
+}
+
+.console-log-info {
+  color: var(--text-secondary);
+}
+.light .console-log-info {
+  color: #334155;
+}
+
+.console-log-error {
+  color: #f87171;
+  background-color: rgba(239, 68, 68, 0.08);
+}
+.light .console-log-error {
+  color: #b91c1c;
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+.console-log-warn {
+  color: #fbbf24;
+  background-color: rgba(245, 158, 11, 0.08);
+}
+.light .console-log-warn {
+  color: #b45309;
+  background-color: rgba(217, 119, 6, 0.05);
 }

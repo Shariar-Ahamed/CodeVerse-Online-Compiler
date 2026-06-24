@@ -73,6 +73,7 @@
         <label for="language-select" class="text-sm font-semibold text-[var(--text-secondary)]">Language:</label>
         <div class="relative">
           <select id="language-select" class="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200">
+            <option value="html">HTML/CSS/JS (Web Lab)</option>
             <option value="c">C (GCC 9.2.0)</option>
             <option value="cpp">C++ (GCC 9.2.0)</option>
             <option value="csharp">C# (Mono 6.6.0)</option>
@@ -147,9 +148,17 @@
         
         <!-- Tab Bar Header -->
         <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-code text-indigo-400 text-xs"></i>
-            <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
+          <div class="flex items-center gap-4">
+            <div id="editor-title-container" class="flex items-center gap-2">
+              <i class="fas fa-code text-indigo-400 text-xs"></i>
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
+            </div>
+            <!-- Web Lab Editor Tabs -->
+            <div id="web-editor-tabs" class="hidden flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border-color)]">
+              <button id="tab-html" class="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-600 text-white transition-all duration-200" data-tab="html">index.html</button>
+              <button id="tab-css" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="css">style.css</button>
+              <button id="tab-js" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="js">script.js</button>
+            </div>
           </div>
           <div class="flex items-center gap-1.5">
             <span class="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
@@ -175,7 +184,7 @@
       <div class="flex flex-col gap-6">
         
         <!-- Standard Input (Stdin) Area -->
-        <div class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
+        <div id="stdin-container" class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
           <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
             <div class="flex items-center gap-2">
               <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
@@ -192,19 +201,39 @@
           <!-- Terminal Header Bar -->
           <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
             <div class="flex items-center gap-2">
-              <i class="fas fa-terminal text-emerald-400 text-xs"></i>
-              <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
+              <i id="console-header-icon" class="fas fa-terminal text-emerald-400 text-xs"></i>
+              <span id="console-header-title" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
             </div>
             <!-- Dynamic Status Badge -->
             <span id="status-badge" class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30">Idle</span>
           </div>
 
           <!-- Stdin Output Console Text display box -->
-          <div class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
+          <div id="console-output-container" class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
             <pre id="output-console" class="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
 CodeVerse Online Terminal.
 Write code and click 'Run Code' to execute.
 <span class="terminal-cursor"></span></pre>
+          </div>
+
+          <!-- Live Preview Iframe Container (Web Lab) -->
+          <div id="preview-container" class="hidden flex-grow flex flex-col min-h-[300px] bg-white relative">
+             <iframe id="preview-frame" class="flex-grow w-full border-none bg-white" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
+             <!-- Web Dev Console Logs Panel -->
+             <div id="web-console" class="h-32 border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden">
+                <div class="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
+                   <div class="flex items-center gap-1.5">
+                      <i class="fas fa-bug text-rose-500/80"></i>
+                      <span>Console Logs</span>
+                   </div>
+                   <button id="clear-web-console" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200" title="Clear Console">
+                      <i class="fas fa-trash-can"></i>
+                   </button>
+                </div>
+                <div id="web-console-logs" class="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1 select-text scrollbar-thin">
+                   <div class="text-[var(--text-muted)] italic">No console logs yet. Press Run to execute code.</div>
+                </div>
+             </div>
           </div>
 
           <!-- Execution metadata footer metrics -->

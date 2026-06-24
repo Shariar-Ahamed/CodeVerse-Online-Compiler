@@ -486,8 +486,102 @@ start() ->
 void main() {
     writeln("Hello, CodeVerse D Workspace!");
 }`
+  },
+  html: {
+    id: "html",
+    name: "HTML/CSS/JS",
+    monacoId: "html",
+    extension: "html",
+    badgeClass: "badge-html",
+    defaultCode: `<!-- HTML Structure -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeVerse Live Preview</title>
+</head>
+<body>
+    <div class="card">
+        <h1>Welcome to CodeVerse!</h1>
+        <p>This is a live frontend development playground.</p>
+        <button id="btn">Click Me!</button>
+    </div>
+</body>
+</html>`
   }
 };
+
+// --- Web Lab Default Templates ---
+const DEFAULT_WEB_CSS = `/* CSS Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e1e38 0%, #0d0d1a 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+h1 {
+    margin-top: 0;
+    background: linear-gradient(to right, #a5b4fc, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+}
+
+p {
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+button {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+button:active {
+    transform: translateY(1px);
+}`;
+
+const DEFAULT_WEB_JS = `// JavaScript logic
+console.log("Hello from CodeVerse Web Lab!");
+
+const btn = document.getElementById("btn");
+if (btn) {
+    btn.addEventListener("click", () => {
+        console.log("Button clicked!");
+        alert("Welcome to the CodeVerse Frontend Playground!");
+    });
+}`;
 
 // --- Application State ---
 let editor = null;
@@ -495,6 +589,104 @@ let currentLanguage = localStorage.getItem("codeverse_lang") || "cpp";
 let apiEndpoint = localStorage.getItem("codeverse_api_url") || DEFAULT_API_URL;
 let apiKey = localStorage.getItem("codeverse_api_key") || "";
 let isExecuting = false;
+
+// --- Web Lab State & Models ---
+let webLabModels = {
+  html: null,
+  css: null,
+  js: null
+};
+let activeWebTab = localStorage.getItem("codeverse_web_active_tab") || "html";
+
+function ensureWebLabModelsCreated() {
+  if (typeof monaco === 'undefined') return;
+  
+  if (!webLabModels.html) {
+    const savedHtml = localStorage.getItem("codeverse_code_html") || LANGUAGES.html.defaultCode;
+    webLabModels.html = monaco.editor.createModel(savedHtml, "html");
+    webLabModels.html.onDidChangeContent(() => {
+      localStorage.setItem("codeverse_code_html", webLabModels.html.getValue());
+    });
+  }
+  if (!webLabModels.css) {
+    const savedCss = localStorage.getItem("codeverse_web_css") || DEFAULT_WEB_CSS;
+    webLabModels.css = monaco.editor.createModel(savedCss, "css");
+    webLabModels.css.onDidChangeContent(() => {
+      localStorage.setItem("codeverse_web_css", webLabModels.css.getValue());
+    });
+  }
+  if (!webLabModels.js) {
+    const savedJs = localStorage.getItem("codeverse_web_js") || DEFAULT_WEB_JS;
+    webLabModels.js = monaco.editor.createModel(savedJs, "javascript");
+    webLabModels.js.onDidChangeContent(() => {
+      localStorage.setItem("codeverse_web_js", webLabModels.js.getValue());
+    });
+  }
+}
+
+function toggleWebLabView(show) {
+  if (show) {
+    if (DOM.webEditorTabs) DOM.webEditorTabs.classList.remove("hidden");
+    if (DOM.editorTitleContainer) DOM.editorTitleContainer.classList.add("hidden");
+    if (DOM.stdinContainer) DOM.stdinContainer.classList.add("hidden");
+    if (DOM.consoleOutputContainer) DOM.consoleOutputContainer.classList.add("hidden");
+    if (DOM.previewContainer) DOM.previewContainer.classList.remove("hidden");
+    
+    if (DOM.consoleHeaderTitle) DOM.consoleHeaderTitle.textContent = "Live Preview";
+    if (DOM.consoleHeaderIcon) {
+      DOM.consoleHeaderIcon.className = "fas fa-eye text-indigo-400 text-xs";
+    }
+    if (DOM.statusBadge) {
+      DOM.statusBadge.textContent = "Web Sandbox";
+      DOM.statusBadge.className = "px-2 py-0.5 rounded text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
+    }
+    
+    updateWebTabUI();
+  } else {
+    if (DOM.webEditorTabs) DOM.webEditorTabs.classList.add("hidden");
+    if (DOM.editorTitleContainer) DOM.editorTitleContainer.classList.remove("hidden");
+    if (DOM.stdinContainer) DOM.stdinContainer.classList.remove("hidden");
+    if (DOM.consoleOutputContainer) DOM.consoleOutputContainer.classList.remove("hidden");
+    if (DOM.previewContainer) DOM.previewContainer.classList.add("hidden");
+    
+    if (DOM.consoleHeaderTitle) DOM.consoleHeaderTitle.textContent = "Output Console";
+    if (DOM.consoleHeaderIcon) {
+      DOM.consoleHeaderIcon.className = "fas fa-terminal text-emerald-400 text-xs";
+    }
+    if (DOM.statusBadge) {
+      DOM.statusBadge.textContent = "Idle";
+      DOM.statusBadge.className = "px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30";
+    }
+  }
+}
+
+function updateWebTabUI() {
+  const tabs = ["html", "css", "js"];
+  tabs.forEach(t => {
+    const tabEl = document.getElementById(`tab-${t}`);
+    if (tabEl) {
+      if (t === activeWebTab) {
+        tabEl.className = "px-2.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-600 text-white transition-all duration-200";
+      } else {
+        tabEl.className = "px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200";
+      }
+    }
+  });
+}
+
+function switchWebTab(tabName) {
+  if (tabName !== "html" && tabName !== "css" && tabName !== "js") return;
+  activeWebTab = tabName;
+  localStorage.setItem("codeverse_web_active_tab", activeWebTab);
+  
+  ensureWebLabModelsCreated();
+  
+  if (editor && webLabModels[activeWebTab]) {
+    editor.setModel(webLabModels[activeWebTab]);
+  }
+  
+  updateWebTabUI();
+}
 
 // Safe UTF-8 Base64 Encoding and Decoding Helpers
 function encodeBase64(str) {
@@ -542,7 +734,22 @@ const DOM = {
   saveSettingsBtn: document.getElementById("save-settings"),
   closeSettingsBtn: document.getElementById("close-settings"),
   apiUrlInput: document.getElementById("api-url-input"),
-  apiKeyInput: document.getElementById("api-key-input")
+  apiKeyInput: document.getElementById("api-key-input"),
+  
+  // Web Lab DOM Elements
+  webEditorTabs: document.getElementById("web-editor-tabs"),
+  tabHtml: document.getElementById("tab-html"),
+  tabCss: document.getElementById("tab-css"),
+  tabJs: document.getElementById("tab-js"),
+  editorTitleContainer: document.getElementById("editor-title-container"),
+  stdinContainer: document.getElementById("stdin-container"),
+  consoleOutputContainer: document.getElementById("console-output-container"),
+  previewContainer: document.getElementById("preview-container"),
+  previewFrame: document.getElementById("preview-frame"),
+  webConsoleLogs: document.getElementById("web-console-logs"),
+  clearWebConsoleBtn: document.getElementById("clear-web-console"),
+  consoleHeaderTitle: document.getElementById("console-header-title"),
+  consoleHeaderIcon: document.getElementById("console-header-icon")
 };
 
 // --- Monaco Editor Initialization ---
@@ -555,6 +762,7 @@ function initMonaco() {
       base: 'vs-dark',
       inherit: true,
       rules: [
+        { token: '', foreground: 'f8f8f2' },
         { token: 'comment', foreground: '6272a4', fontStyle: 'italic' },
         { token: 'keyword', foreground: 'ff79c6' },
         { token: 'identifier', foreground: 'f8f8f2' },
@@ -563,7 +771,34 @@ function initMonaco() {
         { token: 'operator', foreground: 'ff79c6' },
         { token: 'type', foreground: '8be9fd', fontStyle: 'italic' },
         { token: 'class', foreground: '50fa7b' },
-        { token: 'function', foreground: '50fa7b' }
+        { token: 'function', foreground: '50fa7b' },
+        { token: 'variable', foreground: 'f8f8f2' },
+        { token: 'variable.predefined', foreground: '8be9fd' },
+        { token: 'constant', foreground: 'bd93f9' },
+        { token: 'regexp', foreground: 'ffb86c' },
+        { token: 'annotation', foreground: 'ffb86c' },
+        
+        // HTML rules
+        { token: 'tag', foreground: 'ff79c6' },
+        { token: 'tag.id', foreground: '50fa7b' },
+        { token: 'tag.class', foreground: '50fa7b' },
+        { token: 'attribute.name', foreground: '50fa7b' },
+        { token: 'attribute.value', foreground: 'f1fa8c' },
+        { token: 'metatag', foreground: 'ff79c6' },
+        { token: 'metatag.content', foreground: 'f8f8f2' },
+
+        // CSS rules
+        { token: 'tag.css', foreground: 'ff79c6' },
+        { token: 'keyword.css', foreground: 'ff79c6' },
+        { token: 'property.css', foreground: '50fa7b' },
+        { token: 'attribute.value.css', foreground: 'f1fa8c' },
+        { token: 'number.css', foreground: 'bd93f9' },
+        { token: 'attribute.value.unit.css', foreground: 'bd93f9' },
+        { token: 'attribute.value.hex.css', foreground: 'bd93f9' },
+
+        // JSON rules
+        { token: 'string.key.json', foreground: '8be9fd' },
+        { token: 'string.value.json', foreground: 'f1fa8c' }
       ],
       colors: {
         'editor.background': '#282a36',
@@ -577,38 +812,68 @@ function initMonaco() {
     });
     
     // Retrieve saved code or set default
-    const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`);
-    const initialCode = savedCode !== null ? savedCode : LANGUAGES[currentLanguage].defaultCode;
+    if (currentLanguage === "html") {
+      ensureWebLabModelsCreated();
+      
+      editor = monaco.editor.create(document.getElementById('editor-container'), {
+        model: webLabModels[activeWebTab],
+        theme: document.documentElement.classList.contains('light') ? 'vs' : 'dracula',
+        fontSize: 14,
+        fontFamily: 'Fira Code, JetBrains Mono, monospace',
+        fontLigatures: true,
+        automaticLayout: true,
+        minimap: { enabled: true },
+        scrollbar: {
+          vertical: 'visible',
+          horizontal: 'visible',
+          useShadows: false,
+          verticalHasArrows: false,
+          horizontalHasArrows: false,
+          verticalScrollbarSize: 8,
+          horizontalScrollbarSize: 8
+        },
+        cursorBlinking: 'blink',
+        cursorSmoothCaretAnimation: 'on',
+        padding: { top: 12, bottom: 12 },
+        roundedSelection: true,
+        selectOnLineNumbers: true
+      });
+      
+      toggleWebLabView(true);
+    } else {
+      const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`);
+      const initialCode = savedCode !== null ? savedCode : LANGUAGES[currentLanguage].defaultCode;
 
-    editor = monaco.editor.create(document.getElementById('editor-container'), {
-      value: initialCode,
-      language: LANGUAGES[currentLanguage].monacoId,
-      theme: document.documentElement.classList.contains('light') ? 'vs' : 'dracula',
-      fontSize: 14,
-      fontFamily: 'Fira Code, JetBrains Mono, monospace',
-      fontLigatures: true,
-      automaticLayout: true,
-      minimap: { enabled: true },
-      scrollbar: {
-        vertical: 'visible',
-        horizontal: 'visible',
-        useShadows: false,
-        verticalHasArrows: false,
-        horizontalHasArrows: false,
-        verticalScrollbarSize: 8,
-        horizontalScrollbarSize: 8
-      },
-      cursorBlinking: 'blink',
-      cursorSmoothCaretAnimation: 'on',
-      padding: { top: 12, bottom: 12 },
-      roundedSelection: true,
-      selectOnLineNumbers: true
-    });
+      editor = monaco.editor.create(document.getElementById('editor-container'), {
+        value: initialCode,
+        language: LANGUAGES[currentLanguage].monacoId,
+        theme: document.documentElement.classList.contains('light') ? 'vs' : 'dracula',
+        fontSize: 14,
+        fontFamily: 'Fira Code, JetBrains Mono, monospace',
+        fontLigatures: true,
+        automaticLayout: true,
+        minimap: { enabled: true },
+        scrollbar: {
+          vertical: 'visible',
+          horizontal: 'visible',
+          useShadows: false,
+          verticalHasArrows: false,
+          horizontalHasArrows: false,
+          verticalScrollbarSize: 8,
+          horizontalScrollbarSize: 8
+        },
+        cursorBlinking: 'blink',
+        cursorSmoothCaretAnimation: 'on',
+        padding: { top: 12, bottom: 12 },
+        roundedSelection: true,
+        selectOnLineNumbers: true
+      });
 
-    // Auto-save code to localStorage when changed
-    editor.onDidChangeModelContent(() => {
-      localStorage.setItem(`codeverse_code_${currentLanguage}`, editor.getValue());
-    });
+      // Auto-save code to localStorage when changed
+      editor.onDidChangeModelContent(() => {
+        localStorage.setItem(`codeverse_code_${currentLanguage}`, editor.getValue());
+      });
+    }
   });
 }
 
@@ -694,8 +959,98 @@ function showToast(message, type = "info") {
   }, 3500);
 }
 
+function renderWebLabPreview() {
+  if (!DOM.previewFrame || !DOM.webConsoleLogs) return;
+  
+  // Clear logs on run
+  DOM.webConsoleLogs.innerHTML = "";
+  
+  ensureWebLabModelsCreated();
+  
+  const htmlContent = webLabModels.html.getValue();
+  const cssContent = webLabModels.css.getValue();
+  const jsContent = webLabModels.js.getValue();
+  
+  // Custom console interception script to inject into iframe
+  const consoleInterceptionScript = `
+    <script>
+      (function() {
+        const _log = console.log;
+        const _error = console.error;
+        const _warn = console.warn;
+        
+        function sendLog(type, args) {
+          window.parent.postMessage({
+            source: "codeverse-preview",
+            type: type,
+            args: Array.from(args).map(arg => {
+              if (arg instanceof HTMLElement) {
+                return arg.outerHTML;
+              }
+              try {
+                // If it can serialize to json or string
+                return typeof arg === "object" ? JSON.stringify(arg) : arg;
+              } catch(e) {
+                return String(arg);
+              }
+            })
+          }, "*");
+        }
+        
+        console.log = function() {
+          sendLog("info", arguments);
+          _log.apply(console, arguments);
+        };
+        
+        console.error = function() {
+          sendLog("error", arguments);
+          _error.apply(console, arguments);
+        };
+        
+        console.warn = function() {
+          sendLog("warn", arguments);
+          _warn.apply(console, arguments);
+        };
+        
+        window.onerror = function(message, source, lineno, colno, error) {
+          sendLog("error", [message + " (at line " + lineno + ":" + colno + ")"]);
+          return false;
+        };
+      })();
+    </script>
+  `;
+  
+  // Build final HTML document to insert
+  let combinedContent = "";
+  
+  const scriptToInject = consoleInterceptionScript + `\n<style>\n${cssContent}\n</style>\n`;
+  
+  if (htmlContent.includes("</head>")) {
+    combinedContent = htmlContent.replace("</head>", `${scriptToInject}</head>`);
+  } else if (htmlContent.includes("<body>")) {
+    combinedContent = htmlContent.replace("<body>", `<head>${scriptToInject}</head><body>`);
+  } else {
+    combinedContent = `${scriptToInject}\n${htmlContent}`;
+  }
+  
+  const jsToInject = `\n<script>\n${jsContent}\n</script>\n`;
+  if (combinedContent.includes("</body>")) {
+    combinedContent = combinedContent.replace("</body>", `${jsToInject}</body>`);
+  } else {
+    combinedContent = `${combinedContent}\n${jsToInject}`;
+  }
+  
+  DOM.previewFrame.srcdoc = combinedContent;
+  showToast("Web preview updated!", "success");
+}
+
 // --- Judge0 Code Execution Logic ---
 async function runCode() {
+  if (currentLanguage === "html") {
+    renderWebLabPreview();
+    return;
+  }
+
   if (isExecuting) return;
   
   const code = editor ? editor.getValue() : "";
@@ -891,6 +1246,12 @@ function toggleExecutionUI(loading) {
 
 // --- Action Handlers ---
 function clearConsole() {
+  if (currentLanguage === "html") {
+    clearWebConsole();
+    showToast("Web console cleared", "info");
+    return;
+  }
+  
   DOM.outputConsole.innerHTML = '<span class="text-slate-500">Console cleared. Ready to compile.</span><span class="terminal-cursor"></span>';
   DOM.statusBadge.textContent = "Idle";
   DOM.statusBadge.className = "px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30";
@@ -921,20 +1282,26 @@ function downloadCodeFile() {
     return;
   }
 
-  const lang = LANGUAGES[currentLanguage];
+  let fileName = `codeverse_main.${LANGUAGES[currentLanguage].extension}`;
+  if (currentLanguage === "html") {
+    if (activeWebTab === "html") fileName = "index.html";
+    if (activeWebTab === "css") fileName = "style.css";
+    if (activeWebTab === "js") fileName = "script.js";
+  }
+
   const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   
   const link = document.createElement("a");
   link.href = url;
-  link.download = `codeverse_main.${lang.extension}`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   
   // Cleanup
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-  showToast(`Downloaded codeverse_main.${lang.extension}`, "success");
+  showToast(`Downloaded ${fileName}`, "success");
 }
 
 // --- Settings Dialog Handlers ---
@@ -971,23 +1338,46 @@ function handleLanguageChange(event) {
 
   // Save current code before changing languages
   if (editor) {
-    localStorage.setItem(`codeverse_code_${currentLanguage}`, editor.getValue());
+    if (currentLanguage !== "html") {
+      localStorage.setItem(`codeverse_code_${currentLanguage}`, editor.getValue());
+    }
   }
 
+  const prevLang = currentLanguage;
   currentLanguage = nextLang;
   localStorage.setItem("codeverse_lang", currentLanguage);
   updateLanguageBadge();
 
-  // Retrieve code for the new language, fallback to starter template
-  const newLangCode = localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage].defaultCode;
-
-  if (editor) {
-    editor.setValue(newLangCode);
+  if (currentLanguage === "html") {
+    // Switching to Web Lab
+    ensureWebLabModelsCreated();
+    toggleWebLabView(true);
+    if (editor) {
+      editor.setModel(webLabModels[activeWebTab]);
+    }
+  } else {
+    // Switching to backend compiler languages
+    if (prevLang === "html") {
+      toggleWebLabView(false);
+    }
     
-    // Update monaco model language
-    const model = editor.getModel();
-    if (model) {
-      monaco.editor.setModelLanguage(model, LANGUAGES[currentLanguage].monacoId);
+    // Retrieve code for the new language, fallback to starter template
+    const newLangCode = localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage].defaultCode;
+
+    if (editor) {
+      const oldModel = editor.getModel();
+      const newModel = monaco.editor.createModel(newLangCode, LANGUAGES[currentLanguage].monacoId);
+      editor.setModel(newModel);
+      
+      // Auto-save changes for this single model
+      newModel.onDidChangeContent(() => {
+        localStorage.setItem(`codeverse_code_${currentLanguage}`, newModel.getValue());
+      });
+      
+      // Clean up the old model if it was a temporary non-web model to prevent memory leaks
+      if (oldModel && oldModel !== webLabModels.html && oldModel !== webLabModels.css && oldModel !== webLabModels.js) {
+        oldModel.dispose();
+      }
     }
   }
 
@@ -1016,6 +1406,19 @@ function registerEventListeners() {
   // Language Dropdown
   DOM.langSelect.addEventListener("change", handleLanguageChange);
 
+  // Web Lab Tab Clicks
+  if (DOM.tabHtml) DOM.tabHtml.addEventListener("click", () => switchWebTab("html"));
+  if (DOM.tabCss) DOM.tabCss.addEventListener("click", () => switchWebTab("css"));
+  if (DOM.tabJs) DOM.tabJs.addEventListener("click", () => switchWebTab("js"));
+  if (DOM.clearWebConsoleBtn) DOM.clearWebConsoleBtn.addEventListener("click", clearWebConsole);
+
+  // Catch log messages from Web Lab Preview Iframe
+  window.addEventListener("message", (e) => {
+    if (e.data && e.data.source === "codeverse-preview") {
+      appendWebLog(e.data.type, e.data.args);
+    }
+  });
+
   // Setup Hotkeys (Ctrl+Enter to run code)
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
@@ -1023,6 +1426,56 @@ function registerEventListeners() {
       runCode();
     }
   });
+}
+
+function clearWebConsole() {
+  if (DOM.webConsoleLogs) {
+    DOM.webConsoleLogs.innerHTML = `<div class="text-[var(--text-muted)] italic">Console cleared.</div>`;
+  }
+}
+
+function appendWebLog(type, args) {
+  if (!DOM.webConsoleLogs) return;
+  
+  const placeholder = DOM.webConsoleLogs.querySelector(".italic");
+  if (placeholder) placeholder.remove();
+  
+  const logItem = document.createElement("div");
+  logItem.className = `console-log-item console-log-${type}`;
+  
+  let headerIcon = "fa-circle-info text-blue-400";
+  if (type === "error") headerIcon = "fa-circle-xmark text-rose-500";
+  if (type === "warn") headerIcon = "fa-triangle-exclamation text-amber-500";
+  
+  const formattedArgs = args.map(arg => {
+    if (typeof arg === "object") {
+      try {
+        return JSON.stringify(arg, null, 2);
+      } catch (err) {
+        return String(arg);
+      }
+    }
+    return String(arg);
+  }).join(" ");
+  
+  logItem.innerHTML = `
+    <div class="console-log-header">
+       <i class="fas ${headerIcon} text-[10px]"></i>
+       <span class="text-[9px] font-bold text-[var(--text-muted)] font-mono">${type.toUpperCase()}</span>
+    </div>
+    <div class="console-log-body">${escapeHtml(formattedArgs)}</div>
+  `;
+  
+  DOM.webConsoleLogs.appendChild(logItem);
+  DOM.webConsoleLogs.scrollTop = DOM.webConsoleLogs.scrollHeight;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 }
 
 // --- Application Bootstrapping ---
