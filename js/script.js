@@ -958,7 +958,7 @@ function initMonaco() {
           horizontalScrollbarSize: 8
         },
         cursorBlinking: 'smooth',
-        cursorSmoothCaretAnimation: 'on',
+        cursorSmoothCaretAnimation: true,
         padding: { top: 12, bottom: 12 },
         roundedSelection: true,
         selectOnLineNumbers: true
@@ -988,7 +988,7 @@ function initMonaco() {
           horizontalScrollbarSize: 8
         },
         cursorBlinking: 'smooth',
-        cursorSmoothCaretAnimation: 'on',
+        cursorSmoothCaretAnimation: true,
         padding: { top: 12, bottom: 12 },
         roundedSelection: true,
         selectOnLineNumbers: true
