@@ -1,5 +1,7 @@
 # CodeVerse Online Compiler 🚀
 
+🖥️ **Live Demo**: **[https://code-verse-online-compiler.vercel.app/](https://code-verse-online-compiler.vercel.app/)**
+
 CodeVerse is a modern, responsive, and high-performance Online Compiler and IDE web application built from scratch. It features an immersive dark theme inspired by VS Code, glassmorphic layout elements, automatic syntax highlighting with Microsoft's Monaco Editor, and code execution powered by the Judge0 Community Edition API.
 
 ---
