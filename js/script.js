@@ -876,7 +876,9 @@ const DOM = {
   mobileNavCta: document.getElementById("mobile-nav-cta"),
   contactForm: document.getElementById("contact-form"),
   hero: document.getElementById("hero"),
-  heroSpotlight: document.getElementById("hero-spotlight")
+  heroSpotlight: document.getElementById("hero-spotlight"),
+  maintenanceModal: document.getElementById("maintenance-modal"),
+  closeMaintenanceBtn: document.getElementById("close-maintenance-btn")
 };
 
 // --- Monaco Editor Initialization ---
@@ -1034,6 +1036,25 @@ function toggleTheme() {
   DOM.themeIcon.className = isLight ? "fas fa-moon" : "fas fa-sun";
   
   showToast(isLight ? "Light Mode Active" : "Dracula Theme Active");
+
+  // Show warning popup when switching on light mode
+  if (isLight) {
+    openMaintenanceWarning();
+  }
+}
+
+function openMaintenanceWarning() {
+  if (DOM.maintenanceModal) {
+    DOM.maintenanceModal.classList.remove("hidden");
+    DOM.maintenanceModal.classList.add("flex");
+  }
+}
+
+function closeMaintenanceWarning() {
+  if (DOM.maintenanceModal) {
+    DOM.maintenanceModal.classList.remove("flex");
+    DOM.maintenanceModal.classList.add("hidden");
+  }
 }
 
 // --- Dynamic Badge Helper ---
@@ -1529,6 +1550,16 @@ function registerEventListeners() {
   DOM.settingsModal.addEventListener("click", (e) => {
     if (e.target === DOM.settingsModal) closeSettings();
   });
+
+  // Maintenance Warning Modal Listeners
+  if (DOM.closeMaintenanceBtn) {
+    DOM.closeMaintenanceBtn.addEventListener("click", closeMaintenanceWarning);
+  }
+  if (DOM.maintenanceModal) {
+    DOM.maintenanceModal.addEventListener("click", (e) => {
+      if (e.target === DOM.maintenanceModal) closeMaintenanceWarning();
+    });
+  }
 
   // Language Dropdown
   DOM.langSelect.addEventListener("change", handleLanguageChange);

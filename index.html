@@ -26,7 +26,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Custom Styling override sheet (Dark/Light Variables) -->
-    <link rel="stylesheet" href="css/style.css?v=11" />
+    <link rel="stylesheet" href="css/style.css?v=12" />
   </head>
   <body
     class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]"
@@ -1579,6 +1579,32 @@ Write code and click 'Run Code' to execute.
       </div>
     </div>
 
+    <!-- ==================== MAINTENANCE WARNING MODAL ==================== -->
+    <div
+      id="maintenance-modal"
+      class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
+    >
+      <div
+        class="glass-panel w-full max-w-sm rounded-2xl border border-amber-500/20 overflow-hidden shadow-2xl shadow-amber-500/5 p-6 text-center animate-fade-in-up flex flex-col items-center gap-4"
+      >
+        <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xl animate-pulse">
+          <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white mb-2">Under Maintenance</h3>
+          <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+            Light Mode is currently undergoing optimization maintenance. We recommend using our premium Dracula Dark Theme for best performance and code rendering!
+          </p>
+        </div>
+        <button
+          id="close-maintenance-btn"
+          class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all duration-200 shadow-md shadow-amber-600/10 w-full mt-2"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+
     <!-- ==================== FOOTER ==================== -->
     <footer
       class="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/80 pt-16 pb-8 transition-all duration-300"
@@ -1773,6 +1799,6 @@ Write code and click 'Run Code' to execute.
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
     <!-- Core Logic Javascript Script -->
-    <script src="js/script.js?v=30"></script>
+    <script src="js/script.js?v=31"></script>
   </body>
 </html>
