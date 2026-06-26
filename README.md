@@ -1,6 +1,6 @@
 # CodeVerse - Online Compiler & Live Web Editor 🚀
 
-🖥️ **Live Demo**: **[https://code-verse-online-compiler.vercel.app/](https://code-verse-online-compiler.vercel.app/)**
+🖥️ **Live Demo**: **[https://code-verse-online.vercel.app/](https://code-verse-online.vercel.app/)**
 
 CodeVerse is a modern, responsive, high-performance online IDE and visual playground web application built using React + Vite. It features a sleek glassmorphic UI, global state theme configuration (inspired by VS Code & Dracula), Microsoft's Monaco Editor integration, multi-language code execution powered by the Judge0 API, and a custom visual sandbox (Web Lab) for live HTML/CSS/JS frontend previews.
 
