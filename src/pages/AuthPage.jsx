@@ -359,7 +359,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                       <label className="auth-label">
                         Email Address
                       </label>
-                      <div className="auth-input-wrapper">
+                      <div className="auth-input-wrapper floating-enabled">
                         <input
                           type="email"
                           required
@@ -377,7 +377,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                       <label className="auth-label">
                         Password
                       </label>
-                      <div className="auth-input-wrapper">
+                      <div className="auth-input-wrapper floating-enabled">
                         <input
                           type={showLoginPassword ? 'text' : 'password'}
                           required
