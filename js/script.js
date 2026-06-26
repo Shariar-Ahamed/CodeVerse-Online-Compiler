@@ -79,27 +79,26 @@ for i in range(1, 6):
     extension: "js",
     badgeClass: "badge-js",
     defaultCode: `// JavaScript Code Execution (NodeJS Environment)
-const readline = require('readline');
+// In batch compilers like Judge0, we read standard input (stdin) synchronously using fs.readFileSync.
+const fs = require('fs');
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-rl.question('Enter your name: ', (name) => {
+function main() {
+    // Read all inputs from standard input (stdin)
+    const name = fs.readFileSync(0, 'utf-8').trim();
+    
     console.log(\`Hello, \${name || 'World'}! Welcome to CodeVerse Online Compiler.\`);
     
     // Demonstration of calculations
     const result = factorial(5);
     console.log(\`Factorial of 5 is: \${result}\`);
-    
-    rl.close();
-});
+}
 
 function factorial(n) {
     if (n <= 1) return 1;
     return n * factorial(n - 1);
-}`
+}
+
+main();`
   },
   java: {
     id: 62, // Java (OpenJDK 13.0.1)
