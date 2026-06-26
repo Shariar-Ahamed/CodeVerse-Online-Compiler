@@ -9,6 +9,9 @@ import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Toast from './components/Toast';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+
 
 function AppContent() {
   // --- States ---
@@ -58,16 +61,58 @@ function AppContent() {
     showToast("Reverted to Dracula Theme", "info");
   };
 
+  // --- Firebase Auth state observer ---
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Authenticated Firebase User
+        const userData = {
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL,
+          isGuest: false
+        };
+        setUser(userData);
+        localStorage.setItem("codeverse_user", JSON.stringify(userData));
+      } else {
+        // No Firebase user, check if we have a local guest session
+        const savedUser = localStorage.getItem("codeverse_user");
+        let localUser = null;
+        try {
+          localUser = savedUser ? JSON.parse(savedUser) : null;
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (localUser && localUser.isGuest) {
+          setUser(localUser);
+        } else {
+          setUser(null);
+          localStorage.removeItem("codeverse_user");
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // --- Auth Handlers ---
   const handleLogin = (userData) => {
     setUser(userData);
     localStorage.setItem("codeverse_user", JSON.stringify(userData));
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("codeverse_user");
-    showToast("Signed out successfully", "info");
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      localStorage.removeItem("codeverse_user");
+      showToast("Signed out successfully", "info");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      showToast("Error signing out", "error");
+    }
   };
 
   // --- Toast Trigger Helper ---

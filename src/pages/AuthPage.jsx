@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthParticles from '../components/AuthParticles';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  signInWithPopup, 
+  sendPasswordResetEmail 
+} from 'firebase/auth';
+import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { auth, db, googleProvider, githubProvider, facebookProvider } from '../firebase';
+
 
 const getPasswordStrength = (password) => {
   if (!password) return { label: '', color: 'bg-transparent', width: '0%', textClass: 'hidden' };
@@ -25,9 +35,9 @@ export default function AuthPage({ user, onLogin, showToast }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
 
-  // Redirect if already logged in
+  // Redirect if already logged in (ignore guest mode)
   useEffect(() => {
-    if (user) {
+    if (user && !user.isGuest) {
       navigate('/');
     }
   }, [user, navigate]);
@@ -47,21 +57,61 @@ export default function AuthPage({ user, onLogin, showToast }) {
   // Forgot Password State
   const [forgotEmail, setForgotEmail] = useState('');
 
-  const handleLoginSubmit = (e) => {
+  // Helper to migrate guest notes to Cloud Firestore
+  const migrateLocalNotesToFirestore = async (uid) => {
+    try {
+      const saved = localStorage.getItem("codeverse_notes");
+      if (!saved) return;
+      const localNotes = JSON.parse(saved);
+      if (!Array.isArray(localNotes) || localNotes.length === 0) return;
+
+      const userNotesRef = collection(db, "users", uid, "notes");
+      const snapshot = await getDocs(userNotesRef);
+      
+      // Only migrate if user has no notes saved in cloud yet
+      if (snapshot.empty) {
+        for (const note of localNotes) {
+          // Skip the default welcome note unless edited
+          if (note.id === 'welcome' && note.content.includes("Welcome to your personal scratchpad!")) {
+            continue;
+          }
+          const noteDocRef = doc(db, "users", uid, "notes", note.id);
+          await setDoc(noteDocRef, {
+            title: note.title || 'Untitled Note',
+            content: note.content || '',
+            updatedAt: note.updatedAt || new Date().toISOString()
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Migration error:", err);
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) return;
 
-    const name = loginEmail.split('@')[0];
-    const loggedUser = {
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      email: loginEmail,
-    };
-    onLogin(loggedUser);
-    showToast(`Welcome back, ${loggedUser.name}!`, 'success');
-    setTimeout(() => navigate('/'), 800);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      const name = userCredential.user.displayName || loginEmail.split('@')[0];
+      
+      showToast(`Welcome back, ${name}!`, 'success');
+      await migrateLocalNotesToFirestore(userCredential.user.uid);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      let errMsg = "Failed to sign in. Please check your credentials.";
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        errMsg = "Invalid email or password.";
+      } else if (err.code === 'auth/invalid-email') {
+        errMsg = "Invalid email format.";
+      }
+      showToast(errMsg, 'error');
+    }
   };
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
     if (!signupName || !signupEmail || !signupPassword || !signupConfirmPass) return;
 
@@ -70,31 +120,65 @@ export default function AuthPage({ user, onLogin, showToast }) {
       return;
     }
 
-    const loggedUser = { name: signupName, email: signupEmail };
-    onLogin(loggedUser);
-    showToast(`Welcome to CodeVerse, ${signupName}!`, 'success');
-    setTimeout(() => navigate('/'), 800);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
+      await updateProfile(userCredential.user, { displayName: signupName });
+      
+      showToast(`Welcome to CodeVerse, ${signupName}!`, 'success');
+      await migrateLocalNotesToFirestore(userCredential.user.uid);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      let errMsg = "Failed to create account.";
+      if (err.code === 'auth/email-already-in-use') {
+        errMsg = "This email is already in use.";
+      } else if (err.code === 'auth/weak-password') {
+        errMsg = "Password is too weak. Must be at least 6 characters.";
+      }
+      showToast(errMsg, 'error');
+    }
   };
 
-  const handleSocialLogin = (platform) => {
-    const loggedUser = platform === 'github' 
-      ? { name: 'GitHub Coder', email: 'github-coder@codeverse.me' }
-      : platform === 'google'
-      ? { name: 'Google Dev', email: 'google-dev@codeverse.me' }
-      : { name: 'Microsoft Dev', email: 'microsoft-dev@codeverse.me' };
-    
-    onLogin(loggedUser);
-    showToast(`Logged in via ${platform === 'github' ? 'GitHub' : platform === 'google' ? 'Google' : 'Microsoft'}`, 'success');
-    setTimeout(() => navigate('/'), 800);
+  const handleSocialLogin = async (platform) => {
+    let provider;
+    if (platform === 'google') {
+      provider = googleProvider;
+    } else if (platform === 'github') {
+      provider = githubProvider;
+    } else if (platform === 'facebook') {
+      provider = facebookProvider;
+    } else {
+      return;
+    }
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
+      
+      const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+      showToast(`Logged in via ${platformName}!`, 'success');
+      await migrateLocalNotesToFirestore(result.user.uid);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+      showToast(`Failed to log in via ${platformName}.`, 'error');
+    }
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault();
     if (!forgotEmail) return;
 
-    showToast(`Reset link sent to ${forgotEmail}!`, 'success');
-    setForgotEmail('');
-    setActiveTab('login');
+    try {
+      await sendPasswordResetEmail(auth, forgotEmail);
+      showToast(`Password reset link sent to ${forgotEmail}!`, 'success');
+      setForgotEmail('');
+      setActiveTab('login');
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to send reset link. Please check your email.", "error");
+    }
   };
 
   return (
@@ -478,22 +562,25 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 <span>Google</span>
               </button>
               <button
-                onClick={() => handleSocialLogin('microsoft')}
-                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-slate-100 hover:text-white text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-microsoft"
+                onClick={() => handleSocialLogin('facebook')}
+                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-slate-100 hover:text-white text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-facebook"
               >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 23 23">
-                  <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
-                  <rect x="12" y="1" width="10" height="10" fill="#7FBA00"/>
-                  <rect x="1" y="12" width="10" height="10" fill="#00A4EF"/>
-                  <rect x="12" y="12" width="10" height="10" fill="#FFB900"/>
+                <svg className="w-3.5 h-3.5 fill-[#1877F2]" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span>Microsoft</span>
+                <span>Facebook</span>
               </button>
             </div>
 
             {/* Guest Entry Button */}
             <button
               onClick={() => {
+                const guestUser = {
+                  name: "Guest Developer",
+                  email: "guest@codeverse.me",
+                  isGuest: true
+                };
+                onLogin(guestUser);
                 showToast("Entering Workspace as Guest", "info");
                 navigate('/editor');
               }}

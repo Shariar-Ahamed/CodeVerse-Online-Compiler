@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
+import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
 
@@ -52,22 +54,99 @@ export default function EditorPage({ user, theme, showToast }) {
   const [webLogs, setWebLogs] = useState([]);
 
   // --- Text Notes Workspace States & Handlers ---
-  const [notes, setNotes] = useState(() => {
-    try {
-      const saved = localStorage.getItem("codeverse_notes");
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Error reading saved notes", e);
-    }
-    return [
-      {
-        id: 'welcome',
-        title: 'Welcome to CodeVerse Notes!',
-        content: 'Welcome to your personal scratchpad!\n\nHere you can:\n1. Keep notes side-by-side with your programming environment.\n2. Create multiple notes using the "+" button on the sidebar.\n3. Search notes by title.\n4. Download note content as a .txt file.\n5. Auto-save is active - everything you write is instantly stored in your browser\'s local storage.',
-        updatedAt: new Date().toISOString()
+  // --- Firestore Realtime Sync for Notes ---
+  useEffect(() => {
+    if (!user || user.isGuest) {
+      // Guest mode or not logged in: Load notes from localStorage
+      try {
+        const saved = localStorage.getItem("codeverse_notes");
+        if (saved) {
+          setNotes(JSON.parse(saved));
+        } else {
+          setNotes([
+            {
+              id: 'welcome',
+              title: 'Welcome to CodeVerse Notes!',
+              content: 'Welcome to your personal scratchpad!\n\nHere you can:\n1. Keep notes side-by-side with your programming environment.\n2. Create multiple notes using the "+" button on the sidebar.\n3. Search notes by title.\n4. Download note content as a .txt file.\n5. Auto-save is active - everything you write is instantly stored in your browser\'s local storage.',
+              updatedAt: new Date().toISOString()
+            }
+          ]);
+        }
+      } catch (e) {
+        console.error(e);
       }
-    ];
-  });
+      return;
+    }
+
+    // Authenticated Firebase User: Subscribe to Firestore notes collection
+    const userNotesRef = collection(db, "users", user.uid, "notes");
+    const unsubscribe = onSnapshot(userNotesRef, (snapshot) => {
+      const dbNotes = [];
+      snapshot.forEach((docSnap) => {
+        dbNotes.push({ id: docSnap.id, ...docSnap.data() });
+      });
+
+      // Sort by updatedAt descending
+      dbNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+      if (dbNotes.length === 0) {
+        // Create a default welcome note in cloud if they have no notes yet
+        const defaultNote = {
+          title: 'Welcome to CodeVerse Cloud Notes!',
+          content: 'This is your secure cloud scratchpad. Your notes are saved to your account in real-time!',
+          updatedAt: new Date().toISOString()
+        };
+        const defaultDocRef = doc(db, "users", user.uid, "notes", "welcome_cloud");
+        setDoc(defaultDocRef, defaultNote);
+      } else {
+        setNotes(dbNotes);
+      }
+    }, (error) => {
+      console.error("Firestore sync error:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // --- Firestore Cloud Code Load ---
+  useEffect(() => {
+    if (!user || user.isGuest) return;
+
+    const loadCloudCodes = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users", user.uid, "code_workspaces"));
+        querySnapshot.forEach((docSnap) => {
+          const langId = docSnap.id;
+          const data = docSnap.data();
+          if (langId === "html") {
+            if (data.htmlCode) {
+              setHtmlCode(data.htmlCode);
+              localStorage.setItem("codeverse_code_html", data.htmlCode);
+            }
+            if (data.cssCode) {
+              setCssCode(data.cssCode);
+              localStorage.setItem("codeverse_web_css", data.cssCode);
+            }
+            if (data.jsCode) {
+              setJsCode(data.jsCode);
+              localStorage.setItem("codeverse_web_js", data.jsCode);
+            }
+          } else {
+            if (data.code) {
+              localStorage.setItem(`codeverse_code_${langId}`, data.code);
+              if (currentLanguage === langId) {
+                setCode(data.code);
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.error("Error loading codes from Firestore:", e);
+      }
+    };
+
+    loadCloudCodes();
+  }, [user]);
 
   const [activeNoteId, setActiveNoteId] = useState(() => {
     const saved = localStorage.getItem("codeverse_active_note_id");
@@ -76,10 +155,12 @@ export default function EditorPage({ user, theme, showToast }) {
 
   const [noteSearchQuery, setNoteSearchQuery] = useState('');
 
-  // Sync notes and activeNoteId with localStorage
+  // Sync notes and activeNoteId with localStorage (ONLY for guest users!)
   useEffect(() => {
-    localStorage.setItem("codeverse_notes", JSON.stringify(notes));
-  }, [notes]);
+    if (!user || user.isGuest) {
+      localStorage.setItem("codeverse_notes", JSON.stringify(notes));
+    }
+  }, [notes, user]);
 
   useEffect(() => {
     localStorage.setItem("codeverse_active_note_id", activeNoteId);
@@ -87,49 +168,128 @@ export default function EditorPage({ user, theme, showToast }) {
 
   const activeNote = notes.find(n => n.id === activeNoteId) || notes[0];
 
-  const handleCreateNote = () => {
-    if (!user && notes.length >= 3) {
-      showToast("Guest accounts are limited to 3 notes. Sign in to unlock unlimited notes!", "warning");
-      return;
+  // Helper to save current workspace code to cloud database
+  const saveCodeToFirestore = async (lang, data) => {
+    if (!user || user.isGuest) return;
+    try {
+      const docRef = doc(db, "users", user.uid, "code_workspaces", lang);
+      await setDoc(docRef, {
+        ...data,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.error("Error saving code to Firestore:", e);
     }
-    const newNote = {
-      id: Date.now().toString(),
-      title: 'Untitled Note',
-      content: '',
-      updatedAt: new Date().toISOString()
-    };
-    setNotes(prev => [newNote, ...prev]);
-    setActiveNoteId(newNote.id);
-    showToast("New note created", "success");
   };
 
-  const handleDeleteNote = (id, e) => {
+  const handleCreateNote = async () => {
+    if (!user || user.isGuest) {
+      if (notes.length >= 3) {
+        showToast("Guest accounts are limited to 3 notes. Sign in to unlock unlimited notes!", "warning");
+        return;
+      }
+      const newNote = {
+        id: Date.now().toString(),
+        title: 'Untitled Note',
+        content: '',
+        updatedAt: new Date().toISOString()
+      };
+      setNotes(prev => [newNote, ...prev]);
+      setActiveNoteId(newNote.id);
+      showToast("New note created", "success");
+    } else {
+      const noteId = Date.now().toString();
+      const newNote = {
+        title: 'Untitled Note',
+        content: '',
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        const noteDocRef = doc(db, "users", user.uid, "notes", noteId);
+        await setDoc(noteDocRef, newNote);
+        setActiveNoteId(noteId);
+        showToast("New cloud note created", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to create note on cloud.", "error");
+      }
+    }
+  };
+
+  const handleDeleteNote = async (id, e) => {
     if (e) e.stopPropagation();
-    const remaining = notes.filter(n => n.id !== id);
-    setNotes(remaining);
     
-    if (activeNoteId === id) {
-      if (remaining.length > 0) {
-        setActiveNoteId(remaining[0].id);
-      } else {
-        setActiveNoteId('');
+    if (!user || user.isGuest) {
+      const remaining = notes.filter(n => n.id !== id);
+      setNotes(remaining);
+      if (activeNoteId === id) {
+        if (remaining.length > 0) {
+          setActiveNoteId(remaining[0].id);
+        } else {
+          setActiveNoteId('');
+        }
+      }
+      showToast("Note deleted", "info");
+    } else {
+      try {
+        const noteDocRef = doc(db, "users", user.uid, "notes", id);
+        await deleteDoc(noteDocRef);
+        
+        const remaining = notes.filter(n => n.id !== id);
+        if (activeNoteId === id) {
+          if (remaining.length > 0) {
+            setActiveNoteId(remaining[0].id);
+          } else {
+            setActiveNoteId('');
+          }
+        }
+        showToast("Cloud note deleted", "info");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete note from cloud.", "error");
       }
     }
-    showToast("Note deleted", "info");
   };
 
-  const handleUpdateNote = (field, value) => {
+  const handleUpdateNote = async (field, value) => {
     if (!activeNote) return;
-    setNotes(prev => prev.map(n => {
-      if (n.id === activeNote.id) {
-        return {
-          ...n,
-          [field]: value,
+
+    if (!user || user.isGuest) {
+      setNotes(prev => prev.map(n => {
+        if (n.id === activeNote.id) {
+          return {
+            ...n,
+            [field]: value,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return n;
+      }));
+    } else {
+      // Optimistic UI: Update state locally instantly for zero delay
+      setNotes(prev => prev.map(n => {
+        if (n.id === activeNote.id) {
+          return {
+            ...n,
+            [field]: value,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return n;
+      }));
+
+      // Write asynchronously to Firestore
+      try {
+        const noteDocRef = doc(db, "users", user.uid, "notes", activeNote.id);
+        await setDoc(noteDocRef, {
+          title: field === 'title' ? value : activeNote.title,
+          content: field === 'content' ? value : activeNote.content,
           updatedAt: new Date().toISOString()
-        };
+        }, { merge: true });
+      } catch (err) {
+        console.error("Firestore update error:", err);
       }
-      return n;
-    }));
+    }
   };
 
   const handleDownloadNote = () => {
@@ -235,6 +395,27 @@ export default function EditorPage({ user, theme, showToast }) {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       runCode();
     });
+
+    // Add listener for Ctrl+S hotkey to save code to Firestore
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      const editorVal = editor.getValue();
+      if (!user || user.isGuest) {
+        showToast("Logged in users can save workspaces to the cloud! Sign in to use this feature.", "info");
+      } else {
+        if (currentLanguage === "html") {
+          if (activeWebTab === "html") {
+            saveCodeToFirestore("html", { htmlCode: editorVal });
+          } else if (activeWebTab === "css") {
+            saveCodeToFirestore("html", { cssCode: editorVal });
+          } else {
+            saveCodeToFirestore("html", { jsCode: editorVal });
+          }
+        } else if (currentLanguage !== "text") {
+          saveCodeToFirestore(currentLanguage, { code: editorVal });
+        }
+        showToast("Workspace code saved to cloud", "success");
+      }
+    });
   };
 
   const handleLanguageChange = (e) => {
@@ -302,6 +483,10 @@ export default function EditorPage({ user, theme, showToast }) {
     if (!codeToCompile.trim()) {
       showToast("Please enter some code first!", "error");
       return;
+    }
+
+    if (user && !user.isGuest) {
+      saveCodeToFirestore(currentLanguage, { code: codeToCompile });
     }
 
     setIsExecuting(true);
@@ -442,6 +627,10 @@ export default function EditorPage({ user, theme, showToast }) {
     const htmlVal = htmlCode;
     const cssVal = cssCode;
     const jsVal = jsCode;
+
+    if (user && !user.isGuest) {
+      saveCodeToFirestore("html", { htmlCode: htmlVal, cssCode: cssVal, jsCode: jsVal });
+    }
 
     // Inject log interceptor code in iframe preview
     const iframeLoggerScript = `

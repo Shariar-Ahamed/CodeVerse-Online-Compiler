@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LANGUAGES = [
+  { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
   { id: 'html', name: 'HTML/CSS/JS', desc: 'Web Lab Preview', icon: 'fab fa-html5', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500' },
   { id: 'c', name: 'C', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
   { id: 'cpp', name: 'C++', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
@@ -30,8 +31,7 @@ const LANGUAGES = [
   { id: 'elixir', name: 'Elixir', desc: '1.9.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
   { id: 'erlang', name: 'Erlang', desc: 'OTP 22.2 Runtime', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500' },
   { id: 'clojure', name: 'Clojure', desc: '1.10.1 Workspace', icon: 'fas fa-code', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400' },
-  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500' },
-  { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' }
+  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500' }
 ];
 
 const DEMO_SNIPPETS = [

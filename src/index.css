@@ -718,10 +718,10 @@ input:focus, select:focus, textarea:focus {
   background: rgba(239, 68, 68, 0.05) !important;
 }
 
-.auth-social-btn-microsoft:hover {
-  border-color: rgba(0, 164, 239, 0.4) !important;
-  box-shadow: 0 0 15px rgba(0, 164, 239, 0.15) !important;
-  background: rgba(0, 164, 239, 0.05) !important;
+.auth-social-btn-facebook:hover {
+  border-color: rgba(24, 119, 242, 0.4) !important;
+  box-shadow: 0 0 15px rgba(24, 119, 242, 0.15) !important;
+  background: rgba(24, 119, 242, 0.05) !important;
 }
 
 /* Tab active sliding underline indicator */
