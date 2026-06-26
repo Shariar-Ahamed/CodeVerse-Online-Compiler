@@ -307,7 +307,7 @@
           </button>
 
           <!-- Execute / Run Code Trigger Button -->
-          <button id="run-btn" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200">
+          <button id="run-btn" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow">
             <i id="run-icon" class="fas fa-play text-xs"></i>
             <div id="run-spinner" class="spinner hidden"></div>
             <span id="run-text">Run Code</span>
@@ -320,7 +320,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow">
         
         <!-- Monaco Code Editor Area (Occupies 2 columns on large displays) -->
-        <div class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+        <div class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
           
           <!-- Tab Bar Header -->
           <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
@@ -360,7 +360,7 @@
         <div class="flex flex-col gap-6">
           
           <!-- Standard Input (Stdin) Area -->
-          <div id="stdin-container" class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
+          <div id="stdin-container" class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300 ide-neon-border">
             <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
               <div class="flex items-center gap-2">
                 <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
@@ -372,7 +372,7 @@
           </div>
 
           <!-- Output Terminal Panel -->
-          <div class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+          <div class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
             
             <!-- Terminal Header Bar -->
             <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">

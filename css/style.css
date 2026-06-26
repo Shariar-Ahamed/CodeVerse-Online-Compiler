@@ -396,3 +396,126 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--accent-primary-glow);
   box-shadow: 0 4px 20px rgba(99, 102, 241, 0.05);
 }
+
+/* ==========================================================================
+   Animated Pro UI Upgrade Styles
+   ========================================================================== */
+
+/* Premium Neon pulsing card and elements */
+.neon-glow-card {
+  box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.9), 0 0 20px rgba(99, 102, 241, 0.1);
+  animation: pulse-neon-shadow 6s infinite ease-in-out;
+  transition: var(--transition-smooth);
+}
+
+@keyframes pulse-neon-shadow {
+  0%, 100% {
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.9), 0 0 20px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.1);
+  }
+  50% {
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.9), 0 0 35px rgba(6, 182, 212, 0.35), 0 0 0 1px rgba(6, 182, 212, 0.25);
+  }
+}
+
+/* Floating animation */
+.float-slow {
+  animation: float-slow-movement 8s infinite ease-in-out;
+}
+
+@keyframes float-slow-movement {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+/* Glow on focus */
+.glow-input-focus {
+  transition: all 0.25s ease;
+}
+.glow-input-focus:focus-within {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Tab active sliding underline indicator */
+.active-tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #06b6d4);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6);
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Premium Button Glow */
+.btn-premium-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-premium-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+.btn-premium-glow:hover::before {
+  left: 100%;
+}
+.btn-premium-glow:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Double wrapper transition */
+.sliding-form-wrapper {
+  display: flex;
+  width: 200%;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Reveal elements on scroll classes */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Neon outline for IDE output & editor panels */
+.ide-neon-border {
+  transition: var(--transition-smooth);
+}
+.ide-neon-border:focus-within {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Button pulsing halo for compiling status */
+@keyframes run-halo-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+.btn-run-pulse {
+  animation: run-halo-pulse 1.8s infinite;
+}

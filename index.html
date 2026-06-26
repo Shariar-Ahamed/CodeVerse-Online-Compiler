@@ -317,7 +317,7 @@
       <!-- Supported Languages Section -->
       <section
         id="languages"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative animate-fade-in-up"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll"
       >
         <!-- Interactive Canvas for Swirling Galaxy -->
         <canvas
@@ -887,7 +887,7 @@
       <!-- Live Demo Typing Section -->
       <section
         id="live-demo"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] relative"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] relative reveal-on-scroll"
       >
         <!-- Interactive Canvas for Constellation Mesh -->
         <canvas
@@ -983,7 +983,7 @@ Hello World!</pre
       <!-- Features Section -->
       <section
         id="features"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll"
       >
         <!-- Interactive Canvas for Sparkler -->
         <canvas
@@ -1082,7 +1082,7 @@ Hello World!</pre
       <!-- About Section -->
       <section
         id="about"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)] relative"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)] relative reveal-on-scroll"
       >
         <!-- Interactive Canvas for Swirling Galaxy -->
         <canvas
@@ -1114,7 +1114,7 @@ Hello World!</pre
       <!-- Contact Section -->
       <section
         id="contact"
-        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative"
+        class="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll"
       >
         <!-- Interactive Canvas for Constellation Mesh -->
         <canvas
@@ -1231,156 +1231,7 @@ Hello World!</pre
       </section>
     </div>
 
-    <!-- ==================== AUTHENTICATION MODAL ==================== -->
-    <div
-      id="auth-modal"
-      class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
-    >
-      <div
-        id="auth-card"
-        class="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-slate-900/95 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 p-6 animate-fade-in-up flex flex-col gap-6 relative text-left"
-      >
-        <!-- Close button (X) -->
-        <button
-          id="close-auth-x"
-          class="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none"
-          title="Close"
-          type="button"
-        >
-          <i class="fas fa-times"></i>
-        </button>
 
-        <!-- Auth Tabs Header -->
-        <div class="flex border-b border-[var(--border-color)] pb-px">
-          <button
-            id="auth-tab-login"
-            class="flex-1 pb-3 text-center text-sm font-bold border-b-2 border-indigo-500 text-white transition-all duration-200"
-            type="button"
-          >
-            Sign In
-          </button>
-          <button
-            id="auth-tab-signup"
-            class="flex-1 pb-3 text-center text-sm font-bold border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200"
-            type="button"
-          >
-            Create Account
-          </button>
-        </div>
-
-        <!-- Auth Form -->
-        <form id="auth-form" class="flex flex-col gap-4">
-          <!-- Sign Up Name Field (Hidden by default in login state) -->
-          <div id="auth-field-name" class="hidden flex-col gap-1.5">
-            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Full Name</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
-                <i class="fas fa-user text-xs"></i>
-              </span>
-              <input
-                type="text"
-                id="auth-input-name"
-                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                placeholder="Enter your name"
-              />
-            </div>
-          </div>
-
-          <!-- Email Field -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Email Address</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
-                <i class="fas fa-envelope text-xs"></i>
-              </span>
-              <input
-                type="email"
-                id="auth-input-email"
-                required
-                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                placeholder="developer@codeverse.me"
-              />
-            </div>
-          </div>
-
-          <!-- Password Field -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Password</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
-                <i class="fas fa-lock text-xs"></i>
-              </span>
-              <input
-                type="password"
-                id="auth-input-password"
-                required
-                class="w-full pl-9 pr-10 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                placeholder="••••••••"
-              />
-              <button
-                type="button"
-                id="auth-toggle-pass"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors duration-200"
-              >
-                <i class="fas fa-eye text-xs"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Confirm Password Field (Hidden in login state) -->
-          <div id="auth-field-confirm-pass" class="hidden flex-col gap-1.5">
-            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Confirm Password</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
-                <i class="fas fa-lock text-xs"></i>
-              </span>
-              <input
-                type="password"
-                id="auth-input-confirm-pass"
-                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button
-            type="submit"
-            id="auth-submit-btn"
-            class="px-5 py-2.5 mt-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/10 w-full"
-          >
-            Sign In to Account
-          </button>
-        </form>
-
-        <!-- Divider -->
-        <div class="flex items-center my-1">
-          <div class="flex-grow border-t border-[var(--border-color)]"></div>
-          <span class="px-3 text-[10px] text-[var(--text-muted)] font-mono uppercase">Or Continue With</span>
-          <div class="flex-grow border-t border-[var(--border-color)]"></div>
-        </div>
-
-        <!-- Social login buttons (Mocked) -->
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            id="auth-social-github"
-            class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] hover:border-slate-500/50 transition-all duration-200 active:scale-95"
-          >
-            <i class="fab fa-github"></i>
-            <span>GitHub</span>
-          </button>
-          <button
-            type="button"
-            id="auth-social-google"
-            class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] hover:border-slate-500/50 transition-all duration-200 active:scale-95"
-          >
-            <i class="fab fa-google"></i>
-            <span>Google</span>
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer

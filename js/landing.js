@@ -571,6 +571,27 @@ function initLandingPage() {
       contactForm.reset();
     });
   }
+
+  // Intersection Observer for scroll reveal animations
+  const revealElements = document.querySelectorAll(".reveal-on-scroll");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("revealed");
+          observer.unobserve(entry.target); // Reveal only once
+        }
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: "0px 0px -40px 0px"
+    });
+    
+    revealElements.forEach(el => observer.observe(el));
+  } else {
+    // Fallback if IntersectionObserver is not supported
+    revealElements.forEach(el => el.classList.add("revealed"));
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initLandingPage);
