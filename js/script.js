@@ -461,9 +461,9 @@ _start:
     extension: "erl",
     badgeClass: "badge-erlang",
     defaultCode: `-module(main).
--export([start/0]).
+-export([main/1]).
 
-start() ->
+main(_Args) ->
     io:fwrite("Hello, CodeVerse Erlang Console!\\n").`
   },
   clojure: {
