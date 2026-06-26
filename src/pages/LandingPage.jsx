@@ -30,7 +30,8 @@ const LANGUAGES = [
   { id: 'elixir', name: 'Elixir', desc: '1.9.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
   { id: 'erlang', name: 'Erlang', desc: 'OTP 22.2 Runtime', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500' },
   { id: 'clojure', name: 'Clojure', desc: '1.10.1 Workspace', icon: 'fas fa-code', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400' },
-  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500' }
+  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500' },
+  { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' }
 ];
 
 const DEMO_SNIPPETS = [
@@ -67,11 +68,6 @@ export default function LandingPage({ showToast }) {
   const [demoStatus, setDemoStatus] = useState('Accepted');
   const [demoTime, setDemoTime] = useState('0.04s');
 
-  // Contact Form States
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactMessage, setContactMessage] = useState('');
-
   // Refs for Canvases
   const heroRef = useRef(null);
   const heroCanvasRef = useRef(null);
@@ -79,12 +75,8 @@ export default function LandingPage({ showToast }) {
   const languagesCanvasRef = useRef(null);
   const featuresRef = useRef(null);
   const featuresCanvasRef = useRef(null);
-  const aboutRef = useRef(null);
-  const aboutCanvasRef = useRef(null);
   const liveDemoRef = useRef(null);
   const liveDemoCanvasRef = useRef(null);
-  const contactRef = useRef(null);
-  const contactCanvasRef = useRef(null);
 
   // --- 1. Typing Simulation Effect ---
   useEffect(() => {
@@ -537,19 +529,15 @@ export default function LandingPage({ showToast }) {
     // Run Initializations
     const clearHero = initHeroGrid();
     const clearLanguages = initGalaxy(languagesRef.current, languagesCanvasRef.current);
-    const clearAbout = initGalaxy(aboutRef.current, aboutCanvasRef.current);
     const clearSparkler = initSparkler();
     const clearLiveDemo = initConstellation(liveDemoRef.current, liveDemoCanvasRef.current);
-    const clearContact = initConstellation(contactRef.current, contactCanvasRef.current);
 
     return () => {
       observer.disconnect();
       if (clearHero) clearHero();
       if (clearLanguages) clearLanguages();
-      if (clearAbout) clearAbout();
       if (clearSparkler) clearSparkler();
       if (clearLiveDemo) clearLiveDemo();
-      if (clearContact) clearContact();
       
       // Cancel any outstanding animation frame requests
       Object.values(animFrameIds).forEach(id => {
@@ -557,14 +545,6 @@ export default function LandingPage({ showToast }) {
       });
     };
   }, []);
-
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    showToast(`Thank you, ${contactName}! Your message was sent successfully.`, 'success');
-    setContactName('');
-    setContactEmail('');
-    setContactMessage('');
-  };
 
   return (
     <div id="home-view" className="flex-grow flex flex-col">
@@ -791,144 +771,6 @@ export default function LandingPage({ showToast }) {
         </div>
       </section>
 
-      {/* ==================== ABOUT SECTION ==================== */}
-      <section
-        id="about"
-        ref={aboutRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] border-b border-[var(--border-color)] relative reveal-on-scroll"
-      >
-        <canvas ref={aboutCanvasRef} id="about-particles" className="absolute inset-0 pointer-events-none z-0" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white mb-6">
-            About CodeVerse
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
-            CodeVerse was built with a vision to make programming compiler resources free, fast, and accessible for everyone without requiring complicated downloads or configurations. We bypass whitelisted/private API limits using community engines like Judge0 CE, giving developers a sandboxed space for writing algorithms, executing backend logical tests, and designing quick web applications.
-          </p>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            Whether you are testing a Rust snippet, calculating output parameters in Python, or sketching a frontend component, CodeVerse ensures a seamless, modern developer experience.
-          </p>
-        </div>
-      </section>
-
-      {/* ==================== CONTACT SECTION ==================== */}
-      <section
-        id="contact"
-        ref={contactRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll"
-      >
-        <canvas ref={contactCanvasRef} id="contact-particles" className="absolute inset-0 pointer-events-none z-0" />
-        
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left Column: Contact details and support options */}
-            <div className="flex flex-col gap-8 text-left">
-              <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-[10px] font-semibold text-indigo-400 mb-4 animate-pulse">
-                  <i className="fas fa-headset text-[9px]"></i>
-                  <span>24/7 Developer Support</span>
-                </span>
-                <h2 className="text-3xl font-extrabold tracking-tight text-white mb-4">
-                  Get in Touch
-                </h2>
-                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                  Have feedback, suggestions, or API connection issues? Drop us a message. Our compiler status monitors ensure logical sandbox resources stay up 24/7.
-                </p>
-              </div>
-
-              {/* Quick Info Cards */}
-              <div className="flex flex-col gap-4">
-                {/* Email Support Card */}
-                <a href="mailto:shariaralways@gmail.com" className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base">
-                    <i className="fas fa-envelope"></i>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">Direct Support</h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">shariaralways@gmail.com</p>
-                  </div>
-                </a>
-
-                {/* LinkedIn Card */}
-                <a href="https://www.linkedin.com/in/shariarahamed/" target="_blank" rel="noopener noreferrer" className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-cyan-500/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base">
-                    <i className="fab fa-linkedin-in"></i>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">Professional Profile</h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">linkedin.com/in/shariarahamed</p>
-                  </div>
-                </a>
-
-                {/* Active Status Indicator */}
-                <div className="flex items-center gap-2 px-1 text-xs text-[var(--text-secondary)] font-medium">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span>All compiler sandboxes fully operational</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Glassmorphic Form */}
-            <form
-              onSubmit={handleContactSubmit}
-              className="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl text-left"
-            >
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                  placeholder="Write your name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                  placeholder="abc@yourdomain.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Message
-                </label>
-                <textarea
-                  required
-                  rows="4"
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
-                  placeholder="Enter your comments or questions..."
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200 btn-premium-glow"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

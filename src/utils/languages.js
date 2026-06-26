@@ -498,6 +498,14 @@ void main() {
     </div>
 </body>
 </html>`
+  },
+  text: {
+    id: "text",
+    name: "Text Notes",
+    monacoId: "plaintext",
+    extension: "txt",
+    badgeClass: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+    defaultCode: ""
   }
 };
 

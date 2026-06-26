@@ -40,7 +40,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
   };
 
   return (
-    <header className="w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/45 sticky top-0 z-30 backdrop-blur-xl transition-all duration-300">
+    <header className="fixed top-0 left-0 w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/45 z-30 backdrop-blur-xl transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Logo & Name */}
@@ -73,10 +73,10 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => handleNavClick('features')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             Features
           </button>
-          <button onClick={() => handleNavClick('about')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
+          <button onClick={() => navigate('/about')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             About
           </button>
-          <button onClick={() => handleNavClick('contact')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
+          <button onClick={() => navigate('/contact')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             Contact
           </button>
         </nav>
@@ -202,8 +202,8 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => handleNavClick('hero')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Home</button>
           <button onClick={() => handleNavClick('languages')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Languages</button>
           <button onClick={() => handleNavClick('features')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Features</button>
-          <button onClick={() => handleNavClick('about')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">About</button>
-          <button onClick={() => handleNavClick('contact')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Contact</button>
+          <button onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">About</button>
+          <button onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Contact</button>
           
           {location.pathname !== '/editor' && (
             <button

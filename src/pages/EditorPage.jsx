@@ -1,12 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
 
-export default function EditorPage({ theme, showToast }) {
+export default function EditorPage({ user, theme, showToast }) {
   // --- States ---
-  const [currentLanguage, setCurrentLanguage] = useState(() => localStorage.getItem("codeverse_lang") || "html");
+  const [searchParams] = useSearchParams();
+  const queryLang = searchParams.get('lang');
+  
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    const saved = localStorage.getItem("codeverse_lang") || "html";
+    return saved;
+  });
+  
+  useEffect(() => {
+    if (queryLang && LANGUAGES[queryLang]) {
+      setCurrentLanguage(queryLang);
+    }
+  }, [queryLang]);
+
   const [activeWebTab, setActiveWebTab] = useState(() => localStorage.getItem("codeverse_web_active_tab") || "html");
   
   // HTML Playground files states
@@ -16,7 +30,7 @@ export default function EditorPage({ theme, showToast }) {
   
   // Backend compiler code state
   const [code, setCode] = useState(() => {
-    if (currentLanguage === "html") return "";
+    if (currentLanguage === "html" || currentLanguage === "text") return "";
     return localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage]?.defaultCode || "";
   });
 
@@ -36,6 +50,111 @@ export default function EditorPage({ theme, showToast }) {
   
   // Web Lab Logs state
   const [webLogs, setWebLogs] = useState([]);
+
+  // --- Text Notes Workspace States & Handlers ---
+  const [notes, setNotes] = useState(() => {
+    try {
+      const saved = localStorage.getItem("codeverse_notes");
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error("Error reading saved notes", e);
+    }
+    return [
+      {
+        id: 'welcome',
+        title: 'Welcome to CodeVerse Notes!',
+        content: 'Welcome to your personal scratchpad!\n\nHere you can:\n1. Keep notes side-by-side with your programming environment.\n2. Create multiple notes using the "+" button on the sidebar.\n3. Search notes by title.\n4. Download note content as a .txt file.\n5. Auto-save is active - everything you write is instantly stored in your browser\'s local storage.',
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  });
+
+  const [activeNoteId, setActiveNoteId] = useState(() => {
+    const saved = localStorage.getItem("codeverse_active_note_id");
+    return saved || 'welcome';
+  });
+
+  const [noteSearchQuery, setNoteSearchQuery] = useState('');
+
+  // Sync notes and activeNoteId with localStorage
+  useEffect(() => {
+    localStorage.setItem("codeverse_notes", JSON.stringify(notes));
+  }, [notes]);
+
+  useEffect(() => {
+    localStorage.setItem("codeverse_active_note_id", activeNoteId);
+  }, [activeNoteId]);
+
+  const activeNote = notes.find(n => n.id === activeNoteId) || notes[0];
+
+  const handleCreateNote = () => {
+    if (!user && notes.length >= 3) {
+      showToast("Guest accounts are limited to 3 notes. Sign in to unlock unlimited notes!", "warning");
+      return;
+    }
+    const newNote = {
+      id: Date.now().toString(),
+      title: 'Untitled Note',
+      content: '',
+      updatedAt: new Date().toISOString()
+    };
+    setNotes(prev => [newNote, ...prev]);
+    setActiveNoteId(newNote.id);
+    showToast("New note created", "success");
+  };
+
+  const handleDeleteNote = (id, e) => {
+    if (e) e.stopPropagation();
+    const remaining = notes.filter(n => n.id !== id);
+    setNotes(remaining);
+    
+    if (activeNoteId === id) {
+      if (remaining.length > 0) {
+        setActiveNoteId(remaining[0].id);
+      } else {
+        setActiveNoteId('');
+      }
+    }
+    showToast("Note deleted", "info");
+  };
+
+  const handleUpdateNote = (field, value) => {
+    if (!activeNote) return;
+    setNotes(prev => prev.map(n => {
+      if (n.id === activeNote.id) {
+        return {
+          ...n,
+          [field]: value,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return n;
+    }));
+  };
+
+  const handleDownloadNote = () => {
+    if (!activeNote) return;
+    const blob = new Blob([activeNote.content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${activeNote.title || 'Untitled'}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("Downloaded note successfully", "success");
+  };
+
+  const handleCopyNote = () => {
+    if (!activeNote) return;
+    navigator.clipboard.writeText(activeNote.content).then(() => {
+      showToast("Note content copied to clipboard", "success");
+    }).catch(err => {
+      console.error(err);
+      showToast("Failed to copy note", "error");
+    });
+  };
 
   // Refs
   const editorRef = useRef(null);
@@ -69,7 +188,7 @@ export default function EditorPage({ theme, showToast }) {
   // Sync current language settings on load/change
   useEffect(() => {
     localStorage.setItem("codeverse_lang", currentLanguage);
-    if (currentLanguage !== "html") {
+    if (currentLanguage !== "html" && currentLanguage !== "text") {
       const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage]?.defaultCode || "";
       setCode(savedCode);
     }
@@ -127,9 +246,9 @@ export default function EditorPage({ theme, showToast }) {
     if (!LANGUAGES[nextLang]) return;
 
     // Cache current edits
-    if (currentLanguage !== "html") {
+    if (currentLanguage !== "html" && currentLanguage !== "text") {
       localStorage.setItem(`codeverse_code_${currentLanguage}`, code);
-    } else {
+    } else if (currentLanguage === "html") {
       localStorage.setItem("codeverse_code_html", htmlCode);
       localStorage.setItem("codeverse_web_css", cssCode);
       localStorage.setItem("codeverse_web_js", jsCode);
@@ -137,7 +256,7 @@ export default function EditorPage({ theme, showToast }) {
 
     setCurrentLanguage(nextLang);
 
-    if (nextLang !== "html") {
+    if (nextLang !== "html" && nextLang !== "text") {
       const nextCode = localStorage.getItem(`codeverse_code_${nextLang}`) || LANGUAGES[nextLang].defaultCode;
       setCode(nextCode);
     }
@@ -511,68 +630,224 @@ export default function EditorPage({ theme, showToast }) {
             {LANGUAGES[currentLanguage]?.name}
           </span>
         </div>
-
         {/* Action Button Controls */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Clear Console Output Button */}
+          {/* Clear Button */}
           <button
-            onClick={clearConsole}
+            onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <i className="fas fa-eraser"></i>
-            <span>Clear</span>
+            <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
           </button>
 
-          {/* Copy Code to Clipboard Button */}
+          {/* Copy Button */}
           <button
-            onClick={copyCodeToClipboard}
+            onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <i className="fas fa-copy"></i>
-            <span>Copy</span>
+            <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
           </button>
 
-          {/* Download Code File Button */}
+          {/* Download Button */}
           <button
-            onClick={downloadCodeFile}
+            onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
-            <i class="fas fa-download"></i>
-            <span>Download</span>
+            <i className="fas fa-download"></i>
+            <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
           </button>
 
-          {/* Settings Modal Button */}
-          <button
-            onClick={openSettingsModal}
-            className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-            title="API Credentials Configuration"
-          >
-            <i className="fas fa-sliders text-sm"></i>
-          </button>
+          {currentLanguage !== "text" && (
+            <>
+              {/* Settings Modal Button */}
+              <button
+                onClick={openSettingsModal}
+                className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                title="API Credentials Configuration"
+              >
+                <i className="fas fa-sliders text-sm"></i>
+              </button>
 
-          {/* Execute / Run Code Trigger Button */}
-          <button
-            onClick={runCode}
-            disabled={isExecuting}
-            className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-          >
-            {isExecuting ? (
-              <>
-                <div className="spinner"></div>
-                <span>Compiling...</span>
-              </>
-            ) : (
-              <>
-                <i className="fas fa-play text-xs"></i>
-                <span>Run Code</span>
-              </>
-            )}
-          </button>
+              {/* Execute / Run Code Trigger Button */}
+              <button
+                onClick={runCode}
+                disabled={isExecuting}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+              >
+                {isExecuting ? (
+                  <>
+                    <div className="spinner"></div>
+                    <span>Compiling...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-play text-xs"></i>
+                    <span>Run Code</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
+      {currentLanguage === "text" ? (
+        <div className="flex-grow flex flex-col md:flex-row border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border min-h-[500px]">
+          {/* Notes Sidebar */}
+          <div className="w-full md:w-80 border-r border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex flex-col">
+            <div className="p-4 flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30">
+              <div className="flex items-center gap-2">
+                <i className="fas fa-file-alt text-indigo-400"></i>
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Notes</span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                  {notes.length}
+                </span>
+                {!user && (
+                  <span className="px-2 py-0.5 rounded-full text-[8px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500 uppercase tracking-wider" title="Sign in to save notes to cloud">
+                    Guest Mode
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleCreateNote}
+                className="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white flex items-center justify-center transition-all duration-200"
+                title="Create a new note"
+              >
+                <i className="fas fa-plus text-xs"></i>
+              </button>
+            </div>
+            {/* Search Bar */}
+            <div className="p-3 border-b border-[var(--border-color)]/50">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search notes..."
+                  value={noteSearchQuery}
+                  onChange={(e) => setNoteSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
+                />
+                <i className="fas fa-search absolute left-3 top-2.5 text-[var(--text-muted)] text-[10px]"></i>
+              </div>
+            </div>
+            {/* Notes List */}
+            <div className="flex-grow overflow-y-auto divide-y divide-[var(--border-color)]/20 scrollbar-thin max-h-[450px]">
+              {notes.filter(n => n.title.toLowerCase().includes(noteSearchQuery.toLowerCase())).length === 0 ? (
+                <div className="p-4 text-center text-xs text-[var(--text-muted)] italic">
+                  No notes found
+                </div>
+              ) : (
+                notes
+                  .filter(n => n.title.toLowerCase().includes(noteSearchQuery.toLowerCase()))
+                  .map(n => {
+                    const isActive = n.id === activeNoteId;
+                    const cleanExcerpt = n.content ? n.content.substring(0, 45).replace(/\n/g, ' ') + (n.content.length > 45 ? '...' : '') : 'No content';
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => setActiveNoteId(n.id)}
+                        className={`p-3.5 flex items-start justify-between gap-3 cursor-pointer select-none transition-all duration-200 relative group ${
+                          isActive
+                            ? 'bg-indigo-600/10 border-l-2 border-indigo-500'
+                            : 'hover:bg-[var(--bg-tertiary)]/30'
+                        }`}
+                      >
+                        <div className="flex-grow min-w-0">
+                          <h4 className={`text-xs font-bold truncate ${isActive ? 'text-indigo-400' : 'text-white'}`}>
+                            {n.title || 'Untitled Note'}
+                          </h4>
+                          <p className="text-[10px] text-[var(--text-muted)] truncate mt-1">
+                            {cleanExcerpt}
+                          </p>
+                          <span className="text-[8px] text-[var(--text-muted)] mt-2 block font-mono">
+                            {new Date(n.updatedAt).toLocaleDateString()} {new Date(n.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => handleDeleteNote(n.id, e)}
+                          className="text-[var(--text-muted)] hover:text-rose-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200 p-1"
+                          title="Delete Note"
+                        >
+                          <i className="fas fa-trash-can text-xs"></i>
+                        </button>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+          </div>
 
-      {/* ==================== SPLIT EDITOR AND TERMINAL SECTION ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow relative z-10">
+          {/* Active Note Area */}
+          <div className="flex-grow flex flex-col bg-[#1e1e2e]/10 font-sans">
+            {activeNote ? (
+              <>
+                <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-6">
+                  <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] font-mono">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Saved locally</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleCopyNote}
+                      className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-[var(--text-secondary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/40 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                      title="Copy content"
+                    >
+                      <i className="fas fa-copy text-xs"></i>
+                    </button>
+                    <button
+                      onClick={handleDownloadNote}
+                      className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-[var(--text-secondary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/40 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                      title="Download as txt"
+                    >
+                      <i className="fas fa-download text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  type="text"
+                  value={activeNote.title}
+                  onChange={(e) => handleUpdateNote('title', e.target.value)}
+                  placeholder="Note Title"
+                  className="w-full px-6 py-4 bg-transparent border-b border-[var(--border-color)] text-white text-base font-bold focus:outline-none focus:ring-0 placeholder:text-slate-500 font-sans"
+                />
+
+                <textarea
+                  value={activeNote.content}
+                  onChange={(e) => handleUpdateNote('content', e.target.value)}
+                  placeholder="Start typing your thoughts here..."
+                  className="w-full flex-grow px-6 py-4 bg-transparent border-none text-slate-300 font-sans text-sm leading-relaxed resize-none focus:outline-none focus:ring-0 placeholder:text-slate-600 min-h-[300px]"
+                />
+
+                <div className="h-9 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/10 flex items-center justify-between px-6 text-[9px] font-mono text-[var(--text-muted)] select-none">
+                  <div>
+                    Last updated: {new Date(activeNote.updatedAt).toLocaleTimeString()}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span>Words: {activeNote.content.trim().split(/\s+/).filter(Boolean).length}</span>
+                    <span>Chars: {activeNote.content.length}</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-grow flex flex-col items-center justify-center text-center p-6">
+                <i className="far fa-sticky-note text-4xl text-[var(--border-color)] mb-4 animate-bounce"></i>
+                <h3 className="text-sm font-bold text-white mb-2">No active note selected</h3>
+                <p className="text-xs text-[var(--text-muted)] max-w-xs mb-4">
+                  Create a new note using the plus icon or sidebar controls to begin writing.
+                </p>
+                <button
+                  onClick={handleCreateNote}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200"
+                >
+                  Create New Note
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow relative z-10">
         {/* Monaco Code Editor Area (Occupies 2 columns on large displays) */}
         <div className="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
           {/* Tab Bar Header */}
@@ -820,6 +1095,7 @@ export default function EditorPage({ theme, showToast }) {
           )}
         </div>
       </div>
+      )}
 
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
