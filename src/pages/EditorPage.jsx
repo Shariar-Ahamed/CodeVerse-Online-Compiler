@@ -13,8 +13,8 @@ export default function EditorPage({ user, theme, showToast }) {
   const queryLang = searchParams.get('lang');
   
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    const saved = localStorage.getItem("codeverse_lang") || "html";
-    return saved;
+    const saved = localStorage.getItem("codeverse_lang");
+    return (saved && LANGUAGES[saved]) ? saved : "html";
   });
   
   useEffect(() => {
@@ -54,6 +54,28 @@ export default function EditorPage({ user, theme, showToast }) {
   const [webLogs, setWebLogs] = useState([]);
 
   // --- Text Notes Workspace States & Handlers ---
+  const [notes, setNotes] = useState(() => {
+    try {
+      const saved = localStorage.getItem("codeverse_notes");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error("Error reading saved notes", e);
+    }
+    return [
+      {
+        id: 'welcome',
+        title: 'Welcome to CodeVerse Notes!',
+        content: 'Welcome to your personal scratchpad!\n\nHere you can:\n1. Keep notes side-by-side with your programming environment.\n2. Create multiple notes using the "+" button on the sidebar.\n3. Search notes by title.\n4. Download note content as a .txt file.\n5. Auto-save is active - everything you write is instantly stored in your browser\'s local storage.',
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  });
+
   // --- Firestore Realtime Sync for Notes ---
   useEffect(() => {
     if (!user || user.isGuest) {
