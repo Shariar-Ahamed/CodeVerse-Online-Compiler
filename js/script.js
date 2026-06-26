@@ -7,6 +7,8 @@
 const DEFAULT_API_URL = "https://ce.judge0.com"; // Judge0 CE free instance
 const REPO_NAME = "CodeVerse Online Compiler";
 
+let currentUser = null; // Client-side authentication session state
+
 // Language Configurations & Templates
 const LANGUAGES = {
   c: {
@@ -878,7 +880,44 @@ const DOM = {
   heroSpotlight: document.getElementById("hero-spotlight"),
   maintenanceModal: document.getElementById("maintenance-modal"),
   closeMaintenanceBtn: document.getElementById("close-maintenance-btn"),
-  closeMaintenanceX: document.getElementById("close-maintenance-x")
+  closeMaintenanceX: document.getElementById("close-maintenance-x"),
+  
+  // Auth DOM elements
+  authNavContainer: document.getElementById("auth-nav-container"),
+  navSigninBtn: document.getElementById("nav-signin-btn"),
+  navUserProfile: document.getElementById("nav-user-profile"),
+  navUserAvatarBtn: document.getElementById("nav-user-avatar-btn"),
+  navUserDropdown: document.getElementById("nav-user-dropdown"),
+  dropdownUserName: document.getElementById("dropdown-user-name"),
+  dropdownUserEmail: document.getElementById("dropdown-user-email"),
+  dropdownGotoIde: document.getElementById("dropdown-goto-ide"),
+  dropdownSignoutBtn: document.getElementById("dropdown-signout-btn"),
+  
+  // Mobile Auth elements
+  mobileSigninBtn: document.getElementById("mobile-signin-btn"),
+  mobileUserProfile: document.getElementById("mobile-user-profile"),
+  mobileUserAvatar: document.getElementById("mobile-user-avatar"),
+  mobileUserName: document.getElementById("mobile-user-name"),
+  mobileUserEmail: document.getElementById("mobile-user-email"),
+  mobileSignoutBtn: document.getElementById("mobile-signout-btn"),
+
+  // Auth modal elements
+  authModal: document.getElementById("auth-modal"),
+  authCard: document.getElementById("auth-card"),
+  closeAuthX: document.getElementById("close-auth-x"),
+  authTabLogin: document.getElementById("auth-tab-login"),
+  authTabSignup: document.getElementById("auth-tab-signup"),
+  authForm: document.getElementById("auth-form"),
+  authFieldName: document.getElementById("auth-field-name"),
+  authFieldConfirmPass: document.getElementById("auth-field-confirm-pass"),
+  authInputName: document.getElementById("auth-input-name"),
+  authInputEmail: document.getElementById("auth-input-email"),
+  authInputPassword: document.getElementById("auth-input-password"),
+  authInputConfirmPass: document.getElementById("auth-input-confirm-pass"),
+  authTogglePass: document.getElementById("auth-toggle-pass"),
+  authSubmitBtn: document.getElementById("auth-submit-btn"),
+  authSocialGithub: document.getElementById("auth-social-github"),
+  authSocialGoogle: document.getElementById("auth-social-google")
 };
 
 // --- Monaco Editor Initialization ---
@@ -1481,6 +1520,162 @@ function saveSettings() {
   showToast("Settings updated successfully", "success");
 }
 
+// --- Authentication Management ---
+let authCurrentTab = "login"; // "login" or "signup"
+
+function initAuth() {
+  try {
+    const savedUser = localStorage.getItem("codeverse_user");
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+    }
+  } catch (e) {
+    console.error("Error reading saved user session", e);
+  }
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  if (currentUser) {
+    // Logged in states
+    if (DOM.navSigninBtn) DOM.navSigninBtn.classList.add("hidden");
+    if (DOM.navUserProfile) DOM.navUserProfile.classList.remove("hidden");
+    if (DOM.navUserAvatarBtn) {
+      DOM.navUserAvatarBtn.textContent = (currentUser.name || "U").charAt(0).toUpperCase();
+    }
+    if (DOM.dropdownUserName) DOM.dropdownUserName.textContent = currentUser.name || "User";
+    if (DOM.dropdownUserEmail) DOM.dropdownUserEmail.textContent = currentUser.email || "";
+
+    // Mobile nav updates
+    if (DOM.mobileSigninBtn) DOM.mobileSigninBtn.classList.add("hidden");
+    if (DOM.mobileUserProfile) DOM.mobileUserProfile.classList.remove("hidden");
+    if (DOM.mobileUserAvatar) {
+      DOM.mobileUserAvatar.textContent = (currentUser.name || "U").charAt(0).toUpperCase();
+    }
+    if (DOM.mobileUserName) DOM.mobileUserName.textContent = currentUser.name || "User";
+    if (DOM.mobileUserEmail) DOM.mobileUserEmail.textContent = currentUser.email || "";
+  } else {
+    // Logged out states
+    if (DOM.navSigninBtn) DOM.navSigninBtn.classList.remove("hidden");
+    if (DOM.navUserProfile) DOM.navUserProfile.classList.add("hidden");
+    if (DOM.navUserDropdown) DOM.navUserDropdown.classList.add("hidden");
+
+    // Mobile nav updates
+    if (DOM.mobileSigninBtn) DOM.mobileSigninBtn.classList.remove("hidden");
+    if (DOM.mobileUserProfile) DOM.mobileUserProfile.classList.add("hidden");
+  }
+}
+
+function openAuthModal(tab = "login") {
+  if (DOM.authModal) {
+    DOM.authModal.classList.remove("hidden");
+    DOM.authModal.classList.add("flex");
+  }
+  // If mobile menu is open, hide it
+  if (DOM.mobileNav) DOM.mobileNav.classList.add("hidden");
+  switchAuthTab(tab);
+}
+
+function closeAuthModal() {
+  if (DOM.authModal) {
+    DOM.authModal.classList.remove("flex");
+    DOM.authModal.classList.add("hidden");
+  }
+  // Clear input fields
+  if (DOM.authForm) DOM.authForm.reset();
+}
+
+function switchAuthTab(tab) {
+  authCurrentTab = tab;
+  
+  if (tab === "login") {
+    // Tabs UI
+    DOM.authTabLogin.classList.remove("border-transparent", "text-[var(--text-secondary)]");
+    DOM.authTabLogin.classList.add("border-indigo-500", "text-white");
+    
+    DOM.authTabSignup.classList.remove("border-indigo-500", "text-white");
+    DOM.authTabSignup.classList.add("border-transparent", "text-[var(--text-secondary)]");
+    
+    // Field toggles
+    DOM.authFieldName.classList.add("hidden");
+    DOM.authFieldConfirmPass.classList.add("hidden");
+    
+    // Input requirements
+    DOM.authInputName.required = false;
+    DOM.authInputConfirmPass.required = false;
+    
+    // Button text
+    DOM.authSubmitBtn.textContent = "Sign In to Account";
+  } else {
+    // Tabs UI
+    DOM.authTabSignup.classList.remove("border-transparent", "text-[var(--text-secondary)]");
+    DOM.authTabSignup.classList.add("border-indigo-500", "text-white");
+    
+    DOM.authTabLogin.classList.remove("border-indigo-500", "text-white");
+    DOM.authTabLogin.classList.add("border-transparent", "text-[var(--text-secondary)]");
+    
+    // Field toggles
+    DOM.authFieldName.classList.remove("hidden");
+    DOM.authFieldName.classList.add("flex");
+    DOM.authFieldConfirmPass.classList.remove("hidden");
+    DOM.authFieldConfirmPass.classList.add("flex");
+    
+    // Input requirements
+    DOM.authInputName.required = true;
+    DOM.authInputConfirmPass.required = true;
+    
+    // Button text
+    DOM.authSubmitBtn.textContent = "Create Account";
+  }
+}
+
+function handleAuthSubmit(e) {
+  e.preventDefault();
+  
+  const email = DOM.authInputEmail.value.trim();
+  const password = DOM.authInputPassword.value;
+  
+  if (authCurrentTab === "signup") {
+    const name = DOM.authInputName.value.trim();
+    const confirmPass = DOM.authInputConfirmPass.value;
+    
+    if (password !== confirmPass) {
+      showToast("Passwords do not match!", "error");
+      return;
+    }
+    
+    // Simulate successful registration
+    currentUser = { name, email };
+    localStorage.setItem("codeverse_user", JSON.stringify(currentUser));
+    showToast(`Welcome to CodeVerse, ${name}!`, "success");
+  } else {
+    // Simulate successful login (mock credential accept)
+    const name = email.split('@')[0]; // Default user name from email
+    currentUser = { name: name.charAt(0).toUpperCase() + name.slice(1), email };
+    localStorage.setItem("codeverse_user", JSON.stringify(currentUser));
+    showToast(`Welcome back, ${currentUser.name}!`, "success");
+  }
+  
+  updateAuthUI();
+  closeAuthModal();
+}
+
+function handleLogout() {
+  currentUser = null;
+  localStorage.removeItem("codeverse_user");
+  updateAuthUI();
+  showToast("Signed out successfully", "info");
+}
+
+function togglePasswordVisibility() {
+  const type = DOM.authInputPassword.getAttribute("type") === "password" ? "text" : "password";
+  DOM.authInputPassword.setAttribute("type", type);
+  const icon = DOM.authTogglePass.querySelector("i");
+  if (icon) {
+    icon.className = type === "password" ? "fas fa-eye text-xs" : "fas fa-eye-slash text-xs";
+  }
+}
+
 // --- Language Selector Handlers ---
 function handleLanguageChange(event) {
   const nextLang = event.target.value;
@@ -1563,6 +1758,85 @@ function registerEventListeners() {
   if (DOM.maintenanceModal) {
     DOM.maintenanceModal.addEventListener("click", (e) => {
       if (e.target === DOM.maintenanceModal) closeMaintenanceWarning();
+    });
+  }
+
+  // Authentication Event Listeners
+  if (DOM.navSigninBtn) {
+    DOM.navSigninBtn.addEventListener("click", () => openAuthModal("login"));
+  }
+  if (DOM.mobileSigninBtn) {
+    DOM.mobileSigninBtn.addEventListener("click", () => openAuthModal("login"));
+  }
+  if (DOM.closeAuthX) {
+    DOM.closeAuthX.addEventListener("click", closeAuthModal);
+  }
+  if (DOM.authModal) {
+    DOM.authModal.addEventListener("click", (e) => {
+      if (e.target === DOM.authModal) closeAuthModal();
+    });
+  }
+  if (DOM.authTabLogin) {
+    DOM.authTabLogin.addEventListener("click", () => switchAuthTab("login"));
+  }
+  if (DOM.authTabSignup) {
+    DOM.authTabSignup.addEventListener("click", () => switchAuthTab("signup"));
+  }
+  if (DOM.authForm) {
+    DOM.authForm.addEventListener("submit", handleAuthSubmit);
+  }
+  if (DOM.authTogglePass) {
+    DOM.authTogglePass.addEventListener("click", togglePasswordVisibility);
+  }
+  
+  // User Dropdown toggling
+  if (DOM.navUserAvatarBtn) {
+    DOM.navUserAvatarBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      DOM.navUserDropdown.classList.toggle("hidden");
+      DOM.navUserDropdown.classList.toggle("flex");
+    });
+  }
+  
+  // Close dropdown on click outside
+  window.addEventListener("click", () => {
+    if (DOM.navUserDropdown && !DOM.navUserDropdown.classList.contains("hidden")) {
+      DOM.navUserDropdown.classList.add("hidden");
+      DOM.navUserDropdown.classList.remove("flex");
+    }
+  });
+  
+  if (DOM.dropdownGotoIde) {
+    DOM.dropdownGotoIde.addEventListener("click", (e) => {
+      e.preventDefault();
+      showEditorView("html"); // Go to Web Lab IDE
+    });
+  }
+  
+  if (DOM.dropdownSignoutBtn) {
+    DOM.dropdownSignoutBtn.addEventListener("click", handleLogout);
+  }
+  if (DOM.mobileSignoutBtn) {
+    DOM.mobileSignoutBtn.addEventListener("click", handleLogout);
+  }
+  
+  // Mock social logins
+  if (DOM.authSocialGithub) {
+    DOM.authSocialGithub.addEventListener("click", () => {
+      currentUser = { name: "GitHub Coder", email: "github-coder@codeverse.me" };
+      localStorage.setItem("codeverse_user", JSON.stringify(currentUser));
+      updateAuthUI();
+      closeAuthModal();
+      showToast("Logged in via GitHub", "success");
+    });
+  }
+  if (DOM.authSocialGoogle) {
+    DOM.authSocialGoogle.addEventListener("click", () => {
+      currentUser = { name: "Google Dev", email: "google-dev@codeverse.me" };
+      localStorage.setItem("codeverse_user", JSON.stringify(currentUser));
+      updateAuthUI();
+      closeAuthModal();
+      showToast("Logged in via Google", "success");
     });
   }
 
@@ -2145,6 +2419,7 @@ function escapeHtml(str) {
 // --- Application Bootstrapping ---
 function initApp() {
   initTheme();
+  initAuth(); // Initialize client-side authentication states
   registerEventListeners();
   updateLanguageBadge();
   initMonaco();

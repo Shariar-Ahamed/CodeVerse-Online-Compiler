@@ -93,6 +93,53 @@
 
         <!-- Quick Action Navigation Toolbar -->
         <div class="flex items-center gap-3">
+          <!-- Authentication Container -->
+          <div id="auth-nav-container" class="flex items-center gap-2">
+            <!-- Signed Out State -->
+            <button
+              id="nav-signin-btn"
+              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+            >
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Sign In</span>
+            </button>
+            
+            <!-- Signed In State (Hidden by default) -->
+            <div id="nav-user-profile" class="relative hidden">
+              <button
+                id="nav-user-avatar-btn"
+                class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans"
+                title="View Profile"
+              >
+                U
+              </button>
+              <!-- Profile Dropdown Menu -->
+              <div
+                id="nav-user-dropdown"
+                class="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-xl hidden flex-col py-1.5 z-40 animate-scale-up"
+              >
+                <div class="px-4 py-2.5 border-b border-[var(--border-color)] flex flex-col gap-0.5">
+                  <span id="dropdown-user-name" class="text-xs font-bold text-[var(--text-primary)]">User Name</span>
+                  <span id="dropdown-user-email" class="text-[10px] text-[var(--text-secondary)] font-mono truncate">user@domain.com</span>
+                </div>
+                <button
+                  id="dropdown-goto-ide"
+                  class="w-full text-left px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-2 transition-all duration-200"
+                >
+                  <i class="fas fa-code text-[10px]"></i>
+                  <span>Launch IDE Workspace</span>
+                </button>
+                <button
+                  id="dropdown-signout-btn"
+                  class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 flex items-center gap-2 transition-all duration-200 border-t border-[var(--border-color)] mt-1"
+                >
+                  <i class="fas fa-sign-out-alt text-[10px]"></i>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- CTA Button in Header -->
           <button
             id="nav-cta-btn"
@@ -167,6 +214,35 @@
           <i class="fas fa-terminal"></i>
           <span>Launch IDE</span>
         </button>
+
+        <!-- Mobile Auth Button Container -->
+        <div id="mobile-auth-container" class="border-t border-[var(--border-color)]/50 pt-2 flex flex-col gap-2">
+          <!-- Mobile Sign In -->
+          <button
+            id="mobile-signin-btn"
+            class="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 transition-all duration-200"
+          >
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Sign In</span>
+          </button>
+          
+          <!-- Mobile User Profile Info (Hidden by default) -->
+          <div id="mobile-user-profile" class="hidden flex-col gap-2 bg-[var(--bg-tertiary)]/20 p-3 rounded-xl border border-[var(--border-color)]">
+            <div class="flex items-center gap-2.5">
+              <div id="mobile-user-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-white text-xs font-bold font-mono">U</div>
+              <div class="flex flex-col">
+                <span id="mobile-user-name" class="text-xs font-bold text-[var(--text-primary)]">User Name</span>
+                <span id="mobile-user-email" class="text-[10px] text-[var(--text-secondary)] font-mono">user@domain.com</span>
+              </div>
+            </div>
+            <button
+              id="mobile-signout-btn"
+              class="w-full py-1.5 mt-1 rounded-lg text-xs font-bold text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -1611,6 +1687,157 @@ Write code and click 'Run Code' to execute.
         >
           Got it
         </button>
+      </div>
+    </div>
+
+    <!-- ==================== AUTHENTICATION MODAL ==================== -->
+    <div
+      id="auth-modal"
+      class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
+    >
+      <div
+        id="auth-card"
+        class="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-slate-900/95 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 p-6 animate-fade-in-up flex flex-col gap-6 relative text-left"
+      >
+        <!-- Close button (X) -->
+        <button
+          id="close-auth-x"
+          class="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none"
+          title="Close"
+          type="button"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Auth Tabs Header -->
+        <div class="flex border-b border-[var(--border-color)] pb-px">
+          <button
+            id="auth-tab-login"
+            class="flex-1 pb-3 text-center text-sm font-bold border-b-2 border-indigo-500 text-white transition-all duration-200"
+            type="button"
+          >
+            Sign In
+          </button>
+          <button
+            id="auth-tab-signup"
+            class="flex-1 pb-3 text-center text-sm font-bold border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200"
+            type="button"
+          >
+            Create Account
+          </button>
+        </div>
+
+        <!-- Auth Form -->
+        <form id="auth-form" class="flex flex-col gap-4">
+          <!-- Sign Up Name Field (Hidden by default in login state) -->
+          <div id="auth-field-name" class="hidden flex-col gap-1.5">
+            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Full Name</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
+                <i class="fas fa-user text-xs"></i>
+              </span>
+              <input
+                type="text"
+                id="auth-input-name"
+                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="Enter your name"
+              />
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Email Address</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
+                <i class="fas fa-envelope text-xs"></i>
+              </span>
+              <input
+                type="email"
+                id="auth-input-email"
+                required
+                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="developer@codeverse.me"
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
+                <i class="fas fa-lock text-xs"></i>
+              </span>
+              <input
+                type="password"
+                id="auth-input-password"
+                required
+                class="w-full pl-9 pr-10 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                id="auth-toggle-pass"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors duration-200"
+              >
+                <i class="fas fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password Field (Hidden in login state) -->
+          <div id="auth-field-confirm-pass" class="hidden flex-col gap-1.5">
+            <label class="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Confirm Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[var(--text-secondary)]">
+                <i class="fas fa-lock text-xs"></i>
+              </span>
+              <input
+                type="password"
+                id="auth-input-confirm-pass"
+                class="w-full pl-9 pr-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="auth-submit-btn"
+            class="px-5 py-2.5 mt-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/10 w-full"
+          >
+            Sign In to Account
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="flex items-center my-1">
+          <div class="flex-grow border-t border-[var(--border-color)]"></div>
+          <span class="px-3 text-[10px] text-[var(--text-muted)] font-mono uppercase">Or Continue With</span>
+          <div class="flex-grow border-t border-[var(--border-color)]"></div>
+        </div>
+
+        <!-- Social login buttons (Mocked) -->
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            id="auth-social-github"
+            class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] hover:border-slate-500/50 transition-all duration-200 active:scale-95"
+          >
+            <i class="fab fa-github"></i>
+            <span>GitHub</span>
+          </button>
+          <button
+            type="button"
+            id="auth-social-google"
+            class="flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] hover:border-slate-500/50 transition-all duration-200 active:scale-95"
+          >
+            <i class="fab fa-google"></i>
+            <span>Google</span>
+          </button>
+        </div>
       </div>
     </div>
 
