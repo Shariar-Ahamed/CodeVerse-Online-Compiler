@@ -1,82 +1,85 @@
-# CodeVerse Online Compiler 🚀
+# CodeVerse - Online Compiler & Live Web Editor 🚀
 
 🖥️ **Live Demo**: **[https://code-verse-online-compiler.vercel.app/](https://code-verse-online-compiler.vercel.app/)**
 
-CodeVerse is a modern, responsive, and high-performance Online Compiler and IDE web application built from scratch. It features an immersive dark theme inspired by VS Code, glassmorphic layout elements, automatic syntax highlighting with Microsoft's Monaco Editor, and code execution powered by the Judge0 Community Edition API.
+CodeVerse is a modern, responsive, high-performance online IDE and visual playground web application built using React + Vite. It features a sleek glassmorphic UI, global state theme configuration (inspired by VS Code & Dracula), Microsoft's Monaco Editor integration, multi-language code execution powered by the Judge0 API, and a custom visual sandbox (Web Lab) for live HTML/CSS/JS frontend previews.
 
 ---
 
 ## 📂 Project Structure
 
-Below is the directory tree of the workspace:
+Below is the directory tree of the cleaned-up React workspace:
 ```text
 CodeVerse-Online-Compiler/
-├── index.html          # Main HTML UI workspace shell
-├── css/
-│   └── style.css       # Custom stylesheet, transitions & themes
-├── js/
-│   └── script.js       # Core compiler logic & Monaco configuration
-└── README.md           # Documentation and setup instructions
+├── public/                # Static assets (Favicons, icon SVGs)
+├── src/
+│   ├── components/        # Reusable global layout items (Header, Footer, Toast, AuthParticles)
+│   ├── pages/             # App views (LandingPage, AuthPage, EditorPage, ProfilePage)
+│   ├── utils/             # Helper configs (Boilerplate language codes, utilities)
+│   ├── App.jsx            # Main app router (HashRouter), theme configurations, & Auth Guard
+│   ├── main.jsx           # ReactDOM application entry mount point
+│   └── index.css          # Core design system stylesheet (Variables, transitions, ambient glow)
+├── index.html             # React template DOM mounting point
+├── package.json           # npm dependencies & workspace build/dev script configurations
+├── vite.config.js         # Vite bundler configurations
+└── README.md              # Project documentation and guides
 ```
 
 ---
 
 ## 🛠️ Technology Stack
 
-1. **HTML5**: Structured semantic layout.
-2. **Tailwind CSS (via Play CDN)**: Utility-first styling framework for responsive design, grid offsets, spacing, and flex boxes.
-3. **Vanilla JavaScript (ES6+)**: Handles Monaco configuration, tab states, browser storage caching, and asynchronous Judge0 compilation fetching.
-4. **Monaco Editor (via CDN Loader)**: Microsoft's VS Code text editor engine providing auto-indentation, line numbers, and syntax highlighting.
-5. **Judge0 CE API**: Handles multi-language code compilation and safe execution.
+1. **React**: Component-driven UI framework for highly reactive, stateful rendering.
+2. **Vite**: Ultra-fast bundler providing Hot Module Replacement (HMR) for quick local development.
+3. **Tailwind CSS**: Utility-first styling framework driving modular UI structures.
+4. **Monaco Editor (`@monaco-editor/react`)**: Microsoft's VS Code text editor engine featuring syntax highlighting, custom theme registers, auto-indentation, and hotkey bindings.
+5. **Judge0 CE API**: Safe, sandboxed API orchestrating backend code compilation and execution.
 
 ---
 
 ## ✨ Features
 
-- **7 Supported Languages**: Out-of-the-box support for C, C++, Python, JavaScript (Node.js), Java, PHP, and Bash scripts.
-- **Default Boilerplates**: Switching a language automatically updates the editor pane with standard template code.
-- **Interactive Stdin Console**: Send arguments or input values directly to your console program execution.
-- **Custom Settings Dialog**: Change the Judge0 API Base URL (e.g. self-hosted vs RapidAPI proxy) and configure credentials.
-- **Workspace Cache (localStorage)**: Drafted code for each language is saved locally. It will not be lost if you refresh or switch languages.
-- **Responsive Layout**: Designed for optimal editing experiences across desktop, tablet, and mobile screens.
-- **Download/Copy tools**: Download your code directly as a file (`codeverse_main.py`, etc.) or copy it to your clipboard with toast alerts.
-- **Theme Toggle**: Switch between an immersive dark mode and a clean light mode instantly.
+- **29 Supported Languages**: Fully pre-configured compiler boilerplates and environments (C, C++, C#, Java, Python, Go, Rust, Ruby, PHP, Swift, Bash, SQL, etc.).
+- **Live HTML/CSS/JS Sandbox (Web Lab)**: Dedicated editor pane for frontend sketches rendering inside an iframe with real-time browser console log interception.
+- **Dynamic Dracula Theme**: Lockable premium dark mode styling with optional Light mode alert messages.
+- **Developer Profile Dashboard**: Track compilation metrics, achievements, language preferences, and a GitHub-style activity grid visual.
+- **Secure Auth Guard Router**: Protect user profile dashboard views with redirect guards.
+- **Clipboard & File Tools**: Download codes directly as local files or copy to clipboard with toast notifications.
+- **Settings configuration**: Customize API credentials (self-hosted vs RapidAPI proxy) easily.
 
 ---
 
 ## 🚀 Setup & Local Execution Guide
 
-To run this project locally, follow these simple steps:
+To run this project locally, follow these steps:
 
-### Prerequisite
-Make sure you have [Visual Studio Code (VS Code)](https://code.visualstudio.com/) installed on your computer.
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your computer.
 
-### Step 1: Open the Project in VS Code
-1. Open VS Code.
-2. Click on **File** -> **Open Folder...**
-3. Select the `CodeVerse-Online-Compiler` directory.
+### Step 1: Install Dependencies
+Open your shell inside the project workspace directory and run:
+```bash
+npm install
+```
+*(On Windows PowerShell, use `npm.cmd install` if execution policies restrict raw script execution).*
 
-### Step 2: Install Live Server Extension
-1. Go to the **Extensions** tab in VS Code sidebar (or press `Ctrl+Shift+X`).
-2. Search for **"Live Server"** (by Ritwick Dey).
-3. Click **Install**.
+### Step 2: Run Development Server
+To launch Vite's HMR local development server, run:
+```bash
+npm run dev
+```
+*(On Windows PowerShell, use `npm.cmd run dev`)*
 
-### Step 3: Run the Server
-1. Right-click on `index.html` inside the VS Code explorer.
-2. Select **"Open with Live Server"** (or click the **"Go Live"** button in the bottom right corner of the status bar).
-3. Your default web browser will automatically open: `http://127.0.5.1:5500/index.html`.
+Your terminal will display the local address (default: `http://localhost:5173/`). Open this link in your web browser.
 
----
+### Step 3: Build for Production
+To generate compiled production static files ready for hosting, run:
+```bash
+npm run build
+```
+*(On Windows PowerShell, use `npm.cmd run build`)*
 
-## 💻 How to Test Code for Each Language
-
-1. **Select Language**: Click the language selector at the top-left to select your target language (e.g., Python).
-2. **Input arguments (Optional)**: If your script reads inputs (e.g. `scanf` in C, `input()` in Python, `cin` in C++), write those inputs on separate lines inside the **Standard Input (Stdin)** box.
-3. **Execute**: Click **"Run Code"** (or press `Ctrl+Enter` inside the browser).
-4. **Inspect Outputs**:
-   - The status bar will show execution metrics like **Time (seconds)** and **Memory Usage (Megabytes)**.
-   - Successful outputs will be printed in green/white console log.
-   - Syntax or compilation errors will be printed in red color for debugging.
+This compiles assets into the `dist/` directory.
 
 ---
 
@@ -85,7 +88,7 @@ Make sure you have [Visual Studio Code (VS Code)](https://code.visualstudio.com/
 By default, this application connects to the free public instance of Judge0 CE: `https://ce.judge0.com`. 
 
 If you hit rate limits, you can self-host Judge0 via Docker or configure your own RapidAPI tier:
-1. Click the **Gear (Settings)** icon in the top right navbar.
+1. Click the **Sliders (Settings)** icon in the compiler controls bar.
 2. Replace the **Judge0 API Base URL** (e.g. to `http://localhost:2358` or `https://judge0-ce.p.rapidapi.com`).
 3. Add your RapidAPI key (`x-rapidapi-key`) if necessary.
 4. Click **Save Configuration**. It will persist inside your browser cache.
@@ -94,24 +97,11 @@ If you hit rate limits, you can self-host Judge0 via Docker or configure your ow
 
 ## 🌐 Deployment Instructions
 
-### 1. GitHub Pages (Free)
-1. Initialize git and push this repository to GitHub:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial CodeVerse Release"
-   git remote add origin <your-github-repo-url>
-   git branch -M main
-   git push -u origin main
-   ```
-2. Go to your repository settings on GitHub.
-3. Scroll down to **Pages** in the sidebar.
-4. Under **Build and deployment**, select **Deploy from a branch** and choose `main` -> `/root`.
-5. Click **Save**. Your site will be live at `https://<your-username>.github.io/CodeVerse-Online-Compiler/` within minutes.
-
-### 2. Vercel Deployment
-1. Go to [Vercel](https://vercel.com/) and sign in.
-2. Click **Add New** -> **Project**.
-3. Import your GitHub repository.
-4. Leave build settings to default (since this is static HTML/CSS/JS).
-5. Click **Deploy**. Vercel will build and deploy your project automatically.
+### Vercel / Netlify Deployment
+1. Push this repository to your GitHub account.
+2. Log in to [Vercel](https://vercel.com/) or [Netlify](https://www.netlify.com/).
+3. Create a new project and import your repository.
+4. Vercel/Netlify will automatically detect **Vite** configuration:
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+5. Click **Deploy**. Your site will be online in under a minute with automatic HMR deploys on code push.

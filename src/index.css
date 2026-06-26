@@ -57,21 +57,58 @@ body {
   color: var(--text-primary);
   transition: var(--transition-smooth);
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Global Animated Floating Background Glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+              radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 35%);
+  z-index: -10;
+  pointer-events: none;
+  animation: bg-glow-shift 25s ease-in-out infinite alternate;
+}
+
+.light::before {
+  background: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.07) 0%, transparent 40%),
+              radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.07) 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 35%);
+}
+
+@keyframes bg-glow-shift {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(-3%, 4%) scale(1.05) rotate(2deg);
+  }
+  100% {
+    transform: translate(2%, -3%) scale(0.97) rotate(-1deg);
+  }
 }
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(10, 15, 30, 0.38) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
 }
 
 .light .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
 }
 
 /* Glowing Elements */
@@ -112,19 +149,34 @@ body {
   min-height: 400px;
 }
 
-/* Make sure Monaco matches theme transition */
+/* Make sure Monaco matches theme transition and is transparent */
 .monaco-editor, 
 .monaco-editor .margin, 
 .monaco-editor-background {
   transition: background-color 0.3s ease !important;
+  background-color: rgba(10, 15, 30, 0.4) !important;
+}
+
+.light .monaco-editor, 
+.light .monaco-editor .margin, 
+.light .monaco-editor-background {
+  background-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Terminal Console Styling */
 .terminal-console {
   font-family: var(--font-mono);
-  background-color: var(--console-bg);
+  background-color: rgba(3, 7, 18, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
   border: 1px solid var(--border-color);
   transition: var(--transition-smooth);
+}
+
+.light .terminal-console {
+  background-color: rgba(248, 250, 252, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
 }
 
 /* Terminal cursor simulation */
@@ -334,13 +386,51 @@ html {
 .lang-card {
   transition: var(--transition-smooth);
 }
+
+/* Language Cards Dynamic Hover Background/Shadow Colors */
+.lang-card[data-lang="html"] { --hover-color: 249, 115, 22; }      /* Orange */
+.lang-card[data-lang="c"] { --hover-color: 59, 130, 246; }         /* Blue */
+.lang-card[data-lang="cpp"] { --hover-color: 139, 92, 246; }       /* Purple */
+.lang-card[data-lang="csharp"] { --hover-color: 167, 139, 250; }    /* Light Purple */
+.lang-card[data-lang="go"] { --hover-color: 6, 182, 212; }          /* Cyan */
+.lang-card[data-lang="rust"] { --hover-color: 234, 88, 12; }        /* Orange-Red */
+.lang-card[data-lang="python"] { --hover-color: 245, 158, 11; }     /* Amber */
+.lang-card[data-lang="javascript"] { --hover-color: 234, 179, 8; }  /* Yellow */
+.lang-card[data-lang="typescript"] { --hover-color: 59, 130, 246; }  /* Blue */
+.lang-card[data-lang="java"] { --hover-color: 239, 68, 68; }        /* Red */
+.lang-card[data-lang="kotlin"] { --hover-color: 139, 92, 246; }     /* Purple */
+.lang-card[data-lang="php"] { --hover-color: 79, 70, 229; }         /* Indigo */
+.lang-card[data-lang="ruby"] { --hover-color: 239, 68, 68; }        /* Red */
+.lang-card[data-lang="swift"] { --hover-color: 249, 115, 22; }      /* Orange */
+.lang-card[data-lang="bash"] { --hover-color: 16, 185, 129; }       /* Emerald */
+.lang-card[data-lang="sql"] { --hover-color: 16, 185, 129; }        /* Emerald */
+.lang-card[data-lang="scala"] { --hover-color: 220, 38, 38; }       /* Dark Red */
+.lang-card[data-lang="haskell"] { --hover-color: 139, 92, 246; }    /* Purple */
+.lang-card[data-lang="pascal"] { --hover-color: 6, 182, 212; }      /* Cyan */
+.lang-card[data-lang="perl"] { --hover-color: 59, 130, 246; }       /* Blue */
+.lang-card[data-lang="r"] { --hover-color: 37, 99, 235; }          /* Royal Blue */
+.lang-card[data-lang="lisp"] { --hover-color: 249, 115, 22; }       /* Orange */
+.lang-card[data-lang="fortran"] { --hover-color: 16, 185, 129; }     /* Emerald */
+.lang-card[data-lang="lua"] { --hover-color: 59, 130, 246; }        /* Blue */
+.lang-card[data-lang="assembly"] { --hover-color: 148, 163, 184; }   /* Slate */
+.lang-card[data-lang="elixir"] { --hover-color: 139, 92, 246; }     /* Purple */
+.lang-card[data-lang="erlang"] { --hover-color: 220, 38, 38; }      /* Red */
+.lang-card[data-lang="clojure"] { --hover-color: 16, 185, 129; }     /* Emerald */
+.lang-card[data-lang="d"] { --hover-color: 220, 38, 38; }           /* Red */
+
 .lang-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+  border-color: rgba(var(--hover-color, 99, 102, 241), 0.45) !important;
+  box-shadow: 0 0 20px rgba(var(--hover-color, 99, 102, 241), 0.22),
+              0 0 40px rgba(var(--hover-color, 99, 102, 241), 0.1) !important;
+  background: rgba(var(--hover-color, 99, 102, 241), 0.1) !important;
 }
 
 .light .lang-card:hover {
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.08);
+  border-color: rgba(var(--hover-color, 99, 102, 241), 0.35) !important;
+  box-shadow: 0 0 15px rgba(var(--hover-color, 99, 102, 241), 0.15),
+              0 0 30px rgba(var(--hover-color, 99, 102, 241), 0.08) !important;
+  background: rgba(var(--hover-color, 99, 102, 241), 0.06) !important;
 }
 
 /* Monaco Editor Cursor Custom Color */
