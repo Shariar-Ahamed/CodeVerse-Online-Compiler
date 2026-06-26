@@ -372,3 +372,27 @@ html {
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
+
+/* ==========================================================================
+   Multi-Page Refactoring Additions
+   ========================================================================== */
+
+/* Active tab style logic fallback/enhancements */
+#auth-tab-login, #auth-tab-signup {
+  cursor: pointer;
+}
+
+/* Interactive custom focus elements */
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px var(--accent-primary-glow) !important;
+}
+
+/* Developer Dashboard grid tweaks */
+.dashboard-grid-cell {
+  transition: var(--transition-smooth);
+}
+.dashboard-grid-cell:hover {
+  border-color: var(--accent-primary-glow);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.05);
+}

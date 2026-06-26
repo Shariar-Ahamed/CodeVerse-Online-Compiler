@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeVerse - Online Compiler Workspace</title>
+
+    <!-- FontAwesome Icons for modern UI buttons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Google Fonts for sleek developer experience -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styling override sheet (Dark/Light Variables) -->
+    <link rel="stylesheet" href="css/style.css?v=13" />
+  </head>
+  <body
+    class="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]"
+  >
+    <!-- ==================== HEADER / NAVBAR ==================== -->
+    <header
+      class="w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 sticky top-0 z-30 backdrop-blur-md transition-all duration-300"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+      >
+        <!-- Brand Logo & Name -->
+        <div
+          id="brand-logo"
+          class="flex items-center gap-3 cursor-pointer select-none"
+          onclick="window.location.href='index.html'"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20"
+          >
+            <i class="fas fa-cubes text-white text-lg animate-pulse"></i>
+          </div>
+          <div>
+            <h1
+              class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
+            >
+              CodeVerse
+            </h1>
+            <p
+              class="text-[10px] text-[var(--text-secondary)] font-medium -mt-1 tracking-wider uppercase"
+            >
+              Online Compiler
+            </p>
+          </div>
+        </div>
+
+        <!-- Navigation Links (Hidden on mobile) -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a
+            href="index.html"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Home</a
+          >
+          <a
+            href="index.html#languages"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Languages</a
+          >
+          <a
+            href="index.html#features"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Features</a
+          >
+          <a
+            href="index.html#about"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >About</a
+          >
+          <a
+            href="index.html#contact"
+            class="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+            >Contact</a
+          >
+        </nav>
+
+        <!-- Quick Action Navigation Toolbar -->
+        <div class="flex items-center gap-3">
+          <!-- Authentication Container -->
+          <div id="auth-nav-container" class="flex items-center gap-2">
+            <!-- Signed Out State -->
+            <button
+              id="nav-signin-btn"
+              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+            >
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Sign In</span>
+            </button>
+            
+            <!-- Signed In State (Hidden by default) -->
+            <div id="nav-user-profile" class="relative hidden">
+              <button
+                id="nav-user-avatar-btn"
+                class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans"
+                title="View Profile"
+              >
+                U
+              </button>
+              <!-- Profile Dropdown Menu -->
+              <div
+                id="nav-user-dropdown"
+                class="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-xl hidden flex-col py-1.5 z-40 animate-scale-up"
+              >
+                <div class="px-4 py-2.5 border-b border-[var(--border-color)] flex flex-col gap-0.5">
+                  <span id="dropdown-user-name" class="text-xs font-bold text-[var(--text-primary)]">User Name</span>
+                  <span id="dropdown-user-email" class="text-[10px] text-[var(--text-secondary)] font-mono truncate">user@domain.com</span>
+                </div>
+                <button
+                  id="dropdown-goto-profile"
+                  class="w-full text-left px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-2 transition-all duration-200"
+                  onclick="window.location.href='profile.html'"
+                >
+                  <i class="fas fa-user-circle text-[10px]"></i>
+                  <span>Developer Profile</span>
+                </button>
+                <button
+                  id="dropdown-signout-btn"
+                  class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 flex items-center gap-2 transition-all duration-200 border-t border-[var(--border-color)] mt-1"
+                >
+                  <i class="fas fa-sign-out-alt text-[10px]"></i>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Modal Trigger -->
+          <button
+            id="settings-btn"
+            class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            title="API Credentials Configuration"
+          >
+            <i class="fas fa-sliders text-sm"></i>
+          </button>
+
+          <!-- Theme Toggle Switch -->
+          <button
+            id="theme-toggle"
+            class="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            title="Toggle Light/Dark Theme"
+          >
+            <i id="theme-icon" class="fas fa-sun text-sm"></i>
+          </button>
+
+          <!-- Mobile Menu Trigger -->
+          <button
+            id="mobile-menu-btn"
+            class="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          >
+            <i class="fas fa-bars text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Panel (Collapsible) -->
+      <div
+        id="mobile-nav"
+        class="hidden md:hidden border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 flex flex-col gap-3 text-sm font-medium"
+      >
+        <a
+          href="index.html"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Home</a
+        >
+        <a
+          href="index.html#languages"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Languages</a
+        >
+        <a
+          href="index.html#features"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Features</a
+        >
+        <a
+          href="index.html#about"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >About</a
+        >
+        <a
+          href="index.html#contact"
+          class="mobile-nav-link text-[var(--text-secondary)] py-1.5 block"
+          >Contact</a
+        >
+
+        <!-- Mobile Auth Button Container -->
+        <div id="mobile-auth-container" class="border-t border-[var(--border-color)]/50 pt-2 flex flex-col gap-2">
+          <!-- Mobile Sign In -->
+          <button
+            id="mobile-signin-btn"
+            class="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 transition-all duration-200"
+          >
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Sign In</span>
+          </button>
+          
+          <!-- Mobile User Profile Info (Hidden by default) -->
+          <div id="mobile-user-profile" class="hidden flex-col gap-2 bg-[var(--bg-tertiary)]/20 p-3 rounded-xl border border-[var(--border-color)]">
+            <div class="flex items-center gap-2.5">
+              <div id="mobile-user-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-white text-xs font-bold font-mono">U</div>
+              <div class="flex flex-col">
+                <span id="mobile-user-name" class="text-xs font-bold text-[var(--text-primary)]">User Name</span>
+                <span id="mobile-user-email" class="text-[10px] text-[var(--text-secondary)] font-mono">user@domain.com</span>
+              </div>
+            </div>
+            <button
+              class="w-full py-1.5 mt-1 rounded-lg text-xs font-bold text-slate-300 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/20 transition-all duration-200 text-center"
+              onclick="window.location.href='profile.html'"
+            >
+              Developer Profile
+            </button>
+            <button
+              id="mobile-signout-btn"
+              class="w-full py-1.5 mt-1 rounded-lg text-xs font-bold text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== MAIN WORKSPACE CONTAINER ==================== -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
+      
+      <!-- ==================== COMPILER CONTROLS PANEL ==================== -->
+      <div class="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
+        
+        <!-- Selection of Language with Dynamic Icon badge -->
+        <div class="flex items-center gap-3">
+          <label for="language-select" class="text-sm font-semibold text-[var(--text-secondary)]">Language:</label>
+          <div class="relative">
+            <select id="language-select" class="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200">
+              <option value="html">HTML/CSS/JS (Web Lab)</option>
+              <option value="c">C (GCC 9.2.0)</option>
+              <option value="cpp">C++ (GCC 9.2.0)</option>
+              <option value="csharp">C# (Mono 6.6.0)</option>
+              <option value="go">Go (1.13.5)</option>
+              <option value="rust">Rust (1.40.0)</option>
+              <option value="python">Python 3 (3.8.1)</option>
+              <option value="javascript">JavaScript (NodeJS 12.14.0)</option>
+              <option value="typescript">TypeScript (3.7.4)</option>
+              <option value="java">Java (OpenJDK 13.0.1)</option>
+              <option value="kotlin">Kotlin (1.3.70)</option>
+              <option value="php">PHP (7.4.1)</option>
+              <option value="ruby">Ruby (2.7.0)</option>
+              <option value="swift">Swift (5.2.3)</option>
+              <option value="bash">Bash Shell (5.0.0)</option>
+              <option value="sql">SQL (SQLite 3.27.2)</option>
+              <option value="scala">Scala (2.13.2)</option>
+              <option value="haskell">Haskell (GHC 8.8.1)</option>
+              <option value="pascal">Pascal (FPC 3.0.4)</option>
+              <option value="perl">Perl (5.28.1)</option>
+              <option value="r">R (4.0.0)</option>
+              <option value="lisp">Lisp (SBCL 2.0.0)</option>
+              <option value="fortran">Fortran (GFortran 9.2.0)</option>
+              <option value="lua">Lua (5.3.5)</option>
+              <option value="assembly">Assembly (NASM 2.14.02)</option>
+              <option value="elixir">Elixir (1.9.4)</option>
+              <option value="erlang">Erlang (OTP 22.2)</option>
+              <option value="clojure">Clojure (1.10.1)</option>
+              <option value="d">D (DMD 2.089.1)</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
+              <i class="fas fa-chevron-down text-[10px]"></i>
+            </div>
+          </div>
+          <span id="lang-badge" class="px-2 py-0.5 rounded text-xs font-semibold badge-cpp">C++</span>
+        </div>
+
+        <!-- Action Button Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Clear Console Output Button -->
+          <button id="clear-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+            <i class="fas fa-eraser"></i>
+            <span>Clear</span>
+          </button>
+
+          <!-- Copy Code to Clipboard Button -->
+          <button id="copy-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+            <i class="fas fa-copy"></i>
+            <span>Copy</span>
+          </button>
+
+          <!-- Download Code File Button -->
+          <button id="download-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200">
+            <i class="fas fa-download"></i>
+            <span>Download</span>
+          </button>
+
+          <!-- Execute / Run Code Trigger Button -->
+          <button id="run-btn" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200">
+            <i id="run-icon" class="fas fa-play text-xs"></i>
+            <div id="run-spinner" class="spinner hidden"></div>
+            <span id="run-text">Run Code</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ==================== SPLIT EDITOR AND TERMINAL SECTION ==================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow">
+        
+        <!-- Monaco Code Editor Area (Occupies 2 columns on large displays) -->
+        <div class="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+          
+          <!-- Tab Bar Header -->
+          <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+            <div class="flex items-center gap-4">
+              <div id="editor-title-container" class="flex items-center gap-2">
+                <i class="fas fa-code text-indigo-400 text-xs"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
+              </div>
+              <!-- Web Lab Editor Tabs -->
+              <div id="web-editor-tabs" class="hidden flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border-color)]">
+                <button id="tab-html" class="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-600 text-white transition-all duration-200" data-tab="html">index.html</button>
+                <button id="tab-css" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="css">style.css</button>
+                <button id="tab-js" class="px-2.5 py-0.5 rounded text-[10px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200" data-tab="js">script.js</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
+            </div>
+          </div>
+
+          <!-- Monaco Editor Div wrapper -->
+          <div class="flex-grow min-h-[450px] relative">
+            <div id="editor-container" class="absolute inset-0 w-full h-full"></div>
+          </div>
+
+          <!-- Editor Status bar -->
+          <div class="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-4 text-[10px] text-[var(--text-muted)] font-mono">
+            <div>Status: Ready to edit</div>
+            <div>Shortcut: Ctrl + Enter to run</div>
+          </div>
+
+        </div>
+
+        <!-- Input Stdin / Console Output Panel (Occupies 1 column) -->
+        <div class="flex flex-col gap-6">
+          
+          <!-- Standard Input (Stdin) Area -->
+          <div id="stdin-container" class="flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-lg transition-all duration-300">
+            <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-keyboard text-cyan-400 text-xs"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Standard Input (Stdin)</span>
+              </div>
+              <span class="text-[10px] text-[var(--text-muted)] font-mono">Optional</span>
+            </div>
+            <textarea id="stdin-area" class="w-full h-24 p-3 bg-[var(--console-bg)] text-[var(--text-primary)] border-none resize-none focus:outline-none focus:ring-0 font-mono text-xs placeholder:text-[var(--text-muted)] placeholder:italic" placeholder="If your code requires inputs (e.g. scanf, cin, input()), enter them here before clicking 'Run Code' (one input per line)..."></textarea>
+          </div>
+
+          <!-- Output Terminal Panel -->
+          <div class="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl bg-[var(--bg-secondary)] overflow-hidden shadow-xl transition-all duration-300">
+            
+            <!-- Terminal Header Bar -->
+            <div class="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
+              <div class="flex items-center gap-2">
+                <i id="console-header-icon" class="fas fa-terminal text-emerald-400 text-xs"></i>
+                <span id="console-header-title" class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
+              </div>
+              <!-- Dynamic Status Badge -->
+              <span id="status-badge" class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-500/20 text-slate-400 border border-slate-500/30">Idle</span>
+            </div>
+
+            <!-- Stdin Output Console Text display box -->
+            <div id="console-output-container" class="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
+              <pre id="output-console" class="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
+CodeVerse Online Terminal.
+Write code and click 'Run Code' to execute.
+<span class="terminal-cursor"></span></pre>
+            </div>
+
+            <!-- Live Preview Iframe Container (Web Lab) -->
+            <div id="preview-container" class="hidden flex-grow flex flex-col min-h-[300px] bg-white relative">
+               <iframe id="preview-frame" class="flex-grow w-full border-none bg-white" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
+               <!-- Web Dev Console Logs Panel -->
+               <div id="web-console" class="h-32 border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden">
+                  <div class="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
+                     <div class="flex items-center gap-1.5">
+                        <i class="fas fa-bug text-rose-500/80"></i>
+                        <span>Console Logs</span>
+                     </div>
+                     <button id="clear-web-console" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200" title="Clear Console">
+                        <i class="fas fa-trash-can"></i>
+                     </button>
+                  </div>
+                  <div id="web-console-logs" class="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1 select-text scrollbar-thin">
+                     <div class="text-[var(--text-muted)] italic">No console logs yet. Press Run to execute code.</div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Execution metadata footer metrics -->
+            <div class="h-10 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 grid grid-cols-2 divide-x divide-[var(--border-color)] text-[10px] font-mono text-[var(--text-muted)]">
+              <div class="flex items-center justify-center gap-1">
+                <i class="fas fa-clock text-indigo-400/70"></i>
+                <span>Time: </span>
+                <span id="time-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
+              </div>
+              <div class="flex items-center justify-center gap-1">
+                <i class="fas fa-memory text-cyan-400/70"></i>
+                <span>Memory: </span>
+                <span id="memory-indicator" class="font-bold text-[var(--text-secondary)]">-</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- ==================== SETTINGS MODAL ==================== -->
+    <div id="settings-modal" class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden">
+      <div class="glass-panel w-full max-w-md rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl animate-fade-in-up">
+        
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-sliders text-indigo-400"></i>
+            <h3 class="font-bold text-[var(--text-primary)]">Compiler Settings</h3>
+          </div>
+          <button id="close-settings" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Modal Body Form -->
+        <div class="p-6 flex flex-col gap-4">
+          <div>
+            <label for="api-url-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Judge0 API Base URL</label>
+            <input type="text" id="api-url-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="https://ce.judge0.com">
+            <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+              By default we use the Judge0 Community Edition testing instance. You can replace this with your self-hosted Docker URL or RapidAPI proxy.
+            </p>
+          </div>
+
+          <div>
+            <label for="api-key-input" class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">RapidAPI Host Key (x-rapidapi-key)</label>
+            <input type="password" id="api-key-input" class="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200" placeholder="••••••••••••••••••••••••••••••••">
+            <p class="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+              Only required if pointing to RapidAPI endpoint (e.g. <code>https://judge0-ce.p.rapidapi.com</code>). Leave empty for self-hosted instances.
+            </p>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex justify-end gap-3">
+          <button id="save-settings" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200">
+            Save Configuration
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== MAINTENANCE WARNING MODAL ==================== -->
+    <div
+      id="maintenance-modal"
+      class="modal-overlay fixed inset-0 z-50 bg-black/60 items-center justify-center p-4 transition-all duration-300 hidden"
+    >
+      <div
+        class="w-full max-w-sm rounded-2xl border border-amber-500/25 bg-slate-900/95 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 p-6 text-center animate-fade-in-up flex flex-col items-center gap-4 relative"
+      >
+        <!-- Close button (X) -->
+        <button
+          id="close-maintenance-x"
+          class="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none"
+          title="Close and revert to Dark Mode"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xl animate-pulse">
+          <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white mb-2">Under Maintenance</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Light Mode is currently undergoing optimization maintenance. We recommend using our premium Dracula Dark Theme for best performance and code rendering!
+          </p>
+        </div>
+        <button
+          id="close-maintenance-btn"
+          class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all duration-200 shadow-md shadow-amber-600/10 w-full mt-2"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50 py-6 transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-[var(--text-muted)] font-mono">
+        <div>
+          &copy; 2026 CodeVerse IDE. Created for developers worldwide.
+        </div>
+        <div class="flex items-center gap-4">
+          <span>Powered by <a href="https://judge0.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Judge0 API</a></span>
+          <span>Built with <a href="https://tailwindcss.com" target="_blank" class="hover:underline text-[var(--text-secondary)]">Tailwind Play</a></span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Monaco Editor AMD loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+
+    <!-- Core Logic JavaScript -->
+    <script src="js/main.js?v=32"></script>
+    <script src="js/editor.js?v=32"></script>
+  </body>
+</html>
