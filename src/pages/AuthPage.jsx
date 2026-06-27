@@ -39,7 +39,9 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
   // Redirect if already logged in (ignore guest mode)
   useEffect(() => {
+    console.log("[DEBUG AuthPage] Redirect check triggered. user =", user);
     if (user && !user.isGuest) {
+      console.log("[DEBUG AuthPage] User authenticated! Redirecting to /");
       navigate('/');
     }
   }, [user, navigate]);
@@ -114,16 +116,19 @@ export default function AuthPage({ user, onLogin, showToast }) {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) return;
+    console.log("[DEBUG AuthPage] handleLoginSubmit started for:", loginEmail);
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
       const name = userCredential.user.displayName || loginEmail.split('@')[0];
+      console.log("[DEBUG AuthPage] signInWithEmailAndPassword resolved. User:", userCredential.user.email);
       
       showToast(`Welcome back, ${name}!`, 'success');
       await migrateLocalNotesToFirestore(userCredential.user.uid);
+      console.log("[DEBUG AuthPage] Notes migrated. Navigating to /");
       navigate('/');
     } catch (err) {
-      console.error(err);
+      console.error("[DEBUG AuthPage] signInWithEmailAndPassword error:", err);
       let errMsg = "Failed to sign in. Please check your credentials.";
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         errMsg = "Invalid email or password.";
@@ -354,6 +359,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
   };
 
   const handleSocialLogin = async (platform) => {
+    console.log("[DEBUG AuthPage] handleSocialLogin triggered for platform:", platform);
     let provider;
     if (platform === 'google') {
       provider = googleProvider;
@@ -366,23 +372,27 @@ export default function AuthPage({ user, onLogin, showToast }) {
     }
 
     try {
+      console.log("[DEBUG AuthPage] Attempting signInWithPopup for", platform);
       const result = await signInWithPopup(auth, provider);
+      console.log("[DEBUG AuthPage] signInWithPopup resolved. User:", result.user.email);
       const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
       
       const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
       showToast(`Logged in via ${platformName}!`, 'success');
       await migrateLocalNotesToFirestore(result.user.uid);
+      console.log("[DEBUG AuthPage] Notes migrated. Navigating to /");
       navigate('/');
     } catch (err) {
-      console.error(err);
+      console.error("[DEBUG AuthPage] signInWithPopup error:", err);
       const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
       
       if (err.code === 'auth/popup-blocked') {
+        console.log("[DEBUG AuthPage] Popup was blocked. Falling back to signInWithRedirect...");
         showToast(`Popup blocked. Redirecting to ${platformName} login...`, 'info');
         try {
           await signInWithRedirect(auth, provider);
         } catch (redirectErr) {
-          console.error(redirectErr);
+          console.error("[DEBUG AuthPage] signInWithRedirect error:", redirectErr);
           showToast(`Failed to redirect to ${platformName} login.`, 'error');
         }
       } else {
