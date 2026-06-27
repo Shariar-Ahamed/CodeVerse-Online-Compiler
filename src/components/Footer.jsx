@@ -122,26 +122,19 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-4">
             <span>
-              Powered by{' '}
+              Developed by{' '}
               <a
-                href="https://judge0.com"
+                href="https://www.shariarahamed.me/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline text-[var(--text-secondary)]"
               >
-                Judge0 API
+                Shariar Ahamed
               </a>
             </span>
             <span>
-              Built with{' '}
-              <a
-                href="https://tailwindcss.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline text-[var(--text-secondary)]"
-              >
-                Tailwind Play
-              </a>
+              <i className="fas fa-shield-alt text-indigo-400 mr-1"></i>
+              Secure Sandbox Execution
             </span>
           </div>
         </div>
