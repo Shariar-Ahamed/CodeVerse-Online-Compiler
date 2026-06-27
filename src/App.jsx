@@ -25,6 +25,8 @@ function AppContent() {
     }
   });
 
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("codeverse_theme") || "dark";
   });
@@ -135,10 +137,27 @@ function AppContent() {
           localStorage.removeItem("codeverse_user");
         }
       }
+      setAuthLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
+
+  // Show loading indicator during initial auth state recovery
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0b0f19] text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 animate-pulse">
+            <i className="fas fa-cubes text-white text-3xl"></i>
+          </div>
+          <div className="text-xs font-bold text-indigo-400/80 tracking-widest uppercase animate-pulse">
+            Initializing CodeVerse...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // --- Auth Handlers ---
   const handleLogin = (userData) => {
