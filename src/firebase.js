@@ -5,7 +5,9 @@ import { getFirestore } from "firebase/firestore";
 // CodeVerse Firebase configuration keys
 const firebaseConfig = {
   apiKey: "AIzaSyDPAoTyMZbZCCQzlA48vxaKMLJeJGTf0Tg",
-  authDomain: "codeverse-79496.firebaseapp.com",
+  authDomain: typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "codeverse-79496.firebaseapp.com"
+    : "code-verse-online.vercel.app",
   projectId: "codeverse-79496",
   storageBucket: "codeverse-79496.firebasestorage.app",
   messagingSenderId: "184408179665",
