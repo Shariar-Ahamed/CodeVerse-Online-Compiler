@@ -25,7 +25,8 @@ function AppContent() {
     }
   });
 
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [redirectChecking, setRedirectChecking] = useState(true);
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("codeverse_theme") || "dark";
@@ -103,6 +104,9 @@ function AppContent() {
         if (err.code && err.code !== 'auth/redirect-cancelled') {
           showToast(`Redirect Sign-In failed: ${err.message || err.code}`, 'error');
         }
+      })
+      .finally(() => {
+        setRedirectChecking(false);
       });
   }, []);
 
@@ -137,14 +141,16 @@ function AppContent() {
           localStorage.removeItem("codeverse_user");
         }
       }
-      setAuthLoading(false);
+      setAuthChecking(false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  const isInitializing = authChecking || redirectChecking;
+
   // Show loading indicator during initial auth state recovery
-  if (authLoading) {
+  if (isInitializing) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#0b0f19] text-white">
         <div className="flex flex-col items-center gap-4">
