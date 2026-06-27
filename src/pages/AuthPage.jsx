@@ -94,7 +94,10 @@ export default function AuthPage({ user, onLogin, showToast }) {
       })
       .catch((err) => {
         console.error("Redirect sign-in error:", err);
-        // User closed redirect or configuration issue
+        // Don't show toast if it's just a normal load without redirect action
+        if (err.code && err.code !== 'auth/redirect-cancelled') {
+          showToast(`Redirect Sign-In failed: ${err.message || err.code}`, 'error');
+        }
       });
   }, []);
 
