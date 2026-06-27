@@ -6,7 +6,9 @@ import {
   createUserWithEmailAndPassword, 
   updateProfile, 
   signInWithPopup, 
-  sendPasswordResetEmail 
+  sendPasswordResetEmail,
+  signInWithRedirect,
+  getRedirectResult 
 } from 'firebase/auth';
 import { collection, doc, setDoc, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { auth, db, googleProvider, githubProvider, facebookProvider } from '../firebase';
@@ -78,6 +80,23 @@ export default function AuthPage({ user, onLogin, showToast }) {
     }
     return () => clearInterval(interval);
   }, [showOtpModal, otpTimer]);
+
+  // Handle Firebase redirect login result on page load
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
+          showToast(`Welcome back, ${name}!`, 'success');
+          await migrateLocalNotesToFirestore(result.user.uid);
+          navigate('/');
+        }
+      })
+      .catch((err) => {
+        console.error("Redirect sign-in error:", err);
+        // User closed redirect or configuration issue
+      });
+  }, []);
 
   // Helper to migrate guest notes to Cloud Firestore
   const migrateLocalNotesToFirestore = async (uid) => {
@@ -375,7 +394,18 @@ export default function AuthPage({ user, onLogin, showToast }) {
     } catch (err) {
       console.error(err);
       const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-      showToast(`Failed to log in via ${platformName}.`, 'error');
+      
+      if (err.code === 'auth/popup-blocked') {
+        showToast(`Popup blocked. Redirecting to ${platformName} login...`, 'info');
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (redirectErr) {
+          console.error(redirectErr);
+          showToast(`Failed to redirect to ${platformName} login.`, 'error');
+        }
+      } else {
+        showToast(`Failed to log in via ${platformName}.`, 'error');
+      }
     }
   };
 
