@@ -646,6 +646,55 @@ export default function LandingPage({ showToast }) {
         <div className="absolute top-10 left-1/4 w-72 h-72 rounded-full bg-indigo-500/10 blur-[100px] animate-pulse pointer-events-none" />
         <div className="absolute bottom-10 right-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
 
+        {/* Floating Language Badges (Hidden on mobile) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden lg:block hidden">
+          {/* 1. Python (Left Topmost - Medium) */}
+          <div className="absolute left-[3%] top-[15%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#3776ab]/70 shadow-[inset_0_0_10px_rgba(55,118,171,0.55),_0_0_12px_rgba(55,118,171,0.2)] flex items-center justify-center animate-float-1 select-none">
+            <i className="fab fa-python text-[#3776ab] text-2xl"></i>
+          </div>
+          {/* 2. Swift (Left Inner Top - Medium - Fills Circle 1) */}
+          <div className="absolute left-[16%] top-[25%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#fa7343]/70 shadow-[inset_0_0_10px_rgba(250,115,67,0.55),_0_0_12px_rgba(250,115,67,0.2)] flex items-center justify-center animate-float-2 select-none">
+            <i className="fab fa-swift text-[#fa7343] text-2xl"></i>
+          </div>
+          {/* 3. C++ (Left Mid - Small) */}
+          <div className="absolute left-[6%] top-[50%] -translate-y-1/2 w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#00599c]/70 shadow-[inset_0_0_8px_rgba(0,89,156,0.5),_0_0_10px_rgba(0,89,156,0.18)] flex items-center justify-center animate-float-3 select-none">
+            <i className="fas fa-code text-[#00599c] text-lg"></i>
+          </div>
+          {/* 4. Bash Shell (Left Inner Bottom - Small - Fills Circle 2) */}
+          <div className="absolute left-[18%] bottom-[20%] w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#34d399]/70 shadow-[inset_0_0_8px_rgba(52,211,153,0.5),_0_0_10px_rgba(52,211,153,0.18)] flex items-center justify-center animate-float-1 select-none">
+            <i className="fas fa-terminal text-[#34d399] text-lg"></i>
+          </div>
+          {/* 5. Java (Left Bottommost - Large) */}
+          <div className="absolute left-[4%] bottom-[12%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#ea2d2e]/70 shadow-[inset_0_0_12px_rgba(234,45,46,0.6),_0_0_15px_rgba(234,45,46,0.25)] flex items-center justify-center animate-float-2 select-none">
+            <i className="fab fa-java text-[#ea2d2e] text-3xl"></i>
+          </div>
+
+          {/* 6. Ruby (Right Inner Top - Medium - Fills Circle 3) */}
+          <div className="absolute right-[18%] top-[14%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#e0115f]/70 shadow-[inset_0_0_10px_rgba(224,17,95,0.55),_0_0_12px_rgba(224,17,95,0.2)] flex items-center justify-center animate-float-3 select-none">
+            <i className="fas fa-gem text-[#e0115f] text-2xl"></i>
+          </div>
+          {/* 7. JavaScript (Right Topmost - Large) */}
+          <div className="absolute right-[4%] top-[18%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#eab308]/70 shadow-[inset_0_0_12px_rgba(234,179,8,0.6),_0_0_15px_rgba(234,179,8,0.25)] flex items-center justify-center animate-float-2 select-none">
+            <i className="fab fa-js text-[#eab308] text-3xl"></i>
+          </div>
+          {/* 7.5. Go (Right Inner Mid - Medium - Fills the empty right side area) */}
+          <div className="absolute right-[21%] top-[42%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#00add8]/70 shadow-[inset_0_0_10px_rgba(0,173,216,0.55),_0_0_12px_rgba(0,173,216,0.2)] flex items-center justify-center animate-float-3 select-none">
+            <i className="fas fa-code text-[#00add8] text-2xl"></i>
+          </div>
+          {/* 8. HTML5 (Right Mid - Medium) */}
+          <div className="absolute right-[5%] top-[50%] -translate-y-1/2 w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#e34f26]/70 shadow-[inset_0_0_10px_rgba(227,79,38,0.55),_0_0_12px_rgba(227,79,38,0.2)] flex items-center justify-center animate-float-1 select-none">
+            <i className="fab fa-html5 text-[#e34f26] text-2xl"></i>
+          </div>
+          {/* 9. PHP (Right Inner Bottom - Large - Fills Circle 4) */}
+          <div className="absolute right-[16%] bottom-[14%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#777bb4]/70 shadow-[inset_0_0_12px_rgba(119,123,180,0.6),_0_0_15px_rgba(119,123,180,0.25)] flex items-center justify-center animate-float-1 select-none">
+            <i className="fab fa-php text-[#777bb4] text-3xl"></i>
+          </div>
+          {/* 10. SQL (Right Bottommost - Small) */}
+          <div className="absolute right-[3%] bottom-[10%] w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#0064a5]/70 shadow-[inset_0_0_8px_rgba(0,100,165,0.5),_0_0_10px_rgba(0,100,165,0.18)] flex items-center justify-center animate-float-3 select-none">
+            <i className="fas fa-database text-[#0064a5] text-lg"></i>
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center pt-8 pb-12 relative z-10">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-400 mb-5 animate-bounce">
             <i className="fas fa-terminal text-[10px]"></i>
@@ -664,13 +713,20 @@ export default function LandingPage({ showToast }) {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <button
-              onClick={() => navigate('/editor')}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 border border-indigo-500/20"
-            >
-              <i className="fas fa-code"></i>
-              <span>Open Code Workspace</span>
-            </button>
+            <div className="relative group w-full sm:w-auto">
+              {/* Ripple 1 */}
+              <div className="absolute inset-0 rounded-lg border-2 border-[#818cf8] pointer-events-none animate-ripple-1"></div>
+              {/* Ripple 2 */}
+              <div className="absolute inset-0 rounded-lg border-2 border-[#818cf8] pointer-events-none animate-ripple-2"></div>
+              
+              <button
+                onClick={() => navigate('/editor')}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 border border-indigo-500/20 relative z-10"
+              >
+                <i className="fas fa-code"></i>
+                <span>Open Code Workspace</span>
+              </button>
+            </div>
             <button
               onClick={() => {
                 const langEl = document.getElementById('languages');
@@ -966,6 +1022,36 @@ export default function LandingPage({ showToast }) {
             </button>
           </div>
 
+          {/* Infinite Marquee of Languages for Milestone 1 */}
+          {currentMilestoneIndex === 0 && (
+            <div className={`mt-10 overflow-hidden relative w-full mask-gradient transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+              <div className="animate-marquee-rtl hover:[animation-play-state:paused] flex gap-4">
+                {/* 1st list */}
+                {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
+                  <div
+                    key={`mar1-${lang.id}-${idx}`}
+                    onClick={() => navigate(`/editor?lang=${lang.id}`)}
+                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  >
+                    <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
+                    <span className="text-xs font-semibold">{lang.name}</span>
+                  </div>
+                ))}
+                {/* 2nd list for looping */}
+                {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
+                  <div
+                    key={`mar2-${lang.id}-${idx}`}
+                    onClick={() => navigate(`/editor?lang=${lang.id}`)}
+                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  >
+                    <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
+                    <span className="text-xs font-semibold">{lang.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -989,47 +1075,59 @@ export default function LandingPage({ showToast }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
             {/* Feature 1 */}
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg">
-                <i className="fas fa-keyboard"></i>
+            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(99,102,241,0.15)] transition-all duration-300 group select-none">
+              <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-indigo animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg">
+                  <i className="fas fa-keyboard"></i>
+                </div>
+                <h3 className="font-bold text-white text-base">VS Code Core (Monaco)</h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Powered by Monaco Editor. Customize settings, theme configurations, automatic auto-saving, and tab switching layouts.
+                </p>
               </div>
-              <h3 className="font-bold text-white text-base">VS Code Core (Monaco)</h3>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Powered by Monaco Editor. Customize settings, theme configurations, automatic auto-saving, and tab switching layouts.
-              </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg">
-                <i className="fas fa-eye"></i>
+            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(6,182,212,0.15)] transition-all duration-300 group select-none">
+              <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-cyan animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg">
+                  <i className="fas fa-eye"></i>
+                </div>
+                <h3 className="font-bold text-white text-base">Live Web Sandbox</h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Write interactive templates using HTML, CSS, and JS. Render web pages inside the iframe preview and monitor output logs.
+                </p>
               </div>
-              <h3 className="font-bold text-white text-base">Live Web Sandbox</h3>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Write interactive templates using HTML, CSS, and JS. Render web pages inside the iframe preview and monitor output logs.
-              </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg">
-                <i className="fas fa-bolt"></i>
+            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(16,185,129,0.15)] transition-all duration-300 group select-none">
+              <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-emerald animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg">
+                  <i className="fas fa-bolt"></i>
+                </div>
+                <h3 className="font-bold text-white text-base">Low-latency Execution</h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Execute scripts instantly on pre-configured sandboxed backend endpoints without setup parameters.
+                </p>
               </div>
-              <h3 className="font-bold text-white text-base">Low-latency Execution</h3>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Execute scripts instantly on pre-configured sandboxed backend endpoints without setup parameters.
-              </p>
             </div>
 
             {/* Feature 4 */}
-            <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
-                <i className="fas fa-sun"></i>
+            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(168,85,247,0.15)] transition-all duration-300 group select-none">
+              <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-purple animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
+                  <i className="fas fa-sun"></i>
+                </div>
+                <h3 className="font-bold text-white text-base">Dracula & Light Theme</h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Toggle active dark theme settings with standard Dracula syntax highlighting rules and minimal light modes instantly.
+                </p>
               </div>
-              <h3 className="font-bold text-white text-base">Dracula & Light Theme</h3>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                Toggle active dark theme settings with standard Dracula syntax highlighting rules and minimal light modes instantly.
-              </p>
             </div>
           </div>
         </div>
