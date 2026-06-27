@@ -58,8 +58,92 @@ const DEMO_SNIPPETS = [
   }
 ];
 
+const MILESTONES = [
+  {
+    id: '01',
+    title: 'Code Playgrounds',
+    desc: 'Core Compilers & Runtimes',
+    color: 'from-indigo-600 to-indigo-500',
+    shadow: 'shadow-indigo-500/25',
+    leftTopics: [
+      { name: 'C/C++ GCC 9.2', desc: 'Powerful high-performance compilation' },
+      { name: 'Python 3.8', desc: 'Vibrant and clean scripting interpreter' },
+      { name: 'NodeJS 12.14', desc: 'Ultra-fast JavaScript backend runtime' },
+      { name: 'Rust 1.40 Cargo', desc: 'Secure memory-safe compilation flow' }
+    ],
+    rightOutcomes: [
+      { text: 'Run algorithm challenges instantly', completed: true },
+      { text: 'Code on the go without local runtime installations', completed: true },
+      { text: 'Get detailed runtime errors & compile timings', completed: true },
+      { text: 'Write C/C++ apps directly in the browser', completed: true }
+    ]
+  },
+  {
+    id: '02',
+    title: 'Web Laboratory',
+    desc: 'Live Frontend Visual Sandboxes',
+    color: 'from-cyan-600 to-cyan-500',
+    shadow: 'shadow-cyan-500/25',
+    leftTopics: [
+      { name: 'HTML5 Semantic Structure', desc: 'Proper markup and content layouts' },
+      { name: 'CSS Flexbox & Grid', desc: 'Beautiful responsive styling alignments' },
+      { name: 'Vibrant Vanilla JavaScript', desc: 'Dynamic client-side action events' },
+      { name: 'Iframe Isolated Preview', desc: 'Realtime hot-reloaded visual render' }
+    ],
+    rightOutcomes: [
+      { text: 'Build interactive front-end web pages', completed: true },
+      { text: 'Verify layout responsiveness instantly in viewport', completed: true },
+      { text: 'Test JavaScript script DOM events visually', completed: true },
+      { text: 'Create portfolio mockups and design drafts', completed: true }
+    ]
+  },
+  {
+    id: '03',
+    title: 'Cloud Workspace',
+    desc: 'Persistent Snippets & Identity',
+    color: 'from-purple-600 to-purple-500',
+    shadow: 'shadow-purple-500/25',
+    leftTopics: [
+      { name: 'Secure Google/GitHub Auth', desc: 'Single click authenticated sessions' },
+      { name: 'Notepad Document Library', desc: 'Organized personal cloud document save' },
+      { name: 'Firestore Rules Security', desc: 'Encrypted safe nested write validation' },
+      { name: 'State Management Sync', desc: 'Automatic local-to-cloud workspace sync' }
+    ],
+    rightOutcomes: [
+      { text: 'Access your saved documents from any device', completed: true },
+      { text: 'Never lose code fragments with auto-cloud backing', completed: true },
+      { text: 'Organize compiler workspaces in custom lists', completed: true },
+      { text: 'Toggle secure guest workspace limits safely', completed: true }
+    ]
+  }
+];
+
 export default function LandingPage({ showToast }) {
   const navigate = useNavigate();
+
+  // --- Milestone Roadmap States ---
+  const [currentMilestoneIndex, setCurrentMilestoneIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [hoveredRightIndex, setHoveredRightIndex] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handlePrevMilestone = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentMilestoneIndex(prev => (prev === 0 ? MILESTONES.length - 1 : prev - 1));
+      setIsTransitioning(false);
+    }, 250);
+  };
+
+  const handleNextMilestone = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentMilestoneIndex(prev => (prev === MILESTONES.length - 1 ? 0 : prev + 1));
+      setIsTransitioning(false);
+    }, 250);
+  };
 
   // --- Auto-Typing States ---
   const [demoIndex, setDemoIndex] = useState(0);
@@ -77,6 +161,8 @@ export default function LandingPage({ showToast }) {
   const featuresCanvasRef = useRef(null);
   const liveDemoRef = useRef(null);
   const liveDemoCanvasRef = useRef(null);
+  const milestonesRef = useRef(null);
+  const milestonesCanvasRef = useRef(null);
 
   // --- 1. Typing Simulation Effect ---
   useEffect(() => {
@@ -531,6 +617,7 @@ export default function LandingPage({ showToast }) {
     const clearLanguages = initGalaxy(languagesRef.current, languagesCanvasRef.current);
     const clearSparkler = initSparkler();
     const clearLiveDemo = initConstellation(liveDemoRef.current, liveDemoCanvasRef.current);
+    const clearMilestones = initConstellation(milestonesRef.current, milestonesCanvasRef.current);
 
     return () => {
       observer.disconnect();
@@ -538,6 +625,7 @@ export default function LandingPage({ showToast }) {
       if (clearLanguages) clearLanguages();
       if (clearSparkler) clearSparkler();
       if (clearLiveDemo) clearLiveDemo();
+      if (clearMilestones) clearMilestones();
       
       // Cancel any outstanding animation frame requests
       Object.values(animFrameIds).forEach(id => {
@@ -578,7 +666,7 @@ export default function LandingPage({ showToast }) {
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <button
               onClick={() => navigate('/editor')}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 border border-indigo-500/20"
             >
               <i className="fas fa-code"></i>
               <span>Open Code Workspace</span>
@@ -702,6 +790,182 @@ export default function LandingPage({ showToast }) {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ==================== MILESTONE ROADMAP SECTION ==================== */}
+      <section
+        id="milestones"
+        ref={milestonesRef}
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] border-b border-[var(--border-color)] relative"
+      >
+        <canvas ref={milestonesCanvasRef} id="milestones-particles" className="absolute inset-0 pointer-events-none z-0" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          
+          {/* Header */}
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-xs font-semibold text-indigo-400 mb-4 uppercase tracking-wider">
+              <i className="fas fa-map-location-dot text-[10px]"></i>
+              <span>Interactive Roadmap</span>
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+              CodeVerse Journey Map
+            </h2>
+            <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
+              Select milestones to explore supported compiler environments, isolated previews, and saved cloud snippet workflows.
+            </p>
+          </div>
+
+          {/* Symmetrical Interactive Container */}
+          <div className="relative w-full max-w-5xl mx-auto min-h-[480px]">
+            
+            {/* Symmetrical SVG paths overlay (Hidden on mobile) */}
+            <svg className={`absolute inset-0 w-full h-full pointer-events-none lg:block hidden z-[-1] transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`} viewBox="0 0 1000 500" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="left-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.05" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.6" />
+                </linearGradient>
+                <linearGradient id="right-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.05" />
+                </linearGradient>
+              </defs>
+              
+              {/* Left lines (Topics -> Center) */}
+              <path d="M 280 60 C 360 60, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 0 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
+              <path d="M 280 160 C 360 160, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 1 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
+              <path d="M 280 260 C 360 260, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 2 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
+              <path d="M 280 360 C 360 360, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 3 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
+
+              {/* Right lines (Center -> Outcomes) */}
+              <path d="M 540 250 C 580 250, 640 60, 720 60" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 0 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+              <path d="M 540 250 C 580 250, 640 160, 720 160" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 1 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+              <path d="M 540 250 C 580 250, 640 260, 720 260" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 2 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+              <path d="M 540 250 C 580 250, 640 360, 720 360" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 3 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+            </svg>
+
+            {/* Columns Grid */}
+            <div className={`grid grid-cols-1 lg:grid-cols-5 gap-8 items-center relative z-10 min-h-[420px] transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'}`}>
+              
+              {/* Left Column: Topics */}
+              <div className="lg:col-span-2 flex flex-col gap-4 justify-between h-full py-2">
+                {MILESTONES[currentMilestoneIndex].leftTopics.map((topic, idx) => (
+                  <div
+                    key={idx}
+                    onMouseEnter={() => setHoveredIndex(idx)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none relative group cursor-pointer ${
+                      hoveredIndex === idx
+                        ? 'border-indigo-500/50 bg-indigo-500/5 lg:translate-x-2'
+                        : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20'
+                    }`}
+                  >
+                    <h4 className="font-bold text-xs text-white group-hover:text-indigo-400 transition-colors duration-200">
+                      {topic.name}
+                    </h4>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-1 leading-relaxed">
+                      {topic.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Center Column: Glossy Folder Card */}
+              <div className="lg:col-span-1 flex flex-col items-center justify-center py-6">
+                <div className="relative w-48 h-40 flex flex-col select-none z-10">
+                  
+                  {/* Folder Tab (Layer 0) */}
+                  <div className="absolute top-0 left-3 w-16 h-4 bg-indigo-600 rounded-t-md z-0 border-t border-x border-white/10"></div>
+                  
+                  {/* Layer 1: Back sheet (Indigo-800) */}
+                  <div className="absolute top-3 left-2 right-2 h-10 bg-indigo-800 rounded-t-lg z-10 border-t border-x border-white/10"></div>
+                  
+                  {/* Layer 2: Sheet 1 (Indigo-500) */}
+                  <div className="absolute top-5 left-4 right-4 h-8 bg-indigo-500 rounded-t-lg z-20 border-t border-x border-white/10"></div>
+                  
+                  {/* Layer 3: Sheet 2 (Cyan-500) */}
+                  <div className="absolute top-7 left-3 right-3 h-6 bg-cyan-500 rounded-t-lg z-30 border-t border-x border-white/10"></div>
+                  
+                  {/* Layer 4: Front Cover (Dark Website-matching Theme) */}
+                  <div className="absolute top-10 left-0 right-0 bottom-0 bg-gradient-to-br from-[#1b1c2a] via-[#151622] to-[#0f101a] rounded-2xl border border-indigo-500/40 shadow-2xl shadow-indigo-500/25 z-40 overflow-hidden flex flex-col justify-center items-center px-5 text-center transform transition-all duration-300 hover:scale-105 active:scale-95 group cursor-pointer">
+                    {/* Glass sheen reflection overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none"></div>
+                    
+                    {/* Top highlight line */}
+                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent"></div>
+
+                    <span className="text-[13px] font-extrabold tracking-widest text-white uppercase leading-none">
+                      Step
+                    </span>
+                    <span className="text-5xl font-black text-white/50 mt-1.5 select-none tracking-tight">
+                      {MILESTONES[currentMilestoneIndex].id}
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Right Column: Outcomes */}
+              <div className="lg:col-span-2 flex flex-col gap-4 justify-between h-full py-2">
+                {MILESTONES[currentMilestoneIndex].rightOutcomes.map((outcome, idx) => (
+                  <div
+                    key={idx}
+                    onMouseEnter={() => setHoveredRightIndex(idx)}
+                    onMouseLeave={() => setHoveredRightIndex(null)}
+                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none group cursor-pointer ${
+                      hoveredRightIndex === idx
+                        ? 'border-cyan-500/50 bg-cyan-500/5 lg:-translate-x-2'
+                        : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center text-[10px] shrink-0 mt-0.5 transition-all duration-300 ${
+                        hoveredIndex === idx || hoveredRightIndex === idx
+                          ? 'border-cyan-400 bg-cyan-500/10 text-cyan-400 shadow-sm shadow-cyan-400/25'
+                          : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 text-[var(--text-muted)]'
+                      }`}>
+                        <i className="fas fa-check"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-300 group-hover:text-cyan-300 transition-colors duration-200 leading-relaxed">
+                          {outcome.text}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="flex items-center justify-center gap-6 mt-12">
+            <button
+              onClick={handlePrevMilestone}
+              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+            >
+              <i className="fas fa-chevron-left text-xs"></i>
+            </button>
+            
+            <div className="text-center min-w-[240px]">
+              <h3 className="text-sm font-bold text-white tracking-wide">
+                {MILESTONES[currentMilestoneIndex].title}
+              </h3>
+              <p className="text-[10px] text-indigo-400/80 font-bold uppercase tracking-widest mt-0.5">
+                {MILESTONES[currentMilestoneIndex].desc}
+              </p>
+            </div>
+
+            <button
+              onClick={handleNextMilestone}
+              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+            >
+              <i className="fas fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+
         </div>
       </section>
 

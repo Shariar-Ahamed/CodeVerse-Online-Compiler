@@ -806,20 +806,42 @@ input:focus, select:focus, textarea:focus {
 
 /* Premium Upgrade for Indigo Buttons globally */
 .bg-indigo-600 {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  background: #6366f1 !important;
   box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.35) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 .bg-indigo-600:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+  background: #4f46e5 !important;
   box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.55) !important;
   transform: translateY(-1.5px) !important;
 }
 
 .bg-indigo-600:active {
   transform: translateY(0.5px) !important;
+}
+
+/* --- Flowing SVG lines animations --- */
+@keyframes flow-left {
+  to {
+    stroke-dashoffset: 24;
+  }
+}
+@keyframes flow-right {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.flowing-path-left {
+  stroke-dasharray: 8, 4;
+  animation: flow-left 1.2s linear infinite;
+}
+
+.flowing-path-right {
+  stroke-dasharray: 8, 4;
+  animation: flow-right 1.2s linear infinite;
 }
 
 /* ==========================================================================

@@ -89,7 +89,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
               <button
                 id="nav-signin-btn"
                 onClick={() => navigate('/login')}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 shadow-md shadow-indigo-500/5 active:scale-95 transition-all duration-200"
               >
                 <i className="fas fa-sign-in-alt"></i>
                 <span>Sign In</span>
@@ -115,16 +115,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             )}
           </div>
 
-          {/* Quick CTA to IDE (Hidden if already on editor) */}
-          {location.pathname !== '/editor' && (
-            <button
-              onClick={() => navigate('/editor')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
-            >
-              <i className="fas fa-terminal"></i>
-              <span>Launch IDE</span>
-            </button>
-          )}
+
 
           {/* Theme Toggle Switch */}
           <button
@@ -172,18 +163,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">About</button>
           <button onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Contact</button>
           
-          {location.pathname !== '/editor' && (
-            <button
-              onClick={() => {
-                navigate('/editor');
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center justify-center gap-1.5 py-2 mt-2 rounded-lg text-xs font-bold text-white bg-indigo-600"
-            >
-              <i className="fas fa-terminal"></i>
-              <span>Launch IDE</span>
-            </button>
-          )}
+
 
           {/* Mobile Auth Container */}
           <div id="mobile-auth-container" className="border-t border-[var(--border-color)]/50 pt-2 flex flex-col gap-2">
@@ -193,7 +173,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                   navigate('/login');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 transition-all duration-200"
+                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 active:scale-95 transition-all duration-200"
               >
                 <i className="fas fa-sign-in-alt"></i>
                 <span>Sign In</span>
