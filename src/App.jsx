@@ -9,7 +9,7 @@ import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Toast from './components/Toast';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth';
 import { auth } from './firebase';
 
 
@@ -60,6 +60,49 @@ function AppContent() {
     setTheme('dark');
     showToast("Reverted to Dracula Theme", "info");
   };
+
+  // --- Handle Firebase redirect login result on app mount ---
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
+          showToast(`Welcome back, ${name}!`, 'success');
+          
+          // Migrate local notes to Firestore if needed
+          try {
+            const saved = localStorage.getItem("codeverse_notes");
+            if (saved) {
+              const localNotes = JSON.parse(saved);
+              if (Array.isArray(localNotes) && localNotes.length > 0) {
+                const { collection, doc, setDoc, getDocs } = await import('firebase/firestore');
+                const { db } = await import('./firebase');
+                const userNotesRef = collection(db, "users", result.user.uid, "notes");
+                const snapshot = await getDocs(userNotesRef);
+                if (snapshot.empty) {
+                  for (const note of localNotes) {
+                    if (note.id === 'welcome' && note.content.includes("Welcome to your personal scratchpad!")) continue;
+                    await setDoc(doc(db, "users", result.user.uid, "notes", note.id), {
+                      title: note.title || 'Untitled Note',
+                      content: note.content || '',
+                      updatedAt: note.updatedAt || new Date().toISOString()
+                    });
+                  }
+                }
+              }
+            }
+          } catch (migrateErr) {
+            console.error("Redirect notes migration error:", migrateErr);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Redirect sign-in error:", err);
+        if (err.code && err.code !== 'auth/redirect-cancelled') {
+          showToast(`Redirect Sign-In failed: ${err.message || err.code}`, 'error');
+        }
+      });
+  }, []);
 
   // --- Firebase Auth state observer ---
   useEffect(() => {

@@ -7,8 +7,7 @@ import {
   updateProfile, 
   signInWithPopup, 
   sendPasswordResetEmail,
-  signInWithRedirect,
-  getRedirectResult 
+  signInWithRedirect 
 } from 'firebase/auth';
 import { collection, doc, setDoc, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { auth, db, googleProvider, githubProvider, facebookProvider } from '../firebase';
@@ -80,26 +79,6 @@ export default function AuthPage({ user, onLogin, showToast }) {
     }
     return () => clearInterval(interval);
   }, [showOtpModal, otpTimer]);
-
-  // Handle Firebase redirect login result on page load
-  useEffect(() => {
-    getRedirectResult(auth)
-      .then(async (result) => {
-        if (result && result.user) {
-          const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
-          showToast(`Welcome back, ${name}!`, 'success');
-          await migrateLocalNotesToFirestore(result.user.uid);
-          navigate('/');
-        }
-      })
-      .catch((err) => {
-        console.error("Redirect sign-in error:", err);
-        // Don't show toast if it's just a normal load without redirect action
-        if (err.code && err.code !== 'auth/redirect-cancelled') {
-          showToast(`Redirect Sign-In failed: ${err.message || err.code}`, 'error');
-        }
-      });
-  }, []);
 
   // Helper to migrate guest notes to Cloud Firestore
   const migrateLocalNotesToFirestore = async (uid) => {
