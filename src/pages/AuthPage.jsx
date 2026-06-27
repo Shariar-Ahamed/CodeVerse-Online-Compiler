@@ -200,6 +200,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
     if (!signupName || !signupEmail || !signupPassword || !signupConfirmPass) return;
+    console.log("[DEBUG Signup] handleSignupSubmit called. Email:", signupEmail);
 
     if (signupPassword !== signupConfirmPass) {
       showToast('Passwords do not match!', 'error');
@@ -241,6 +242,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
   const handleVerifyOtpSubmit = async (e) => {
     e.preventDefault();
+    console.log("[DEBUG Signup] handleVerifyOtpSubmit called. OTP Input:", otpInput);
     if (!otpInput || otpInput.length !== 6) {
       showToast("Please enter a valid 6-digit OTP.", "error");
       return;
