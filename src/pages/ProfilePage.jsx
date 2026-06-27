@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
+import { db, auth } from '../firebase';
 
 export default function ProfilePage({ user, onLogout, showToast }) {
   const navigate = useNavigate();
@@ -18,6 +21,180 @@ export default function ProfilePage({ user, onLogout, showToast }) {
     navigate('/');
   };
 
+  // State Management for Profile Data & Editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || 'Developer',
+    email: user?.email || '',
+    title: 'Premium Developer',
+    bio: 'Coding enthusiast. Building CodeVerse Workspace compiler platform.',
+    skills: ['JavaScript', 'React', 'C++'],
+    photoURL: user?.photoURL || '',
+    github: '',
+    linkedin: '',
+    website: ''
+  });
+
+  const [inputs, setInputs] = useState({
+    name: '',
+    title: '',
+    bio: '',
+    skills: '',
+    photoURL: '',
+    github: '',
+    linkedin: '',
+    website: ''
+  });
+
+  // Fetch Custom Profile Metadata from Firestore on mount
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchProfile = async () => {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setProfileData({
+            name: data.name || user.name || 'Developer',
+            email: data.email || user.email || '',
+            title: data.title || 'Premium Developer',
+            bio: data.bio || '',
+            skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
+            photoURL: data.photoURL || user.photoURL || '',
+            github: data.socials?.github || '',
+            linkedin: data.socials?.linkedin || '',
+            website: data.socials?.website || ''
+          });
+        } else {
+          setProfileData({
+            name: user.name || 'Developer',
+            email: user.email || '',
+            title: 'Premium Developer',
+            bio: '',
+            skills: ['JavaScript', 'React', 'C++'],
+            photoURL: user.photoURL || '',
+            github: '',
+            linkedin: '',
+            website: ''
+          });
+        }
+      } catch (err) {
+        console.error("Error loading profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  // Handle local image upload selection and canvas compression
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 160, 160);
+        
+        // Export compressed JPEG Base64
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        setInputs(prev => ({ ...prev, photoURL: compressedBase64 }));
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Sync state variables for Edit Form
+  const handleEditClick = () => {
+    setInputs({
+      name: profileData.name,
+      title: profileData.title,
+      bio: profileData.bio,
+      skills: profileData.skills.join(', '),
+      photoURL: profileData.photoURL,
+      github: profileData.github,
+      linkedin: profileData.linkedin,
+      website: profileData.website
+    });
+    setIsEditing(true);
+  };
+
+  // Submit and Save to Firebase Auth + Firestore
+  const handleSaveSubmit = async (e) => {
+    e.preventDefault();
+    if (!inputs.name.trim()) {
+      showToast("Name cannot be empty", "error");
+      return;
+    }
+    
+    setSaveLoading(true);
+    try {
+      const skillsArray = inputs.skills
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      // 1. Update Firebase Auth display profile (name and photo URL)
+      if (auth.currentUser) {
+        const updatePayload = {};
+        if (inputs.name !== user.name) updatePayload.displayName = inputs.name;
+        if (inputs.photoURL !== user.photoURL) updatePayload.photoURL = inputs.photoURL;
+
+        if (Object.keys(updatePayload).length > 0) {
+          await updateProfile(auth.currentUser, updatePayload);
+        }
+      }
+
+      // 2. Update Firestore user document metadata
+      const userDocRef = doc(db, "users", user.uid);
+      await setDoc(userDocRef, {
+        name: inputs.name,
+        email: user.email,
+        title: inputs.title,
+        bio: inputs.bio,
+        skills: skillsArray,
+        photoURL: inputs.photoURL,
+        socials: {
+          github: inputs.github,
+          linkedin: inputs.linkedin,
+          website: inputs.website
+        },
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // 3. Update Local state to render immediately
+      setProfileData({
+        name: inputs.name,
+        email: user.email,
+        title: inputs.title,
+        bio: inputs.bio,
+        skills: skillsArray,
+        photoURL: inputs.photoURL,
+        github: inputs.github,
+        linkedin: inputs.linkedin,
+        website: inputs.website
+      });
+
+      showToast("Profile updated successfully", "success");
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      showToast("Failed to save changes. Please try again.", "error");
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   if (!user) return null;
 
   // Determinstic opacity list for activity contributions log
@@ -30,7 +207,6 @@ export default function ProfilePage({ user, onLogout, showToast }) {
   ];
   
   const contributionGrid = Array.from({ length: 112 }).map((_, i) => {
-    // Generate a pseudo-random stable index based on a mathematical pattern
     const key = (i * 7 + 13) % gridOpacities.length;
     const count = (i * 3 + 2) % 9;
     return {
@@ -67,49 +243,280 @@ export default function ProfilePage({ user, onLogout, showToast }) {
       {/* Dashboard Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start relative z-10">
         
-        {/* Left Column: User Card */}
+        {/* Left Column: User Card (Display Mode or Edit Mode) */}
         <div className="flex flex-col gap-6">
-          <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col items-center text-center gap-5 relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-500/10 blur-xl"></div>
-            
-            {/* Large Avatar */}
-            <div
-              id="profile-avatar-large"
-              className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 border-2 border-indigo-400 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg shadow-indigo-500/20 font-sans select-none"
-            >
-              <span id="profile-avatar-initial">{(user.name || 'U').charAt(0).toUpperCase()}</span>
-            </div>
+          {isEditing ? (
+            <div className="glass-panel p-6 rounded-2xl border border-indigo-500/25 bg-slate-900/60 flex flex-col gap-4 relative overflow-hidden animate-fade-in">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-500/5 blur-xl"></div>
+              
+              <h3 className="font-bold text-base text-white border-b border-[var(--border-color)] pb-2 mb-2 flex items-center gap-2">
+                <i className="fas fa-user-pen text-indigo-400"></i>
+                <span>Edit Profile Details</span>
+              </h3>
 
-            {/* User Text Details */}
-            <div className="flex flex-col gap-1">
-              <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)]">{user.name || 'Developer'}</h3>
-              <p id="profile-email" className="text-xs text-[var(--text-muted)] font-mono">{user.email || 'user@codeverse.com'}</p>
-              <span className="inline-block mx-auto mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                Premium Developer
-              </span>
-            </div>
-
-            {/* Stats Mini Row */}
-            <div className="grid grid-cols-2 divide-x divide-[var(--border-color)] border-y border-[var(--border-color)]/60 w-full py-3 mt-1 text-center">
-              <div>
-                <span className="block text-lg font-bold text-[var(--text-primary)] font-mono">148</span>
-                <span className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">Total Runs</span>
+              {/* Avatar Upload Preview */}
+              <div className="flex flex-col items-center gap-2 mb-3 relative group">
+                <div className="w-18 h-18 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800">
+                  {inputs.photoURL ? (
+                    <img src={inputs.photoURL} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xl">
+                      {(inputs.name || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  {/* File selection cover overlay */}
+                  <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 text-white text-[10px] gap-1 select-none">
+                    <i className="fas fa-camera text-sm animate-pulse"></i>
+                    <span>Upload</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <span className="text-[9px] text-[var(--text-secondary)] font-medium">Click photo to upload</span>
               </div>
-              <div>
-                <span className="block text-lg font-bold text-emerald-400 font-mono">92.4%</span>
-                <span className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">Success Rate</span>
-              </div>
-            </div>
 
-            {/* Action buttons */}
-            <div className="flex flex-col gap-2 w-full">
-              <button
-                onClick={handleLogoutClick}
-                className="w-full py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200 cursor-pointer"
+              <form onSubmit={handleSaveSubmit} className="flex flex-col gap-3 text-left">
+                {/* Name */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={inputs.name}
+                    onChange={(e) => setInputs(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                  />
+                </div>
+
+                {/* Professional Title */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Professional Title</label>
+                  <input
+                    type="text"
+                    value={inputs.title}
+                    onChange={(e) => setInputs(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                    placeholder="e.g. Full Stack Developer"
+                  />
+                </div>
+
+                {/* Short Bio */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Bio</label>
+                  <textarea
+                    value={inputs.bio}
+                    onChange={(e) => setInputs(prev => ({ ...prev, bio: e.target.value }))}
+                    rows={3}
+                    maxLength={150}
+                    className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200 resize-none"
+                    placeholder="Tell us about yourself (max 150 chars)..."
+                  />
+                </div>
+
+                {/* Skills (Comma Separated) */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Skills (comma separated)</label>
+                  <input
+                    type="text"
+                    value={inputs.skills}
+                    onChange={(e) => setInputs(prev => ({ ...prev, skills: e.target.value }))}
+                    className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                    placeholder="React, C++, Python, CSS"
+                  />
+                </div>
+
+                {/* Social Links */}
+                <div className="flex flex-col gap-2.5 mt-1 border-t border-[var(--border-color)]/30 pt-3">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Social Links</label>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 text-center text-slate-400"><i className="fab fa-github"></i></span>
+                    <input
+                      type="url"
+                      value={inputs.github}
+                      onChange={(e) => setInputs(prev => ({ ...prev, github: e.target.value }))}
+                      className="flex-grow bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                      placeholder="GitHub profile URL"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 text-center text-slate-400"><i className="fab fa-linkedin"></i></span>
+                    <input
+                      type="url"
+                      value={inputs.linkedin}
+                      onChange={(e) => setInputs(prev => ({ ...prev, linkedin: e.target.value }))}
+                      className="flex-grow bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                      placeholder="LinkedIn profile URL"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 text-center text-slate-400"><i className="fas fa-globe"></i></span>
+                    <input
+                      type="url"
+                      value={inputs.website}
+                      onChange={(e) => setInputs(prev => ({ ...prev, website: e.target.value }))}
+                      className="flex-grow bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
+                      placeholder="Personal website URL"
+                    />
+                  </div>
+                </div>
+
+                {/* Form Buttons */}
+                <div className="flex items-center gap-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    disabled={saveLoading}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition-all duration-200 cursor-pointer disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saveLoading}
+                    className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    {saveLoading ? (
+                      <>
+                        <i className="fas fa-circle-notch animate-spin"></i>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-floppy-disk"></i>
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col items-center text-center gap-5 relative overflow-hidden">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-500/10 blur-xl"></div>
+              
+              {/* Large Avatar */}
+              <div
+                id="profile-avatar-large"
+                className="w-20 h-20 rounded-full border-2 border-indigo-400 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg shadow-indigo-500/20 font-sans select-none overflow-hidden bg-slate-800"
               >
-                <i className="fas fa-sign-out-alt mr-1.5"></i>
-                <span>Sign Out Account</span>
-              </button>
+                {profileData.photoURL ? (
+                  <img src={profileData.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
+                    {(profileData.name || 'U').charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+
+              {/* User Text Details */}
+              <div className="flex flex-col gap-1 w-full">
+                <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate">{profileData.name || 'Developer'}</h3>
+                <p id="profile-email" className="text-xs text-[var(--text-muted)] font-mono truncate">{profileData.email || ''}</p>
+                <span className="inline-block mx-auto mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  {profileData.title || 'Premium Developer'}
+                </span>
+              </div>
+
+              {/* Short Bio */}
+              {profileData.bio && (
+                <p className="text-xs text-[var(--text-secondary)] italic max-w-[240px] leading-relaxed border-t border-[var(--border-color)]/30 pt-3 w-full">
+                  "{profileData.bio}"
+                </p>
+              )}
+
+              {/* Social Links Row */}
+              {(profileData.github || profileData.linkedin || profileData.website) && (
+                <div className="flex items-center justify-center gap-3">
+                  {profileData.github && (
+                    <a
+                      href={profileData.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      title="GitHub Profile"
+                    >
+                      <i className="fab fa-github"></i>
+                    </a>
+                  )}
+                  {profileData.linkedin && (
+                    <a
+                      href={profileData.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      title="LinkedIn Profile"
+                    >
+                      <i className="fab fa-linkedin"></i>
+                    </a>
+                  )}
+                  {profileData.website && (
+                    <a
+                      href={profileData.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      title="Personal Website"
+                    >
+                      <i className="fas fa-globe"></i>
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Stats Mini Row */}
+              <div className="grid grid-cols-2 divide-x divide-[var(--border-color)] border-y border-[var(--border-color)]/60 w-full py-3 mt-1 text-center">
+                <div>
+                  <span className="block text-lg font-bold text-[var(--text-primary)] font-mono">148</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">Total Runs</span>
+                </div>
+                <div>
+                  <span className="block text-lg font-bold text-emerald-400 font-mono">92.4%</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">Success Rate</span>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-2 w-full">
+                <button
+                  onClick={handleEditClick}
+                  className="w-full py-2 rounded-xl text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <i className="fas fa-user-pen"></i>
+                  <span>Edit Profile</span>
+                </button>
+                <button
+                  onClick={handleLogoutClick}
+                  className="w-full py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200 cursor-pointer"
+                >
+                  <i className="fas fa-sign-out-alt mr-1.5"></i>
+                  <span>Sign Out Account</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Skills & Technologies Card */}
+          <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Skills & Technologies</h4>
+            <div className="flex flex-wrap gap-2">
+              {profileData.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                >
+                  {skill}
+                </span>
+              ))}
+              {profileData.skills.length === 0 && (
+                <span className="text-xs text-[var(--text-muted)] italic">No skills listed yet.</span>
+              )}
             </div>
           </div>
 

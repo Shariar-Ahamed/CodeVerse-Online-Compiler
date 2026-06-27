@@ -100,21 +100,16 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 <button
                   id="nav-user-avatar-btn"
                   onClick={() => navigate('/profile')}
-                  className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans"
+                  className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
                   title="View Developer Profile"
                 >
-                  {(user.name || 'U').charAt(0).toUpperCase()}
-                </button>
-
-                {/* Direct Sign Out Button */}
-                <button
-                  id="nav-signout-direct-btn"
-                  onClick={onLogout}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
-                  title="Sign Out"
-                >
-                  <i className="fas fa-sign-out-alt"></i>
-                  <span>Sign Out</span>
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
+                      {(user.name || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </button>
               </div>
             )}
@@ -140,6 +135,19 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           >
             <i id="theme-icon" className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'} text-sm`}></i>
           </button>
+
+          {/* Direct Sign Out Button (Shown on the right of Theme Toggle) */}
+          {user && (
+            <button
+              id="nav-signout-direct-btn"
+              onClick={onLogout}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
+              title="Sign Out"
+            >
+              <i className="fas fa-sign-out-alt"></i>
+              <span>Sign Out</span>
+            </button>
+          )}
 
           {/* Mobile Menu Trigger */}
           <button
@@ -193,8 +201,14 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             ) : (
               <div id="mobile-user-profile" className="flex flex-col gap-2 bg-[var(--bg-tertiary)]/20 p-3 rounded-xl border border-[var(--border-color)]">
                 <div className="flex items-center gap-2.5">
-                  <div id="mobile-user-avatar" className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-white text-xs font-bold font-mono">
-                    {(user.name || 'U').charAt(0).toUpperCase()}
+                  <div id="mobile-user-avatar" className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold font-mono overflow-hidden flex items-center justify-center">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
+                        {(user.name || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col">
                     <span id="mobile-user-name" className="text-xs font-bold text-[var(--text-primary)]">{user.name || 'User'}</span>
