@@ -107,7 +107,6 @@ function AppContent() {
   // --- Firebase Auth state observer ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("[DEBUG App.jsx] onAuthStateChanged user:", firebaseUser ? firebaseUser.email : "NULL");
       if (firebaseUser) {
         // Authenticated Firebase User
         const userData = {
