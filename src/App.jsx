@@ -63,11 +63,9 @@ function AppContent() {
 
   // --- Handle Firebase redirect login result on app mount ---
   useEffect(() => {
-    console.log("[DEBUG App.jsx] checking redirect result...");
     getRedirectResult(auth)
       .then(async (result) => {
         if (result && result.user) {
-          console.log("[DEBUG App.jsx] Redirect sign-in success. User:", result.user.email);
           const name = result.user.displayName || result.user.email?.split('@')[0] || "Developer";
           showToast(`Welcome back, ${name}!`, 'success');
           
@@ -96,12 +94,10 @@ function AppContent() {
           } catch (migrateErr) {
             console.error("Redirect notes migration error:", migrateErr);
           }
-        } else {
-          console.log("[DEBUG App.jsx] No redirect result found.");
         }
       })
       .catch((err) => {
-        console.error("[DEBUG App.jsx] Redirect sign-in error:", err);
+        console.error("Redirect sign-in error:", err);
         if (err.code && err.code !== 'auth/redirect-cancelled') {
           showToast(`Redirect Sign-In failed: ${err.message || err.code}`, 'error');
         }
@@ -110,9 +106,7 @@ function AppContent() {
 
   // --- Firebase Auth state observer ---
   useEffect(() => {
-    console.log("[DEBUG App.jsx] Registering onAuthStateChanged observer.");
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("[DEBUG App.jsx] onAuthStateChanged fired. firebaseUser:", firebaseUser ? firebaseUser.email : "NULL");
       if (firebaseUser) {
         // Authenticated Firebase User
         const userData = {
@@ -135,10 +129,8 @@ function AppContent() {
         }
 
         if (localUser && localUser.isGuest) {
-          console.log("[DEBUG App.jsx] Preserving local guest session:", localUser.name);
           setUser(localUser);
         } else {
-          console.log("[DEBUG App.jsx] Clearing session.");
           setUser(null);
           localStorage.removeItem("codeverse_user");
         }
