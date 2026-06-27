@@ -95,68 +95,27 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 <span>Sign In</span>
               </button>
             ) : (
-              <div id="nav-user-profile" className="relative">
+              <div id="nav-user-profile" className="flex items-center gap-2.5">
+                {/* User Avatar Button (Goes directly to Profile) */}
                 <button
                   id="nav-user-avatar-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDropdownOpen(!dropdownOpen);
-                  }}
+                  onClick={() => navigate('/profile')}
                   className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans"
-                  title="View Profile"
+                  title="View Developer Profile"
                 >
                   {(user.name || 'U').charAt(0).toUpperCase()}
                 </button>
-                
-                {/* Profile Dropdown Menu */}
-                {dropdownOpen && (
-                  <div
-                    id="nav-user-dropdown"
-                    className="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/45 shadow-xl flex flex-col py-1.5 z-40 animate-scale-up backdrop-blur-xl"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="px-4 py-2.5 border-b border-[var(--border-color)] flex flex-col gap-0.5">
-                      <span id="dropdown-user-name" className="text-xs font-bold text-[var(--text-primary)]">{user.name || 'User'}</span>
-                      <span id="dropdown-user-email" className="text-[10px] text-[var(--text-secondary)] font-mono truncate">{user.email || ''}</span>
-                    </div>
-                    {location.pathname !== '/editor' && (
-                      <button
-                        id="dropdown-goto-ide"
-                        onClick={() => {
-                          navigate('/editor');
-                          setDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 flex items-center gap-2 transition-all duration-200"
-                      >
-                        <i className="fas fa-code text-[10px]"></i>
-                        <span>Launch IDE Workspace</span>
-                      </button>
-                    )}
-                    {location.pathname !== '/profile' && (
-                      <button
-                        onClick={() => {
-                          navigate('/profile');
-                          setDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 flex items-center gap-2 transition-all duration-200"
-                      >
-                        <i className="fas fa-user-circle text-[10px]"></i>
-                        <span>Developer Profile</span>
-                      </button>
-                    )}
-                    <button
-                      id="dropdown-signout-btn"
-                      onClick={() => {
-                        onLogout();
-                        setDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 flex items-center gap-2 transition-all duration-200 border-t border-[var(--border-color)] mt-1"
-                    >
-                      <i className="fas fa-sign-out-alt text-[10px]"></i>
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
+
+                {/* Direct Sign Out Button */}
+                <button
+                  id="nav-signout-direct-btn"
+                  onClick={onLogout}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
+                  title="Sign Out"
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                  <span>Sign Out</span>
+                </button>
               </div>
             )}
           </div>
