@@ -138,6 +138,12 @@ export default function AuthPage({ user, onLogin, showToast }) {
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+    console.log("DEBUG - EmailJS Env Keys Loaded:", {
+      serviceId: serviceId ? "LOADED" : "UNDEFINED",
+      templateId: templateId ? "LOADED" : "UNDEFINED",
+      publicKey: publicKey ? "LOADED" : "UNDEFINED"
+    });
+
     if (!serviceId || !templateId || !publicKey || serviceId.includes("here") || templateId.includes("here") || publicKey.includes("here")) {
       console.warn("EmailJS keys are missing or placeholders. Using developer fallback alert for testing.");
       return false;
