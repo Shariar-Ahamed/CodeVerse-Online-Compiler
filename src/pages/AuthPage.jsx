@@ -8,8 +8,9 @@ import {
   signInWithPopup, 
   sendPasswordResetEmail 
 } from 'firebase/auth';
-import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { auth, db, googleProvider, githubProvider, facebookProvider } from '../firebase';
+import emailjs from '@emailjs/browser';
 
 
 const getPasswordStrength = (password) => {
@@ -56,6 +57,27 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
   // Forgot Password State
   const [forgotEmail, setForgotEmail] = useState('');
+
+  // OTP Verification States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpInput, setOtpInput] = useState('');
+  const [otpTimer, setOtpTimer] = useState(300);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [signupPayload, setSignupPayload] = useState(null);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+
+  // OTP Timer countdown effect
+  useEffect(() => {
+    let interval = null;
+    if (showOtpModal && otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer(prev => prev - 1);
+      }, 1000);
+    } else if (otpTimer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [showOtpModal, otpTimer]);
 
   // Helper to migrate guest notes to Cloud Firestore
   const migrateLocalNotesToFirestore = async (uid) => {
@@ -111,6 +133,63 @@ export default function AuthPage({ user, onLogin, showToast }) {
     }
   };
 
+  const sendOtpEmail = async (email, name, otp) => {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey || serviceId.includes("here") || templateId.includes("here") || publicKey.includes("here")) {
+      console.warn("EmailJS keys are missing or placeholders. Using developer fallback alert for testing.");
+      return false;
+    }
+
+    try {
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          to_email: email,
+          email: email,
+          to_name: name,
+          name: name,
+          otp: otp,
+        },
+        publicKey
+      );
+      return true;
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      return false;
+    }
+  };
+
+  const sendWelcomeEmail = async (email, name) => {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const welcomeTemplateId = import.meta.env.VITE_EMAILJS_WELCOME_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !welcomeTemplateId || !publicKey || welcomeTemplateId.includes("here")) {
+      console.warn("Welcome email template not configured.");
+      return;
+    }
+
+    try {
+      await emailjs.send(
+        serviceId,
+        welcomeTemplateId,
+        {
+          to_email: email,
+          email: email,
+          to_name: name,
+          name: name,
+        },
+        publicKey
+      );
+    } catch (error) {
+      console.error("Failed to send welcome email:", error);
+    }
+  };
+
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
     if (!signupName || !signupEmail || !signupPassword || !signupConfirmPass) return;
@@ -120,22 +199,150 @@ export default function AuthPage({ user, onLogin, showToast }) {
       return;
     }
 
+    setOtpLoading(true);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
-      await updateProfile(userCredential.user, { displayName: signupName });
+      // 1. Write OTP to Firestore under temp_otps/email
+      const tempOtpRef = doc(db, "temp_otps", signupEmail.toLowerCase());
+      await setDoc(tempOtpRef, {
+        otp: otp,
+        expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes expiration
+      });
+
+      // 2. Send email via EmailJS
+      const sent = await sendOtpEmail(signupEmail, signupName, otp);
       
-      showToast(`Welcome to CodeVerse, ${signupName}!`, 'success');
-      await migrateLocalNotesToFirestore(userCredential.user.uid);
-      navigate('/');
+      setSignupPayload({ name: signupName, email: signupEmail, password: signupPassword });
+      setOtpInput('');
+      setOtpTimer(300); // 5 minutes
+      setVerificationSuccess(false);
+      setShowOtpModal(true);
+
+      if (sent) {
+        showToast("Verification OTP sent to your email!", "success");
+      } else {
+        showToast(`⚠️ [Dev Mode] EmailJS not configured. For testing, your OTP code is: ${otp}`, "warning");
+      }
     } catch (err) {
       console.error(err);
-      let errMsg = "Failed to create account.";
+      showToast("Error starting verification process.", "error");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtpSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpInput || otpInput.length !== 6) {
+      showToast("Please enter a valid 6-digit OTP.", "error");
+      return;
+    }
+
+    if (!signupPayload) return;
+
+    setOtpLoading(true);
+    try {
+      // 1. Read OTP from Firestore
+      const tempOtpRef = doc(db, "temp_otps", signupPayload.email.toLowerCase());
+      const docSnap = await getDoc(tempOtpRef);
+
+      if (!docSnap.exists()) {
+        showToast("No verification record found. Please request a new code.", "error");
+        setOtpLoading(false);
+        return;
+      }
+
+      const data = docSnap.data();
+      const storedOtp = data.otp;
+      const expiresAt = data.expiresAt;
+
+      // 2. Validate OTP and check if expired
+      if (Date.now() > expiresAt) {
+        showToast("The OTP has expired. Please request a new one.", "error");
+        setOtpLoading(false);
+        return;
+      }
+
+      if (otpInput.trim() !== storedOtp.trim()) {
+        showToast("Invalid OTP code. Please try again.", "error");
+        setOtpLoading(false);
+        return;
+      }
+
+      // 3. OTP is correct! Trigger success tick animation
+      setVerificationSuccess(true);
+      setOtpLoading(false);
+
+      // Delay creation slightly so user sees the animated green tick
+      setTimeout(async () => {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, signupPayload.email, signupPayload.password);
+          await updateProfile(userCredential.user, { displayName: signupPayload.name });
+
+          // Send welcome email in background
+          sendWelcomeEmail(signupPayload.email, signupPayload.name);
+
+          // 4. Delete temp OTP record from Firestore
+          await deleteDoc(tempOtpRef);
+
+          showToast(`Welcome to CodeVerse, ${signupPayload.name}!`, 'success');
+          await migrateLocalNotesToFirestore(userCredential.user.uid);
+          setShowOtpModal(false);
+          setSignupPayload(null);
+          setVerificationSuccess(false);
+          navigate('/');
+        } catch (authErr) {
+          console.error(authErr);
+          setVerificationSuccess(false);
+          let errMsg = "Failed to create account after verification.";
+          if (authErr.code === 'auth/email-already-in-use') {
+            errMsg = "This email is already in use.";
+          }
+          showToast(errMsg, 'error');
+        }
+      }, 1800);
+    } catch (err) {
+      console.error(err);
+      let errMsg = "Failed to verify OTP and create account.";
       if (err.code === 'auth/email-already-in-use') {
         errMsg = "This email is already in use.";
       } else if (err.code === 'auth/weak-password') {
         errMsg = "Password is too weak. Must be at least 6 characters.";
       }
       showToast(errMsg, 'error');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!signupPayload || otpTimer > 0) return;
+
+    setOtpLoading(true);
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    try {
+      const tempOtpRef = doc(db, "temp_otps", signupPayload.email.toLowerCase());
+      await setDoc(tempOtpRef, {
+        otp: newOtp,
+        expiresAt: Date.now() + 5 * 60 * 1000
+      });
+
+      const sent = await sendOtpEmail(signupPayload.email, signupPayload.name, newOtp);
+      setOtpInput('');
+      setOtpTimer(300);
+
+      if (sent) {
+        showToast("A new verification OTP has been sent!", "success");
+      } else {
+        showToast(`⚠️ [Dev Mode] EmailJS not configured. New OTP code: ${newOtp}`, "warning");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to resend verification OTP.", "error");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -645,6 +852,167 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* OTP Verification Modal Overlay */}
+          {showOtpModal && (
+            <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-md z-30 p-6 sm:p-10 flex items-center justify-center animate-fade-in-up">
+              <div className="glass-panel border border-[var(--border-color)] p-6 sm:p-8 rounded-2xl w-full max-w-sm flex flex-col gap-4 text-center shadow-2xl relative animate-scale-up">
+                
+                {/* Cancel Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowOtpModal(false);
+                    setSignupPayload(null);
+                  }}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors duration-200 focus:outline-none"
+                  title="Cancel Verification"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+
+                {verificationSuccess ? (
+                  <div className="flex flex-col items-center justify-center py-6 animate-scale-up">
+                    <style>{`
+                      @keyframes checkmark-stroke {
+                        100% { stroke-dashoffset: 0; }
+                      }
+                      @keyframes checkmark-scale {
+                        0%, 100% { transform: none; }
+                        50% { transform: scale3d(1.1, 1.1, 1); }
+                      }
+                      @keyframes checkmark-fill {
+                        100% { box-shadow: inset 0px 0px 0px 30px rgba(16, 185, 129, 0.1); }
+                      }
+                      .checkmark__circle {
+                        stroke-dasharray: 166;
+                        stroke-dashoffset: 166;
+                        stroke-width: 2;
+                        stroke-miterlimit: 10;
+                        stroke: #10b981;
+                        fill: none;
+                        animation: checkmark-stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+                      }
+                      .checkmark {
+                        width: 64px;
+                        height: 64px;
+                        border-radius: 50%;
+                        display: block;
+                        stroke-width: 3;
+                        stroke: #10b981;
+                        stroke-miterlimit: 10;
+                        margin: 10px auto 20px auto;
+                        box-shadow: inset 0px 0px 0px #10b981;
+                        animation: checkmark-fill .4s ease-in-out .4s forwards, checkmark-scale .3s ease-in-out .9s both;
+                      }
+                      .checkmark__check {
+                        transform-origin: 50% 50%;
+                        stroke-dasharray: 48;
+                        stroke-dashoffset: 48;
+                        animation: checkmark-stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+                      }
+                    `}</style>
+                    <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                      <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                      <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                    </svg>
+                    <h3 className="text-base font-bold text-white mb-1">Email Verified!</h3>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Setting up your CodeVerse workspace...
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg mx-auto mb-2">
+                      <i className="fas fa-envelope-open-text animate-pulse"></i>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-black text-white">Verify Your Email</h3>
+                      <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
+                        We've sent a 6-digit verification code to <br />
+                        <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.email}</span>.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleVerifyOtpSubmit} className="flex flex-col gap-4 mt-2">
+                      <div className="flex flex-col gap-1.5 text-left">
+                        <label className="auth-label">
+                          6-Digit OTP Code
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="text"
+                            required
+                            maxLength={6}
+                            pattern="\d{6}"
+                            value={otpInput}
+                            onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                            className="auth-input text-center tracking-[1em] font-mono text-base font-bold pr-3 pl-8"
+                            placeholder="000000"
+                            disabled={otpLoading}
+                          />
+                          <i className="fas fa-key auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Timer & Resend Link */}
+                      <div className="flex flex-col items-center justify-center gap-2 mt-1 select-none">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
+                          {otpTimer > 0 ? (
+                            <>
+                              <i className="far fa-clock text-indigo-400 animate-pulse text-sm"></i>
+                              <span className="text-xs font-semibold text-slate-300">
+                                Expires in: <span className="text-indigo-400 font-mono font-bold text-sm tracking-wider">{Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')}</span>
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-circle-exclamation text-rose-500 animate-bounce text-sm"></i>
+                              <span className="text-xs font-bold text-rose-400 animate-pulse">Code expired!</span>
+                            </>
+                          )}
+                        </div>
+                        
+                        <button
+                          type="button"
+                          disabled={otpTimer > 0 || otpLoading}
+                          onClick={handleResendOtp}
+                          className={`text-xs font-extrabold transition-all duration-200 focus:outline-none flex items-center gap-1 ${
+                            otpTimer > 0 
+                              ? 'text-slate-600 cursor-not-allowed opacity-50' 
+                              : 'text-indigo-400 hover:text-indigo-300 cursor-pointer hover:underline active:scale-95'
+                          }`}
+                        >
+                          <i className="fas fa-rotate-right text-[10px]"></i>
+                          <span>Resend Code</span>
+                        </button>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={otpLoading}
+                        className="w-full py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow flex items-center justify-center gap-2"
+                      >
+                        {otpLoading ? (
+                          <>
+                            <i className="fas fa-circle-notch animate-spin"></i>
+                            <span>Verifying...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-shield-halved"></i>
+                            <span>Verify & Create Account</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
