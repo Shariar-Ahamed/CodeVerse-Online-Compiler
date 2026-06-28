@@ -1116,3 +1116,44 @@ input:-webkit-autofill:active {
   background: rgba(168, 85, 247, 0.25);
   border: 1px solid rgba(168, 85, 247, 0.4);
 }
+
+/* Custom slow pulse animation for breathing glows */
+.animate-pulse-slow {
+  animation: pulse 3.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 3D Holographic Spinning Cube Preloader */
+.cube-wrapper {
+  perspective: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+}
+.cube-3d {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin-cube-3d 5s linear infinite;
+}
+@keyframes spin-cube-3d {
+  0% { transform: rotateX(20deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(20deg) rotateY(360deg) rotateZ(360deg); }
+}
+.cube-face {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1.5px solid rgba(99, 102, 241, 0.85);
+  box-shadow: inset 0 0 8px rgba(99, 102, 241, 0.25);
+  backface-visibility: visible;
+}
+.cube-face-front  { transform: rotateY(0deg) translateZ(25px); border-color: #3b82f6; box-shadow: 0 0 12px rgba(59, 130, 246, 0.4), inset 0 0 6px rgba(59, 130, 246, 0.2); }
+.cube-face-back   { transform: rotateY(180deg) translateZ(25px); border-color: #10b981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4), inset 0 0 6px rgba(16, 185, 129, 0.2); }
+.cube-face-left   { transform: rotateY(-90deg) translateZ(25px); border-color: #8b5cf6; box-shadow: 0 0 12px rgba(139, 92, 246, 0.4), inset 0 0 6px rgba(139, 92, 246, 0.2); }
+.cube-face-right  { transform: rotateY(90deg) translateZ(25px); border-color: #ec4899; box-shadow: 0 0 12px rgba(236, 72, 153, 0.4), inset 0 0 6px rgba(236, 72, 153, 0.2); }
+.cube-face-top    { transform: rotateX(90deg) translateZ(25px); border-color: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4), inset 0 0 6px rgba(245, 158, 11, 0.2); }
+.cube-face-bottom { transform: rotateX(-90deg) translateZ(25px); border-color: #06b6d4; box-shadow: 0 0 12px rgba(6, 182, 212, 0.4), inset 0 0 6px rgba(6, 182, 212, 0.2); }

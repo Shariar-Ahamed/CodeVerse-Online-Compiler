@@ -38,12 +38,15 @@ export default function AIPanel({
   activeCode,
   activeLanguage,
   initialContextPrompt,
-  clearInitialContextPrompt
+  clearInitialContextPrompt,
+  isHome = false
 }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hello! I am **CodeVerse AI** (powered by Llama 3.3 70B). Ask me any questions about your code, or click one of the quick actions below to analyze your active workspace."
+      content: isHome
+        ? "Hello! I am **CodeVerse AI** (powered by Llama 3.3 70B). Ask me any coding or development questions right here!"
+        : "Hello! I am **CodeVerse AI** (powered by Llama 3.3 70B). Ask me any questions about your code, or click one of the quick actions below to analyze your active workspace."
     }
   ]);
   const [input, setInput] = useState('');
@@ -269,29 +272,31 @@ Respond in clean markdown format. When providing code fixes or optimized version
       </div>
 
       {/* Quick Action Widgets */}
-      <div className="p-3 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30 flex gap-2 overflow-x-auto relative z-10 scrollbar-thin flex-shrink-0">
-        <button
-          onClick={() => triggerQuickAction('explain')}
-          className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-500/40 text-[10px] font-bold text-indigo-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
-        >
-          <i className="fas fa-book-open"></i>
-          <span>Explain Code</span>
-        </button>
-        <button
-          onClick={() => triggerQuickAction('optimize')}
-          className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-[10px] font-bold text-cyan-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
-        >
-          <i className="fas fa-bolt"></i>
-          <span>Optimize</span>
-        </button>
-        <button
-          onClick={() => triggerQuickAction('tests')}
-          className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 hover:border-purple-500/40 text-[10px] font-bold text-purple-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
-        >
-          <i className="fas fa-vial"></i>
-          <span>Generate Tests</span>
-        </button>
-      </div>
+      {!isHome && (
+        <div className="p-3 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30 flex gap-2 overflow-x-auto relative z-10 scrollbar-thin flex-shrink-0">
+          <button
+            onClick={() => triggerQuickAction('explain')}
+            className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-500/40 text-[10px] font-bold text-indigo-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
+          >
+            <i className="fas fa-book-open"></i>
+            <span>Explain Code</span>
+          </button>
+          <button
+            onClick={() => triggerQuickAction('optimize')}
+            className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-[10px] font-bold text-cyan-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
+          >
+            <i className="fas fa-bolt"></i>
+            <span>Optimize</span>
+          </button>
+          <button
+            onClick={() => triggerQuickAction('tests')}
+            className="flex-shrink-0 px-2.5 py-1.5 rounded-lg border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 hover:border-purple-500/40 text-[10px] font-bold text-purple-400 flex items-center gap-1 transition-all duration-200 cursor-pointer"
+          >
+            <i className="fas fa-vial"></i>
+            <span>Generate Tests</span>
+          </button>
+        </div>
+      )}
 
       {/* Messages Scroll Area */}
       <div
@@ -331,7 +336,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
           e.preventDefault();
           handleSendPrompt();
         }}
-        className="p-3 border-t border-[var(--border-color)] bg-[#0a0e17]/80 flex gap-2 relative z-10 flex-shrink-0"
+        className="p-3 border-t border-[var(--border-color)] bg-[#0a0e17]/80 flex gap-2 items-end relative z-10 flex-shrink-0"
       >
         <textarea
           ref={textareaRef}
@@ -346,9 +351,13 @@ Respond in clean markdown format. When providing code fixes or optimized version
         <button
           type="submit"
           disabled={isGenerating || !input.trim()}
-          className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white border border-white/10 flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 transition-all duration-200 cursor-pointer"
+          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
+            isGenerating || !input.trim()
+              ? 'bg-[#121826]/40 text-slate-600 border border-white/5 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-400 text-white border border-blue-400/20 shadow-[0_0_12px_rgba(59,130,246,0.7)] hover:shadow-[0_0_20px_rgba(59,130,246,0.95)] hover:scale-105 active:scale-95'
+          }`}
         >
-          <i className="fas fa-paper-plane text-xs"></i>
+          <i className="fas fa-paper-plane text-xs text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.8)]"></i>
         </button>
       </form>
     </div>

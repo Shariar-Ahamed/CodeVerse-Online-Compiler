@@ -189,8 +189,19 @@ function AppContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#0b0f19] text-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 animate-pulse">
-            <i className="fas fa-cubes text-white text-3xl"></i>
+          <div className="relative flex items-center justify-center scale-110 mb-4">
+            {/* Background glowing aura */}
+            <div className="absolute w-36 h-36 rounded-full bg-purple-500/10 blur-3xl animate-pulse pointer-events-none z-0"></div>
+            <div className="absolute w-24 h-24 rounded-full bg-pink-500/10 blur-2xl animate-pulse pointer-events-none z-0"></div>
+
+            <div className="tetra-container relative z-10">
+              <div className="tetra-3d" style={{ animationDuration: '6s' }}>
+                <div className="tetra-face tetra-face-1"></div>
+                <div className="tetra-face tetra-face-2"></div>
+                <div className="tetra-face tetra-face-3"></div>
+                <div className="tetra-face tetra-face-bottom"></div>
+              </div>
+            </div>
           </div>
           <div className="text-xs font-bold text-indigo-400/80 tracking-widest uppercase animate-pulse">
             Initializing CodeVerse...

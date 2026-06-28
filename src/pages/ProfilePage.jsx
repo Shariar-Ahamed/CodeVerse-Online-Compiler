@@ -363,7 +363,17 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
   if (loading) {
     return (
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center justify-center gap-4 animate-fade-in text-white min-h-[60vh]">
-        <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="relative flex items-center justify-center scale-75 mb-2">
+          <div className="absolute w-28 h-28 rounded-full bg-purple-500/10 blur-2xl animate-pulse pointer-events-none z-0"></div>
+          <div className="tetra-container relative z-10">
+            <div className="tetra-3d" style={{ animationDuration: '6s' }}>
+              <div className="tetra-face tetra-face-1"></div>
+              <div className="tetra-face tetra-face-2"></div>
+              <div className="tetra-face tetra-face-3"></div>
+              <div className="tetra-face tetra-face-bottom"></div>
+            </div>
+          </div>
+        </div>
         <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Syncing profile metadata...</p>
       </main>
     );

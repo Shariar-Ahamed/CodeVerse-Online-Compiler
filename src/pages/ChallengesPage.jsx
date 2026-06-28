@@ -125,7 +125,17 @@ export default function ChallengesPage({ user, showToast }) {
         {/* Challenges Grid List */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="relative flex items-center justify-center scale-75 mb-2">
+              <div className="absolute w-28 h-28 rounded-full bg-purple-500/10 blur-2xl animate-pulse pointer-events-none z-0"></div>
+              <div className="tetra-container relative z-10">
+                <div className="tetra-3d" style={{ animationDuration: '6s' }}>
+                  <div className="tetra-face tetra-face-1"></div>
+                  <div className="tetra-face tetra-face-2"></div>
+                  <div className="tetra-face tetra-face-3"></div>
+                  <div className="tetra-face tetra-face-bottom"></div>
+                </div>
+              </div>
+            </div>
             <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Challenges...</p>
           </div>
         ) : filtered.length === 0 ? (

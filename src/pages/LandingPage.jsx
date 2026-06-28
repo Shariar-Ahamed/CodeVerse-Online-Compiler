@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AIPanel from '../components/AIPanel';
 
 const LANGUAGES = [
   { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
@@ -120,6 +121,7 @@ const MILESTONES = [
 
 export default function LandingPage({ showToast }) {
   const navigate = useNavigate();
+  const [showHomeAI, setShowHomeAI] = useState(false);
 
   // --- Milestone Roadmap States ---
   const [currentMilestoneIndex, setCurrentMilestoneIndex] = useState(0);
@@ -1194,6 +1196,58 @@ export default function LandingPage({ showToast }) {
           </div>
         </div>
       </section>
+
+      {/* Floating AI Chat Assistant Widget */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 select-none">
+        {/* Sliding AI Panel Container */}
+        {showHomeAI && (
+          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-fade-in-up relative rounded-2xl overflow-hidden glass-panel border border-[var(--border-color)]">
+            <AIPanel
+              onClose={() => setShowHomeAI(false)}
+              activeCode=""
+              activeLanguage=""
+              initialContextPrompt=""
+              clearInitialContextPrompt={() => {}}
+              isHome={true}
+            />
+          </div>
+        )}
+
+        {/* Floating Toggle Button (FAB) with Backlight Glow */}
+        <div className="relative group">
+          {/* Backlight Glow Aura (Spread of Light) */}
+          <div className={`absolute inset-0 rounded-full blur-xl transition-all duration-300 z-0 pointer-events-none ${
+            showHomeAI
+              ? 'bg-rose-500/40 animate-pulse-slow'
+              : 'bg-emerald-500/40 group-hover:bg-emerald-400/50 animate-pulse-slow'
+          }`}></div>
+          
+          {/* Radiating Ripple Ring (Spreading Light Ray) */}
+          <div className={`absolute -inset-1 rounded-full blur-sm animate-ping z-0 pointer-events-none transition-all duration-300 ${
+            showHomeAI ? 'bg-rose-500/35' : 'bg-emerald-500/35'
+          }`}></div>
+          <div className={`absolute -inset-2 rounded-full blur-md z-0 pointer-events-none transition-all duration-300 ${
+            showHomeAI ? 'bg-rose-500/15 animate-pulse-slow' : 'bg-emerald-500/15 animate-pulse-slow'
+          }`}></div>
+
+          {/* Main Button */}
+          <button
+            onClick={() => setShowHomeAI((prev) => !prev)}
+            className={`relative z-10 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+              showHomeAI
+                ? 'bg-rose-600 hover:bg-rose-500 text-white border border-rose-500/30 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                : 'bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white border border-emerald-400/40 shadow-[0_0_25px_rgba(16,185,129,0.55)] hover:shadow-[0_0_35px_rgba(16,185,129,0.8)]'
+            }`}
+            title="Ask CodeVerse AI"
+          >
+            {showHomeAI ? (
+              <i className="fas fa-times text-sm"></i>
+            ) : (
+              <i className="fas fa-brain text-xl text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.6)]"></i>
+            )}
+          </button>
+        </div>
+      </div>
 
     </div>
   );

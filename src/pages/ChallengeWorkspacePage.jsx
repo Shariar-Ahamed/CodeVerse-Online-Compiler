@@ -469,7 +469,17 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-primary)] text-white">
-        <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="relative flex items-center justify-center scale-100 mb-4">
+          <div className="absolute w-32 h-32 rounded-full bg-purple-500/10 blur-2xl animate-pulse pointer-events-none z-0"></div>
+          <div className="tetra-container relative z-10">
+            <div className="tetra-3d" style={{ animationDuration: '6s' }}>
+              <div className="tetra-face tetra-face-1"></div>
+              <div className="tetra-face tetra-face-2"></div>
+              <div className="tetra-face tetra-face-3"></div>
+              <div className="tetra-face tetra-face-bottom"></div>
+            </div>
+          </div>
+        </div>
         <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest animate-pulse">Configuring Sandbox Workspace...</p>
       </div>
     );
