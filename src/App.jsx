@@ -9,6 +9,9 @@ import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Toast from './components/Toast';
+import ChallengesPage from './pages/ChallengesPage';
+import ChallengeWorkspacePage from './pages/ChallengeWorkspacePage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -34,6 +37,7 @@ function AppContent() {
 
   const [showMaintenance, setShowMaintenance] = useState(false);
   const [toast, setToast] = useState(null);
+  const location = useLocation();
 
   // --- Theme Configuration on Mount ---
   useEffect(() => {
@@ -188,7 +192,6 @@ function AppContent() {
     setToast({ message, type });
   };
 
-  const location = useLocation();
   const isAuthPage = location.pathname === '/login';
 
   return (
@@ -210,6 +213,9 @@ function AppContent() {
           <Route path="/login" element={<AuthPage user={user} onLogin={handleLogin} showToast={showToast} />} />
           <Route path="/editor" element={<EditorPage user={user} theme={theme} showToast={showToast} />} />
           <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} showToast={showToast} />} />
+          <Route path="/challenges" element={<ChallengesPage user={user} showToast={showToast} />} />
+          <Route path="/challenges/:id" element={<ChallengeWorkspacePage user={user} theme={theme} showToast={showToast} />} />
+          <Route path="/leaderboard" element={<LeaderboardPage user={user} showToast={showToast} />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage showToast={showToast} />} />
         </Routes>

@@ -73,6 +73,9 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => handleNavClick('features')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             Features
           </button>
+          <button onClick={() => navigate('/challenges')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
+            Challenges
+          </button>
           <button onClick={() => navigate('/about')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             About
           </button>
@@ -160,6 +163,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => handleNavClick('hero')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Home</button>
           <button onClick={() => handleNavClick('languages')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Languages</button>
           <button onClick={() => handleNavClick('features')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Features</button>
+          <button onClick={() => { navigate('/challenges'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Challenges</button>
           <button onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">About</button>
           <button onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Contact</button>
           
