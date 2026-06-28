@@ -82,6 +82,14 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     return `${day}/${month}/${year}, ${timeStr}`;
   };
 
+  const getStarterComment = (lang) => {
+    const langObj = SUPPORTED_LANGS.find(l => l.key === lang);
+    const langName = langObj ? langObj.name : lang;
+    const ext = LANGUAGES[lang]?.extension || "txt";
+    const commentChar = (ext === "py" || ext === "sh" || ext === "rb" || ext === "pl") ? "#" : "//";
+    return `${commentChar} Environment: ${langName}\n${commentChar} Write your code here and submit...\n\n`;
+  };
+
   // 1. Load Challenge metadata and user submissions on mount
   useEffect(() => {
     const fetchChallengeData = async () => {
@@ -98,14 +106,14 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           const data = challengeDoc.data();
           setChallenge(data);
           
-          // Keep editor completely empty for beginner boilerplate practice
-          setEditorCode("");
+          // Display 2 lines of helpful comments in the editor
+          setEditorCode(getStarterComment(selectedLang));
         } else {
           // Fallback to local INITIAL_CHALLENGES if document not found in DB
           const fallback = INITIAL_CHALLENGES.find(c => c.id === id);
           if (fallback) {
             setChallenge(fallback);
-            setEditorCode("");
+            setEditorCode(getStarterComment(selectedLang));
           } else {
             showToast("Challenge not found.", "error");
             navigate('/challenges');
@@ -121,7 +129,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
         const fallback = INITIAL_CHALLENGES.find(c => c.id === id);
         if (fallback) {
           setChallenge(fallback);
-          setEditorCode("");
+          setEditorCode(getStarterComment(selectedLang));
         } else {
           showToast("Error loading workspace data.", "error");
         }
@@ -161,10 +169,10 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     const nextLang = e.target.value;
     setSelectedLang(nextLang);
     if (challenge) {
-      // Keep editor completely empty for beginner boilerplate practice
-      setEditorCode("");
+      const comment = getStarterComment(nextLang);
+      setEditorCode(comment);
       if (editorRef.current) {
-        editorRef.current.setValue("");
+        editorRef.current.setValue(comment);
       }
     }
   };
