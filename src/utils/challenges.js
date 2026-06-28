@@ -11,10 +11,10 @@ export const INITIAL_CHALLENGES = [
       { input: "3", output: "1\n2\nFizz", isHidden: true }
     ],
     starterCode: {
-      python: "# Python 3 Starter Code\nimport sys\n\ndef fizzBuzz(n):\n    # Write your code here to print numbers from 1 to n\n    pass\n\nfor line in sys.stdin:\n    if not line.strip():\n        continue\n    n = int(line.strip())\n    fizzBuzz(n)\n",
-      cpp: "// C++ Starter Code\n#include <iostream>\nusing namespace std; \n\nvoid fizzBuzz(int n) {\n    // Write your code here to print numbers from 1 to n\n    \n}\n\nint main() {\n    int n;\n    if (cin >> n) {\n        fizzBuzz(n);\n    }\n    return 0;\n}\n",
-      javascript: "// Node.js Starter Code\nconst fs = require('fs');\n\nfunction fizzBuzz(n) {\n    // Write your code here to print numbers from 1 to n\n    \n}\n\nconst input = fs.readFileSync(0, 'utf-8').trim();\nif (input) {\n    const n = parseInt(input, 10);\n    fizzBuzz(n);\n}\n",
-      java: "// Java Starter Code\nimport java.util.Scanner;\n\npublic class Main {\n    public static void fizzBuzz(int n) {\n        // Write your code here to print numbers from 1 to n\n        \n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            fizzBuzz(n);\n        }\n    }\n}\n"
+      python: "# Python 3 Starter Code\n# Write your code here\n",
+      cpp: "// C++ Starter Code\n// Write your code here\n",
+      javascript: "// Node.js Starter Code\n// Write your code here\n",
+      java: "// Java Starter Code\n// Write your code here\n"
     }
   },
   {
@@ -29,9 +29,10 @@ export const INITIAL_CHALLENGES = [
       { input: "a man a plan a canal panama", output: "true", isHidden: true }
     ],
     starterCode: {
-      python: "# Python 3 Starter Code\nimport sys\n\ndef isPalindrome(s):\n    # Write your code here. Return \"true\" or \"false\"\n    return \"false\"\n\nfor line in sys.stdin:\n    s = line.strip()\n    if not s:\n        continue\n    print(isPalindrome(s))\n",
-      cpp: "// C++ Starter Code\n#include <iostream>\n#include <string>\nusing namespace std;\n\nstring isPalindrome(string s) {\n    // Write your code here. Return \"true\" or \"false\"\n    return \"false\";\n}\n\nint main() {\n    string s, temp = \"\";\n    while (cin >> s) {\n        temp += s;\n    }\n    cout << isPalindrome(temp) << endl;\n    return 0;\n}\n",
-      javascript: "// Node.js Starter Code\nconst fs = require('fs');\n\nfunction isPalindrome(s) {\n    // Write your code here. Return \"true\" or \"false\"\n    return \"false\";\n}\n\nconst input = fs.readFileSync(0, 'utf-8').trim();\nif (input) {\n    console.log(isPalindrome(input));\n}\n"
+      python: "# Python 3 Starter Code\n# Write your code here\n",
+      cpp: "// C++ Starter Code\n// Write your code here\n",
+      javascript: "// Node.js Starter Code\n// Write your code here\n",
+      java: "// Java Starter Code\n// Write your code here\n"
     }
   },
   {
@@ -46,9 +47,10 @@ export const INITIAL_CHALLENGES = [
       { input: "0", output: "0", isHidden: true }
     ],
     starterCode: {
-      python: "# Python 3 Starter Code\nimport sys\n\ndef fib(n):\n    # Write your code here. Return the N-th Fibonacci number\n    return 0\n\nfor line in sys.stdin:\n    if not line.strip(): continue\n    print(fib(int(line.strip())))\n",
-      cpp: "// C++ Starter Code\n#include <iostream>\nusing namespace std;\n\nlong long fib(int n) {\n    // Write your code here. Return the N-th Fibonacci number\n    return 0;\n}\n\nint main() {\n    int n;\n    if (cin >> n) {\n        cout << fib(n) << endl;\n    }\n    return 0;\n}\n",
-      javascript: "// Node.js Starter Code\nconst fs = require('fs');\n\nfunction fib(n) {\n    // Write your code here. Return the N-th Fibonacci number\n    return 0;\n}\n\nconst input = fs.readFileSync(0, 'utf-8').trim();\nif (input) {\n    console.log(fib(parseInt(input, 10)));\n}\n"
+      python: "# Python 3 Starter Code\n# Write your code here\n",
+      cpp: "// C++ Starter Code\n// Write your code here\n",
+      javascript: "// Node.js Starter Code\n// Write your code here\n",
+      java: "// Java Starter Code\n// Write your code here\n"
     }
   },
   {
@@ -63,9 +65,10 @@ export const INITIAL_CHALLENGES = [
       { input: "1\n42", output: "42", isHidden: true }
     ],
     starterCode: {
-      python: "# Python 3 Starter Code\nimport sys\n\ndef getSum(n, arr):\n    # Write your code here. Return the sum of the array\n    return 0\n\nlines = sys.stdin.read().splitlines()\nif len(lines) >= 2:\n    n = int(lines[0])\n    arr = list(map(int, lines[1].split()))\n    print(getSum(n, arr))\n",
-      cpp: "// C++ Starter Code\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nlong long getSum(int n, vector<int>& arr) {\n    // Write your code here. Return the sum of the array\n    return 0;\n}\n\nint main() {\n    int n;\n    if (cin >> n) {\n        vector<int> arr(n);\n        for (int i = 0; i < n; i++) {\n            cin >> arr[i];\n        }\n        cout << getSum(n, arr) << endl;\n    }\n    return 0;\n}\n",
-      javascript: "// Node.js Starter Code\nconst fs = require('fs');\n\nfunction getSum(n, arr) {\n    // Write your code here. Return the sum of the array\n    return 0;\n}\n\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nif (input.length >= 2) {\n    const n = parseInt(input[0], 10);\n    const arr = input[1].split(/\\s+/).map(Number);\n    console.log(getSum(n, arr));\n}\n"
+      python: "# Python 3 Starter Code\n# Write your code here\n",
+      cpp: "// C++ Starter Code\n// Write your code here\n",
+      javascript: "// Node.js Starter Code\n// Write your code here\n",
+      java: "// Java Starter Code\n// Write your code here\n"
     }
   },
   {
@@ -80,9 +83,10 @@ export const INITIAL_CHALLENGES = [
       { input: "0", output: "1", isHidden: true }
     ],
     starterCode: {
-      python: "# Python 3 Starter Code\nimport sys\n\ndef factorial(n):\n    # Write your code here. Return N!\n    return 1\n\nfor line in sys.stdin:\n    if not line.strip(): continue\n    print(factorial(int(line.strip())))\n",
-      cpp: "// C++ Starter Code\n#include <iostream>\nusing namespace std;\n\nlong long factorial(int n) {\n    // Write your code here. Return N!\n    return 1;\n}\n\nint main() {\n    int n;\n    if (cin >> n) {\n        cout << factorial(n) << endl;\n    }\n    return 0;\n}\n",
-      javascript: "// Node.js Starter Code\nconst fs = require('fs');\n\nfunction factorial(n) {\n    // Write your code here. Return N!\n    return 1;\n}\n\nconst input = fs.readFileSync(0, 'utf-8').trim();\nif (input) {\n    console.log(factorial(parseInt(input, 10)));\n}\n"
+      python: "# Python 3 Starter Code\n# Write your code here\n",
+      cpp: "// C++ Starter Code\n// Write your code here\n",
+      javascript: "// Node.js Starter Code\n// Write your code here\n",
+      java: "// Java Starter Code\n// Write your code here\n"
     }
   }
 ];

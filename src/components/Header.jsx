@@ -82,6 +82,12 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => navigate('/contact')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             Contact
           </button>
+          {user && user.role === 'admin' && (
+            <button onClick={() => navigate('/admin')} className="nav-link text-indigo-400 hover:text-indigo-300 font-extrabold transition-colors duration-200 focus:outline-none flex items-center gap-1">
+              <i className="fas fa-crown text-[10px] text-amber-400"></i>
+              <span>Admin Panel</span>
+            </button>
+          )}
         </nav>
 
         {/* Quick Action Navigation Toolbar */}
@@ -166,6 +172,12 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button onClick={() => { navigate('/challenges'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Challenges</button>
           <button onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">About</button>
           <button onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Contact</button>
+          {user && user.role === 'admin' && (
+            <button onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-indigo-400 font-extrabold py-1.5 block focus:outline-none flex items-center gap-1.5">
+              <i className="fas fa-crown text-[10px] text-amber-400"></i>
+              <span>Admin Panel</span>
+            </button>
+          )}
           
 
 

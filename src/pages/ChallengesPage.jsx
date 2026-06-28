@@ -131,7 +131,7 @@ export default function ChallengesPage({ user, showToast }) {
             <p className="text-xs text-slate-400">Try switching your difficulty filter to locate problems.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-3.5">
             {filtered.map((item) => {
               const isSolved = solvedList.includes(item.id);
               let diffColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
@@ -141,49 +141,44 @@ export default function ChallengesPage({ user, showToast }) {
               return (
                 <div
                   key={item.id}
-                  className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-1.5 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px]"
+                  onClick={() => {
+                    if (!user || user.isGuest) {
+                      showToast("Please login or create an account to start coding!", "error");
+                      navigate('/login');
+                    } else {
+                      navigate(`/challenges/${item.id}`);
+                    }
+                  }}
+                  className="w-full bg-[#0d1321]/30 glass-panel border border-[var(--border-color)] border-l-4 border-l-transparent rounded-xl p-5 hover:border-indigo-500/30 hover:border-l-indigo-500/90 hover:bg-[#0d1321]/60 hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(99,102,241,0.08)] transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-5 text-left cursor-pointer select-none"
                 >
-                  {/* Rotating Border Beams */}
-                  <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-indigo animate-border-spin opacity-20 group-hover:opacity-60 transition-opacity duration-300 pointer-events-none"></div>
-                  
-                  {/* Body Content */}
-                  <div className="relative bg-[#0d1321]/95 p-6 rounded-2xl h-full flex flex-col justify-between gap-4">
-                    <div>
-                      <div className="flex items-center justify-between gap-4 mb-3">
-                        <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-lg border ${diffColor}`}>
-                          {item.difficulty}
-                        </span>
-                        
-                        <span className="text-xs font-black text-indigo-400">
-                          +{item.points} pts
-                        </span>
-                      </div>
-
-                      <h3 className="font-extrabold text-white text-base leading-snug group-hover:text-indigo-400 transition-colors duration-200 flex items-center gap-2">
+                  <div className="flex-grow space-y-1.5 min-w-0">
+                    <div className="flex items-center gap-3">
+                      <h3 className="font-extrabold text-white text-base tracking-tight flex items-center gap-2">
                         {item.title}
                         {isSolved && (
                           <i className="fas fa-circle-check text-emerald-400 text-sm" title="Solved successfully"></i>
                         )}
                       </h3>
-                      
-                      <p className="text-xs text-slate-400 mt-2 line-clamp-3 leading-relaxed">
-                        {item.description}
-                      </p>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border ${diffColor}`}>
+                        {item.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 font-normal leading-relaxed line-clamp-1">
+                      {item.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-6 shrink-0 w-full sm:w-auto border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
+                    <div className="flex flex-col items-start sm:items-end">
+                      <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Reward</span>
+                      <span className="text-xs font-black text-indigo-400">+{item.points} pts</span>
                     </div>
 
                     <button
-                      onClick={() => {
-                        if (!user || user.isGuest) {
-                          showToast("Please login or create an account to start coding!", "error");
-                          navigate('/login');
-                        } else {
-                          navigate(`/challenges/${item.id}`);
-                        }
-                      }}
-                      className="w-full py-2.5 rounded-xl font-bold text-xs bg-[var(--bg-tertiary)] hover:bg-indigo-600 hover:text-white border border-[var(--border-color)] group-hover:border-indigo-500/30 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                      className="px-5 py-2.5 rounded-xl font-bold text-xs bg-[var(--bg-tertiary)] hover:bg-indigo-600 hover:text-white border border-[var(--border-color)] active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0"
                     >
-                      <span>{isSolved ? "Resolve Challenge" : "Solve Challenge"}</span>
-                      <i className="fas fa-arrow-right text-[10px]"></i>
+                      <span>{isSolved ? "Resolve" : "Solve"}</span>
+                      <i className="fas fa-play text-[9px]"></i>
                     </button>
                   </div>
                 </div>

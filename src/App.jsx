@@ -12,8 +12,10 @@ import Toast from './components/Toast';
 import ChallengesPage from './pages/ChallengesPage';
 import ChallengeWorkspacePage from './pages/ChallengeWorkspacePage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import AdminPage from './pages/AdminPage';
 import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth';
-import { auth } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 
 
 function AppContent() {
@@ -116,7 +118,7 @@ function AppContent() {
 
   // --- Firebase Auth state observer ---
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         // Authenticated Firebase User
         const userData = {
@@ -124,8 +126,20 @@ function AppContent() {
           name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
           email: firebaseUser.email,
           photoURL: firebaseUser.photoURL,
-          isGuest: false
+          isGuest: false,
+          role: 'user'
         };
+
+        try {
+          const userDocRef = doc(db, "users", firebaseUser.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            userData.role = docSnap.data().role || 'user';
+          }
+        } catch (e) {
+          console.error("Error loading user role from Firestore:", e);
+        }
+
         setUser(userData);
         localStorage.setItem("codeverse_user", JSON.stringify(userData));
       } else {
@@ -216,6 +230,26 @@ function AppContent() {
           <Route path="/challenges" element={<ChallengesPage user={user} showToast={showToast} />} />
           <Route path="/challenges/:id" element={<ChallengeWorkspacePage user={user} theme={theme} showToast={showToast} />} />
           <Route path="/leaderboard" element={<LeaderboardPage user={user} showToast={showToast} />} />
+          <Route 
+            path="/admin" 
+            element={
+              user && user.role === 'admin' ? (
+                <AdminPage user={user} showToast={showToast} />
+              ) : (
+                <div className="flex-grow flex items-center justify-center min-h-[60vh] text-white p-6">
+                  <div className="text-center p-8 bg-[#0d1321]/40 border border-red-500/20 rounded-2xl max-w-sm mx-auto ide-neon-border shadow-2xl backdrop-blur-md animate-fade-in-up">
+                    <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 text-xl mx-auto mb-4 animate-bounce">
+                      <i className="fas fa-shield-halved"></i>
+                    </div>
+                    <h2 className="text-lg font-black text-white mb-2">Access Denied</h2>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      You do not have administrative privileges to access this area. If you believe this is an error, contact technical support.
+                    </p>
+                  </div>
+                </div>
+              )
+            } 
+          />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage showToast={showToast} />} />
         </Routes>
