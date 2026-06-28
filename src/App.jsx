@@ -227,6 +227,7 @@ function AppContent() {
           <Route path="/login" element={<AuthPage user={user} onLogin={handleLogin} showToast={showToast} />} />
           <Route path="/editor" element={<EditorPage user={user} theme={theme} showToast={showToast} />} />
           <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} showToast={showToast} />} />
+          <Route path="/profile/:profileId" element={<ProfilePage user={user} onLogout={handleLogout} showToast={showToast} />} />
           <Route path="/challenges" element={<ChallengesPage user={user} showToast={showToast} />} />
           <Route path="/challenges/:id" element={<ChallengeWorkspacePage user={user} theme={theme} showToast={showToast} />} />
           <Route path="/leaderboard" element={<LeaderboardPage user={user} showToast={showToast} />} />

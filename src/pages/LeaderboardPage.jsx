@@ -144,20 +144,23 @@ export default function LeaderboardPage({ user, showToast }) {
 
                           {/* Profile Details column */}
                           <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
+                            <div 
+                              onClick={() => navigate(`/profile/${player.uid}`)}
+                              className="flex items-center gap-3 cursor-pointer group/dev hover:scale-[1.03] origin-left transition-all duration-200"
+                            >
                               {player.photoURL ? (
                                 <img
                                   src={player.photoURL}
                                   alt={player.name}
-                                  className="w-9 h-9 rounded-full object-cover border border-white/10"
+                                  className="w-9 h-9 rounded-full object-cover border border-white/10 group-hover/dev:border-indigo-400 transition-colors"
                                 />
                               ) : (
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner group-hover/dev:border-indigo-400 transition-colors">
                                   {player.name.charAt(0)}
                                 </div>
                               )}
                               <div>
-                                <span className={`font-bold block ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
+                                <span className={`font-bold block group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
                                   {player.name}
                                   {isCurrentUser && (
                                     <span className="ml-2 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
@@ -165,7 +168,7 @@ export default function LeaderboardPage({ user, showToast }) {
                                     </span>
                                   )}
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-medium">{player.title}</span>
+                                <span className="text-[10px] text-slate-400 font-medium group-hover/dev:text-slate-300 transition-colors">{player.title}</span>
                               </div>
                             </div>
                           </td>

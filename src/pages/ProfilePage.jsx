@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
 export default function ProfilePage({ user, onLogout, showToast }) {
   const navigate = useNavigate();
+  const { profileId } = useParams();
 
-  // Auth Guard: Redirect to login if user is not signed in
+  const targetUid = profileId || user?.uid;
+  const isOwnProfile = !profileId || profileId === user?.uid;
+
+  // Auth Guard: Redirect to login if user is not signed in and trying to view own profile
   useEffect(() => {
-    if (!user) {
+    if (!user && isOwnProfile) {
       navigate('/login');
     }
-  }, [user, navigate]);
+  }, [user, isOwnProfile, navigate]);
 
   // Handle Logout
   const handleLogoutClick = () => {
@@ -25,12 +29,12 @@ export default function ProfilePage({ user, onLogout, showToast }) {
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || 'Developer',
-    email: user?.email || '',
+    name: 'Developer',
+    email: '',
     title: 'Premium Developer',
     bio: 'Coding enthusiast. Building CodeVerse Workspace compiler platform.',
     skills: ['JavaScript', 'React', 'C++'],
-    photoURL: user?.photoURL || '',
+    photoURL: '',
     github: '',
     linkedin: '',
     website: ''
@@ -49,34 +53,34 @@ export default function ProfilePage({ user, onLogout, showToast }) {
 
   // Fetch Custom Profile Metadata from Firestore on mount
   useEffect(() => {
-    if (!user) return;
+    if (!targetUid) return;
     
     const fetchProfile = async () => {
       try {
-        const docRef = doc(db, "users", user.uid);
+        const docRef = doc(db, "users", targetUid);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
           setProfileData({
-            name: data.name || user.name || 'Developer',
-            email: data.email || user.email || '',
+            name: data.name || 'Developer',
+            email: data.email || '',
             title: data.title || 'Premium Developer',
             bio: data.bio || '',
             skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
-            photoURL: data.photoURL || user.photoURL || '',
+            photoURL: data.photoURL || '',
             github: data.socials?.github || '',
             linkedin: data.socials?.linkedin || '',
             website: data.socials?.website || ''
           });
         } else {
           setProfileData({
-            name: user.name || 'Developer',
-            email: user.email || '',
+            name: 'Developer',
+            email: '',
             title: 'Premium Developer',
             bio: '',
             skills: ['JavaScript', 'React', 'C++'],
-            photoURL: user.photoURL || '',
+            photoURL: '',
             github: '',
             linkedin: '',
             website: ''
@@ -88,7 +92,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
     };
 
     fetchProfile();
-  }, [user]);
+  }, [targetUid]);
 
   // Handle local image upload selection and canvas compression
   const handleImageChange = (e) => {
@@ -195,7 +199,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
     }
   };
 
-  if (!user) return null;
+  if (isOwnProfile && !user) return null;
 
   // Determinstic opacity list for activity contributions log
   const gridOpacities = [
@@ -225,19 +229,23 @@ export default function ProfilePage({ user, onLogout, showToast }) {
       <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 relative z-10">
         <div>
           <h2 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-            Developer Dashboard
+            {isOwnProfile ? "Developer Dashboard" : `${profileData.name}'s Profile`}
           </h2>
           <p className="text-xs text-[var(--text-secondary)] mt-1">
-            Monitor compilation metrics, account details, and workspace activities.
+            {isOwnProfile 
+              ? "Monitor compilation metrics, account details, and workspace activities."
+              : `View compilation stats and profile information of ${profileData.name}.`}
           </p>
         </div>
-        <button
-          onClick={() => navigate('/editor')}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/15 cursor-pointer relative z-20"
-        >
-          <i className="fas fa-terminal"></i>
-          <span>Launch Code Editor</span>
-        </button>
+        {isOwnProfile && (
+          <button
+            onClick={() => navigate('/editor')}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/15 cursor-pointer relative z-20"
+          >
+            <i className="fas fa-terminal"></i>
+            <span>Launch Code Editor</span>
+          </button>
+        )}
       </div>
 
       {/* Dashboard Layout Grid */}
@@ -418,7 +426,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
               {/* User Text Details */}
               <div className="flex flex-col gap-1 w-full">
                 <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate">{profileData.name || 'Developer'}</h3>
-                <p id="profile-email" className="text-xs text-[var(--text-muted)] font-mono truncate">{profileData.email || ''}</p>
+                {isOwnProfile && <p id="profile-email" className="text-xs text-[var(--text-muted)] font-mono truncate">{profileData.email || ''}</p>}
                 <span className="inline-block mx-auto mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                   {profileData.title || 'Premium Developer'}
                 </span>
@@ -483,22 +491,29 @@ export default function ProfilePage({ user, onLogout, showToast }) {
               </div>
 
               {/* Action buttons */}
-              <div className="flex flex-col gap-2 w-full">
-                <button
-                  onClick={handleEditClick}
-                  className="w-full py-2 rounded-xl text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <i className="fas fa-user-pen"></i>
-                  <span>Edit Profile</span>
-                </button>
-                <button
-                  onClick={handleLogoutClick}
-                  className="w-full py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200 cursor-pointer"
-                >
-                  <i className="fas fa-sign-out-alt mr-1.5"></i>
-                  <span>Sign Out Account</span>
-                </button>
-              </div>
+              {isOwnProfile ? (
+                <div className="flex flex-col gap-2 w-full">
+                  <button
+                    onClick={handleEditClick}
+                    className="w-full py-2 rounded-xl text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <i className="fas fa-user-pen"></i>
+                    <span>Edit Profile</span>
+                  </button>
+                  <button
+                    onClick={handleLogoutClick}
+                    className="w-full py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200 cursor-pointer"
+                  >
+                    <i className="fas fa-sign-out-alt mr-1.5"></i>
+                    <span>Sign Out Account</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full text-slate-500 text-[10px] uppercase font-bold tracking-wider py-2 border-t border-[var(--border-color)]/30 mt-1">
+                  <i className="fas fa-globe mr-1.5 text-indigo-400 animate-pulse"></i>
+                  <span>Public Profile View</span>
+                </div>
+              )}
             </div>
           )}
 
