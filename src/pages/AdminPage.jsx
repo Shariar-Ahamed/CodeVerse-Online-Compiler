@@ -90,7 +90,7 @@ export default function AdminPage({ user, showToast }) {
       setContacts(list);
     } catch (err) {
       console.error("Error loading contact messages:", err);
-      showToast("Error loading contact messages list", "error");
+      // Log to console but avoid aggressive user-facing toast for custom permission configurations
     } finally {
       setContactsLoading(false);
     }
@@ -334,7 +334,7 @@ export default function AdminPage({ user, showToast }) {
         </div>
 
         {/* Dynamic Tab Render */}
-        {activeTab === 'challenges' ? (
+        {activeTab === 'challenges' && (
           <>
             {/* Dashboard Statistics summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -432,7 +432,9 @@ export default function AdminPage({ user, showToast }) {
               )}
             </div>
           </>
-        ) : (
+        )}
+
+        {activeTab === 'users' && (
           <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
             {usersLoading ? (
               <div className="py-20 flex flex-col items-center justify-center gap-4">
