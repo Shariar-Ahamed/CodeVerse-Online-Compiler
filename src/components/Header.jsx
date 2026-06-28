@@ -108,7 +108,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 {/* User Avatar Button (Goes directly to Profile) */}
                 <button
                   id="nav-user-avatar-btn"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate(`/profile/${user.username || ''}`)}
                   className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
                   title="View Developer Profile"
                 >
@@ -211,10 +211,10 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                     <span id="mobile-user-email" className="text-[10px] text-[var(--text-secondary)] font-mono">{user.email || ''}</span>
                   </div>
                 </div>
-                {location.pathname !== '/profile' && (
+                {!location.pathname.startsWith('/profile') && (
                   <button
                     onClick={() => {
-                      navigate('/profile');
+                      navigate(`/profile/${user.username || ''}`);
                       setMobileMenuOpen(false);
                     }}
                     className="w-full py-1.5 mt-1 rounded-lg text-xs font-bold text-slate-300 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/20 transition-all duration-200 text-center"

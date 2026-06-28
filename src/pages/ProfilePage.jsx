@@ -17,8 +17,12 @@ export default function ProfilePage({ user, onLogout, showToast }) {
   useEffect(() => {
     if (!user && isOwnProfile) {
       navigate('/login');
+    } else if (user && !username) {
+      if (user.username) {
+        navigate(`/profile/${user.username}`, { replace: true });
+      }
     }
-  }, [user, isOwnProfile, navigate]);
+  }, [user, isOwnProfile, username, navigate]);
 
   // Handle Logout
   const handleLogoutClick = () => {
