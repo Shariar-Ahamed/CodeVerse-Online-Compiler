@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from 'f
 import { updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
-export default function ProfilePage({ user, onLogout, showToast }) {
+export default function ProfilePage({ user, onLogout, onUserUpdate, showToast }) {
   const navigate = useNavigate();
   const { username } = useParams();
   const isOwnProfile = !username || 
@@ -311,8 +311,15 @@ export default function ProfilePage({ user, onLogout, showToast }) {
 
       // Update Local user context username if we are editing our own profile
       if (user) {
-        user.username = cleanedUsername;
-        localStorage.setItem("codeverse_user", JSON.stringify(user));
+        const updated = { ...user, username: cleanedUsername, name: inputs.name, photoURL: inputs.photoURL };
+        if (onUserUpdate) {
+          onUserUpdate(updated);
+        } else {
+          user.username = cleanedUsername;
+          user.name = inputs.name;
+          user.photoURL = inputs.photoURL;
+          localStorage.setItem("codeverse_user", JSON.stringify(user));
+        }
       }
 
       // 3. Update Local state to render immediately
