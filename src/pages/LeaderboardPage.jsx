@@ -28,6 +28,7 @@ export default function LeaderboardPage({ user, showToast }) {
             ranks.push({
               uid: docSnap.id,
               name: data.name || "Developer",
+              username: data.username || "",
               photoURL: data.photoURL || "",
               title: data.title || "Premium Developer",
               score: data.score || 0,
@@ -40,9 +41,9 @@ export default function LeaderboardPage({ user, showToast }) {
         if (ranks.length === 0) {
           // Add default demo profile ranking data if Firestore is empty
           ranks.push(
-            { uid: "demo1", name: "AlphaCoder", title: "Principal Architect", score: 360, solvedCount: 5 },
-            { uid: "demo2", name: "SyntaxNinja", title: "Full Stack Engineer", score: 260, solvedCount: 4 },
-            { uid: "demo3", name: "ByteMaster", title: "Systems Dev", score: 210, solvedCount: 3 }
+            { uid: "demo1", name: "AlphaCoder", username: "alphacoder", title: "Principal Architect", score: 360, solvedCount: 5 },
+            { uid: "demo2", name: "SyntaxNinja", username: "syntaxninja", title: "Full Stack Engineer", score: 260, solvedCount: 4 },
+            { uid: "demo3", name: "ByteMaster", username: "bytemaster", title: "Systems Dev", score: 210, solvedCount: 3 }
           );
         }
 
@@ -162,6 +163,9 @@ export default function LeaderboardPage({ user, showToast }) {
                               <div>
                                 <span className={`font-bold block group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
                                   {player.name}
+                                  {player.username && (
+                                    <span className="text-slate-400 font-mono font-semibold text-[11px] ml-2 select-all">@{player.username}</span>
+                                  )}
                                   {isCurrentUser && (
                                     <span className="ml-2 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                                       You

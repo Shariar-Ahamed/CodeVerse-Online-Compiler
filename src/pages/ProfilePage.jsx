@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
@@ -30,6 +30,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
   const [saveLoading, setSaveLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     name: 'Developer',
+    username: '',
     email: '',
     title: 'Premium Developer',
     bio: 'Coding enthusiast. Building CodeVerse Workspace compiler platform.',
@@ -42,6 +43,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
 
   const [inputs, setInputs] = useState({
     name: '',
+    username: '',
     title: '',
     bio: '',
     skills: '',
@@ -64,6 +66,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
           const data = docSnap.data();
           setProfileData({
             name: data.name || 'Developer',
+            username: data.username || '',
             email: data.email || '',
             title: data.title || 'Premium Developer',
             bio: data.bio || '',
@@ -76,6 +79,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
         } else {
           setProfileData({
             name: 'Developer',
+            username: '',
             email: '',
             title: 'Premium Developer',
             bio: '',
@@ -122,6 +126,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
   const handleEditClick = () => {
     setInputs({
       name: profileData.name,
+      username: profileData.username || '',
       title: profileData.title,
       bio: profileData.bio,
       skills: profileData.skills.join(', '),
@@ -141,8 +146,35 @@ export default function ProfilePage({ user, onLogout, showToast }) {
       return;
     }
     
+    // Validate username input
+    const cleanedUsername = inputs.username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (cleanedUsername.length < 3) {
+      showToast("Username must be at least 3 characters and alphanumeric/underscores only.", "error");
+      return;
+    }
+
     setSaveLoading(true);
     try {
+      // Check username uniqueness if it changed
+      if (cleanedUsername !== profileData.username) {
+        const usersCol = collection(db, "users");
+        const q = query(usersCol, where("username", "==", cleanedUsername));
+        const querySnapshot = await getDocs(q);
+        
+        let isTaken = false;
+        querySnapshot.forEach(docSnap => {
+          if (docSnap.id !== user.uid) {
+            isTaken = true;
+          }
+        });
+
+        if (isTaken) {
+          showToast("This username is already taken. Please choose another one!", "error");
+          setSaveLoading(false);
+          return;
+        }
+      }
+
       const skillsArray = inputs.skills
         .split(',')
         .map(s => s.trim())
@@ -163,6 +195,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
       const userDocRef = doc(db, "users", user.uid);
       await setDoc(userDocRef, {
         name: inputs.name,
+        username: cleanedUsername,
         email: user.email,
         title: inputs.title,
         bio: inputs.bio,
@@ -176,9 +209,16 @@ export default function ProfilePage({ user, onLogout, showToast }) {
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
+      // Update Local user context username if we are editing our own profile
+      if (user) {
+        user.username = cleanedUsername;
+        localStorage.setItem("codeverse_user", JSON.stringify(user));
+      }
+
       // 3. Update Local state to render immediately
       setProfileData({
         name: inputs.name,
+        username: cleanedUsername,
         email: user.email,
         title: inputs.title,
         bio: inputs.bio,
@@ -298,6 +338,22 @@ export default function ProfilePage({ user, onLogout, showToast }) {
                     onChange={(e) => setInputs(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200"
                   />
+                </div>
+
+                {/* Username */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase font-bold text-[var(--text-secondary)]">Username (Unique)</label>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-3 text-xs text-slate-500 font-mono">@</span>
+                    <input
+                      type="text"
+                      required
+                      value={inputs.username}
+                      onChange={(e) => setInputs(prev => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "") }))}
+                      className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl pl-7 pr-3 py-2 text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/55 transition-all duration-200 font-mono"
+                      placeholder="username"
+                    />
+                  </div>
                 </div>
 
                 {/* Professional Title */}
@@ -424,9 +480,12 @@ export default function ProfilePage({ user, onLogout, showToast }) {
               </div>
 
               {/* User Text Details */}
-              <div className="flex flex-col gap-1 w-full">
+              <div className="flex flex-col gap-0.5 w-full">
                 <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate">{profileData.name || 'Developer'}</h3>
-                {isOwnProfile && <p id="profile-email" className="text-xs text-[var(--text-muted)] font-mono truncate">{profileData.email || ''}</p>}
+                {profileData.username && (
+                  <p className="text-xs text-indigo-400 font-mono font-bold">@{profileData.username}</p>
+                )}
+                {isOwnProfile && <p id="profile-email" className="text-[10px] text-[var(--text-muted)] font-mono truncate mt-0.5">{profileData.email || ''}</p>}
                 <span className="inline-block mx-auto mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                   {profileData.title || 'Premium Developer'}
                 </span>

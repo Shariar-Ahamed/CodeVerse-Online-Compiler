@@ -14,7 +14,7 @@ import ChallengeWorkspacePage from './pages/ChallengeWorkspacePage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import AdminPage from './pages/AdminPage';
 import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 
@@ -84,8 +84,6 @@ function AppContent() {
             if (saved) {
               const localNotes = JSON.parse(saved);
               if (Array.isArray(localNotes) && localNotes.length > 0) {
-                const { collection, doc, setDoc, getDocs } = await import('firebase/firestore');
-                const { db } = await import('./firebase');
                 const userNotesRef = collection(db, "users", result.user.uid, "notes");
                 const snapshot = await getDocs(userNotesRef);
                 if (snapshot.empty) {
@@ -127,14 +125,33 @@ function AppContent() {
           email: firebaseUser.email,
           photoURL: firebaseUser.photoURL,
           isGuest: false,
-          role: 'user'
+          role: 'user',
+          username: ''
         };
 
         try {
           const userDocRef = doc(db, "users", firebaseUser.uid);
           const docSnap = await getDoc(userDocRef);
           if (docSnap.exists()) {
-            userData.role = docSnap.data().role || 'user';
+            const data = docSnap.data();
+            userData.role = data.role || 'user';
+            userData.username = data.username || '';
+          } else {
+            // Document doesn't exist, create it!
+            const baseUsername = firebaseUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+            const finalUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+            
+            await setDoc(userDocRef, {
+              name: firebaseUser.displayName || baseUsername,
+              email: firebaseUser.email.toLowerCase(),
+              username: finalUsername,
+              role: 'user',
+              score: 0,
+              solvedChallenges: [],
+              createdAt: new Date().toISOString()
+            });
+            userData.role = 'user';
+            userData.username = finalUsername;
           }
         } catch (e) {
           console.error("Error loading user role from Firestore:", e);
