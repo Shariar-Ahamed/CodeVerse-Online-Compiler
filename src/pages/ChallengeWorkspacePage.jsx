@@ -98,16 +98,14 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           const data = challengeDoc.data();
           setChallenge(data);
           
-          // Set initial code template based on first selected language
-          const starter = data.starterCode?.[selectedLang] || LANGUAGES[selectedLang]?.defaultCode || "";
-          setEditorCode(starter);
+          // Keep editor completely empty for beginner boilerplate practice
+          setEditorCode("");
         } else {
           // Fallback to local INITIAL_CHALLENGES if document not found in DB
           const fallback = INITIAL_CHALLENGES.find(c => c.id === id);
           if (fallback) {
             setChallenge(fallback);
-            const starter = fallback.starterCode?.[selectedLang] || LANGUAGES[selectedLang]?.defaultCode || "";
-            setEditorCode(starter);
+            setEditorCode("");
           } else {
             showToast("Challenge not found.", "error");
             navigate('/challenges');
@@ -123,8 +121,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
         const fallback = INITIAL_CHALLENGES.find(c => c.id === id);
         if (fallback) {
           setChallenge(fallback);
-          const starter = fallback.starterCode?.[selectedLang] || LANGUAGES[selectedLang]?.defaultCode || "";
-          setEditorCode(starter);
+          setEditorCode("");
         } else {
           showToast("Error loading workspace data.", "error");
         }
@@ -164,18 +161,10 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     const nextLang = e.target.value;
     setSelectedLang(nextLang);
     if (challenge) {
-      let template = challenge.starterCode?.[nextLang];
-      if (!template) {
-        const ext = LANGUAGES[nextLang]?.extension || "txt";
-        if (ext === "py" || ext === "sh" || ext === "rb" || ext === "pl") {
-          template = `# ${LANGUAGES[nextLang]?.name || nextLang} Starter Code\n# Write your code here\n`;
-        } else {
-          template = `// ${LANGUAGES[nextLang]?.name || nextLang} Starter Code\n// Write your code here\n`;
-        }
-      }
-      setEditorCode(template);
+      // Keep editor completely empty for beginner boilerplate practice
+      setEditorCode("");
       if (editorRef.current) {
-        editorRef.current.setValue(template);
+        editorRef.current.setValue("");
       }
     }
   };
