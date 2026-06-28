@@ -255,8 +255,8 @@ Respond in clean markdown format. When providing code fixes or optimized version
       {/* Header */}
       <div className="h-14 border-b border-[var(--border-color)] flex items-center justify-between px-4 bg-[var(--bg-tertiary)]/20 relative z-10 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs">
-            <i className="fas fa-brain animate-pulse"></i>
+          <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs animate-pulse">
+            <i className="fas fa-brain text-emerald-400"></i>
           </div>
           <span className="text-xs font-bold text-white tracking-wide">CodeVerse AI Assistant</span>
         </div>

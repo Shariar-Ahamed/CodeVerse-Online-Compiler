@@ -909,12 +909,12 @@ Explain why this error occurred and how to fix it.`;
                 onClick={() => setShowAIPanel(prev => !prev)}
                 className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
                   showAIPanel
-                    ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400 shadow-md shadow-indigo-500/10'
-                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+                    ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
+                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
                 }`}
                 title="AI Code Assistant"
               >
-                <i className="fas fa-brain text-sm"></i>
+                <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
               </button>
 
               {/* Execute / Run Code Trigger Button */}
