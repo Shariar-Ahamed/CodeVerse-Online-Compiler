@@ -146,7 +146,7 @@ export default function LeaderboardPage({ user, showToast }) {
                           {/* Profile Details column */}
                           <td className="py-4 px-6">
                             <div 
-                              onClick={() => navigate(`/profile/${player.uid}`)}
+                              onClick={() => navigate(`/profile/${player.username || player.uid}`)}
                               className="flex items-center gap-3 cursor-pointer group/dev hover:scale-[1.03] origin-left transition-all duration-200"
                             >
                               {player.photoURL ? (

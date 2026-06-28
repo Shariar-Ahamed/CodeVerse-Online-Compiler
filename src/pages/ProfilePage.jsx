@@ -6,10 +6,8 @@ import { db, auth } from '../firebase';
 
 export default function ProfilePage({ user, onLogout, showToast }) {
   const navigate = useNavigate();
-  const { profileId } = useParams();
-
-  const targetUid = profileId || user?.uid;
-  const isOwnProfile = !profileId || profileId === user?.uid;
+  const { username } = useParams();
+  const isOwnProfile = !username || (user && user.username && username.toLowerCase() === user.username.toLowerCase());
 
   // Auth Guard: Redirect to login if user is not signed in and trying to view own profile
   useEffect(() => {
@@ -55,40 +53,84 @@ export default function ProfilePage({ user, onLogout, showToast }) {
 
   // Fetch Custom Profile Metadata from Firestore on mount
   useEffect(() => {
-    if (!targetUid) return;
-    
     const fetchProfile = async () => {
       try {
-        const docRef = doc(db, "users", targetUid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setProfileData({
-            name: data.name || 'Developer',
-            username: data.username || '',
-            email: data.email || '',
-            title: data.title || 'Premium Developer',
-            bio: data.bio || '',
-            skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
-            photoURL: data.photoURL || '',
-            github: data.socials?.github || '',
-            linkedin: data.socials?.linkedin || '',
-            website: data.socials?.website || ''
-          });
+        if (isOwnProfile) {
+          if (!user?.uid) return;
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setProfileData({
+              name: data.name || 'Developer',
+              username: data.username || '',
+              email: data.email || '',
+              title: data.title || 'Premium Developer',
+              bio: data.bio || '',
+              skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
+              photoURL: data.photoURL || '',
+              github: data.socials?.github || '',
+              linkedin: data.socials?.linkedin || '',
+              website: data.socials?.website || ''
+            });
+          }
         } else {
-          setProfileData({
-            name: 'Developer',
-            username: '',
-            email: '',
-            title: 'Premium Developer',
-            bio: '',
-            skills: ['JavaScript', 'React', 'C++'],
-            photoURL: '',
-            github: '',
-            linkedin: '',
-            website: ''
-          });
+          // Fetch by querying username (case-insensitive conversion to lowercase)
+          const targetUsername = username.toLowerCase();
+          const usersCol = collection(db, "users");
+          const q = query(usersCol, where("username", "==", targetUsername), limit(1));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            const docSnap = querySnapshot.docs[0];
+            const data = docSnap.data();
+            setProfileData({
+              name: data.name || 'Developer',
+              username: data.username || '',
+              email: data.email || '',
+              title: data.title || 'Premium Developer',
+              bio: data.bio || '',
+              skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
+              photoURL: data.photoURL || '',
+              github: data.socials?.github || '',
+              linkedin: data.socials?.linkedin || '',
+              website: data.socials?.website || ''
+            });
+          } else {
+            // Try fallback fetch by doc ID (in case it is a UID instead of a username)
+            const fallbackRef = doc(db, "users", username);
+            const fallbackSnap = await getDoc(fallbackRef);
+            if (fallbackSnap.exists()) {
+              const data = fallbackSnap.data();
+              setProfileData({
+                name: data.name || 'Developer',
+                username: data.username || '',
+                email: data.email || '',
+                title: data.title || 'Premium Developer',
+                bio: data.bio || '',
+                skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
+                photoURL: data.photoURL || '',
+                github: data.socials?.github || '',
+                linkedin: data.socials?.linkedin || '',
+                website: data.socials?.website || ''
+              });
+            } else {
+              // Profile not found
+              setProfileData({
+                name: 'User Not Found',
+                username: targetUsername,
+                email: '',
+                title: 'Unknown',
+                bio: 'This profile does not exist on CodeVerse.',
+                skills: [],
+                photoURL: '',
+                github: '',
+                linkedin: '',
+                website: ''
+              });
+            }
+          }
         }
       } catch (err) {
         console.error("Error loading profile:", err);
@@ -96,7 +138,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
     };
 
     fetchProfile();
-  }, [targetUid]);
+  }, [username, isOwnProfile, user]);
 
   // Handle local image upload selection and canvas compression
   const handleImageChange = (e) => {
