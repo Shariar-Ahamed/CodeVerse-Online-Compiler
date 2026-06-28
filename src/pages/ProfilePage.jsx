@@ -668,13 +668,6 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                     <i className="fas fa-user-pen"></i>
                     <span>Edit Profile</span>
                   </button>
-                  <button
-                    onClick={handleLogoutClick}
-                    className="w-full py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200 cursor-pointer"
-                  >
-                    <i className="fas fa-sign-out-alt mr-1.5"></i>
-                    <span>Sign Out Account</span>
-                  </button>
                 </div>
               ) : (
                 <div className="w-full text-slate-500 text-[10px] uppercase font-bold tracking-wider py-2 border-t border-[var(--border-color)]/30 mt-1">
