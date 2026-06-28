@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { db } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import React, { useEffect, useState, useRef } from "react";
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function ContactPage({ showToast }) {
   const contactRef = useRef(null);
   const contactCanvasRef = useRef(null);
 
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactMessage, setContactMessage] = useState('');
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -17,11 +17,15 @@ export default function ContactPage({ showToast }) {
     const canvas = contactCanvasRef.current;
     if (!parentEl || !canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     let particles = [];
     let animFrameId = null;
     const colors = [
-      'rgba(99, 102, 241, ', 'rgba(168, 85, 247, ', 'rgba(34, 211, 238, ', 'rgba(8, 203, 0, ', 'rgba(255, 121, 198, '
+      "rgba(99, 102, 241, ",
+      "rgba(168, 85, 247, ",
+      "rgba(34, 211, 238, ",
+      "rgba(8, 203, 0, ",
+      "rgba(255, 121, 198, ",
     ];
 
     const setupCanvas = () => {
@@ -49,7 +53,7 @@ export default function ContactPage({ showToast }) {
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.colorPrefix + this.alpha + ')';
+        ctx.fillStyle = this.colorPrefix + this.alpha + ")";
         ctx.fill();
       }
     }
@@ -109,13 +113,13 @@ export default function ContactPage({ showToast }) {
       if (!animFrameId) animate();
     };
 
-    parentEl.addEventListener('mousemove', handleMove);
-    window.addEventListener('resize', setupCanvas);
+    parentEl.addEventListener("mousemove", handleMove);
+    window.addEventListener("resize", setupCanvas);
     setupCanvas();
 
     return () => {
-      parentEl.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('resize', setupCanvas);
+      parentEl.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("resize", setupCanvas);
       if (animFrameId) cancelAnimationFrame(animFrameId);
     };
   }, []);
@@ -133,13 +137,13 @@ export default function ContactPage({ showToast }) {
         name: contactName.trim(),
         email: contactEmail.trim().toLowerCase(),
         message: contactMessage.trim(),
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
 
       setShowSuccessModal(true);
-      setContactName('');
-      setContactEmail('');
-      setContactMessage('');
+      setContactName("");
+      setContactEmail("");
+      setContactMessage("");
     } catch (err) {
       console.error("Error sending contact message:", err);
       showToast("Failed to send message. Please try again.", "error");
@@ -159,11 +163,14 @@ export default function ContactPage({ showToast }) {
         ref={contactRef}
         className="w-full py-24 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative flex flex-col justify-center min-h-[70vh] overflow-hidden"
       >
-        <canvas ref={contactCanvasRef} id="contact-particles" className="absolute inset-0 pointer-events-none z-0" />
-        
+        <canvas
+          ref={contactCanvasRef}
+          id="contact-particles"
+          className="absolute inset-0 pointer-events-none z-0"
+        />
+
         <div className="max-w-5xl mx-auto relative z-10 w-full animate-fade-in-up">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            
             {/* Left Column: Contact details */}
             <div className="flex flex-col gap-8 text-left">
               <div>
@@ -175,29 +182,47 @@ export default function ContactPage({ showToast }) {
                   Get in Touch
                 </h2>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                  Have feedback, suggestions, or API connection issues? Drop us a message. Our compiler status monitors ensure logical sandbox resources stay up 24/7.
+                  Have feedback, suggestions, or API connection issues? Drop us
+                  a message. Our compiler status monitors ensure logical sandbox
+                  resources stay up 24/7.
                 </p>
               </div>
 
               {/* Quick Info Cards */}
               <div className="flex flex-col gap-4">
-                <a href="mailto:shariaralways@gmail.com" className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-all duration-300">
+                <a
+                  href="mailto:shariaralways@gmail.com"
+                  className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-all duration-300"
+                >
                   <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base">
                     <i className="fas fa-envelope"></i>
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-xs">Direct Support</h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">shariaralways@gmail.com</p>
+                    <h4 className="font-bold text-white text-xs">
+                      Direct Support
+                    </h4>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+                      shariaralways@gmail.com
+                    </p>
                   </div>
                 </a>
 
-                <a href="https://www.linkedin.com/in/shariarahamed/" target="_blank" rel="noopener noreferrer" className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-cyan-500/30 transition-all duration-300">
+                <a
+                  href="https://www.linkedin.com/in/shariarahamed/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-cyan-500/30 transition-all duration-300"
+                >
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base">
                     <i className="fab fa-linkedin-in"></i>
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-xs">Professional Profile</h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">linkedin.com/in/shariarahamed</p>
+                    <h4 className="font-bold text-white text-xs">
+                      Professional Profile
+                    </h4>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+                      linkedin.com/in/shariarahamed
+                    </p>
                   </div>
                 </a>
 
@@ -273,7 +298,6 @@ export default function ContactPage({ showToast }) {
                 )}
               </button>
             </form>
-
           </div>
         </div>
       </section>
@@ -292,9 +316,14 @@ export default function ContactPage({ showToast }) {
             </div>
 
             {/* Title & Description */}
-            <h3 className="text-xl font-extrabold text-white mb-2.5 tracking-tight">Message Received!</h3>
+            <h3 className="text-xl font-extrabold text-white mb-2.5 tracking-tight">
+              Message Received!
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-6 px-1">
-              Thank you for reaching out to <span className="text-indigo-400 font-bold">CodeVerse</span>. Your developer ticket has been logged successfully and our support crew will review it shortly!
+              Thank you for reaching out to{" "}
+              <span className="text-indigo-400 font-bold">CodeVerse</span>. Your
+              developer ticket has been logged successfully and our support crew
+              will review it shortly!
             </p>
 
             {/* Premium Confirm Button */}

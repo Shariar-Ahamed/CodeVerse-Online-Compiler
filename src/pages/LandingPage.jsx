@@ -785,10 +785,44 @@ export default function LandingPage({ showToast }) {
       <section
         id="live-demo"
         ref={liveDemoRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] relative reveal-on-scroll"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] to-[var(--bg-secondary)] relative reveal-on-scroll overflow-hidden"
       >
         <canvas ref={liveDemoCanvasRef} id="live-demo-particles" className="absolute inset-0 pointer-events-none z-0" />
         
+        {/* Futuristic Rotating Tech Dials (Left & Right Side background circles) */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] pointer-events-none z-0 opacity-20 sm:opacity-30 select-none hidden sm:block">
+          <svg className="w-64 h-64 md:w-[450px] md:h-[450px]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="95" stroke="url(#techGlow)" strokeWidth="1" strokeDasharray="15 8 40 5 10 10" className="animate-spin-slow-radar origin-center" />
+            <circle cx="100" cy="100" r="82" stroke="url(#techGlow2)" strokeWidth="0.8" strokeDasharray="6 6 12 4" className="animate-spin-reverse-slow origin-center" />
+            <circle cx="100" cy="100" r="70" stroke="url(#techGlow)" strokeWidth="1.5" strokeDasharray="50 15 80 20" className="animate-spin-slow origin-center" />
+            <circle cx="100" cy="100" r="58" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.25" />
+            <circle cx="100" cy="100" r="46" stroke="url(#techGlow)" strokeWidth="1" strokeDasharray="3 15" className="animate-spin-fast origin-center" />
+            <circle cx="100" cy="100" r="30" stroke="#22d3ee" strokeWidth="0.5" strokeOpacity="0.3" strokeDasharray="4 4" className="animate-spin-slow origin-center" />
+            <defs>
+              <linearGradient id="techGlow" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
+                <stop offset="50%" stopColor="#a855f7" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.6" />
+              </linearGradient>
+              <linearGradient id="techGlow2" x1="200" y1="0" x2="0" y2="200" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#08CB00" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[40%] pointer-events-none z-0 opacity-20 sm:opacity-30 select-none hidden sm:block">
+          <svg className="w-64 h-64 md:w-[450px] md:h-[450px]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="95" stroke="url(#techGlow)" strokeWidth="1" strokeDasharray="15 8 40 5 10 10" className="animate-spin-slow-radar origin-center" />
+            <circle cx="100" cy="100" r="82" stroke="url(#techGlow2)" strokeWidth="0.8" strokeDasharray="6 6 12 4" className="animate-spin-reverse-slow origin-center" />
+            <circle cx="100" cy="100" r="70" stroke="url(#techGlow)" strokeWidth="1.5" strokeDasharray="50 15 80 20" className="animate-spin-slow origin-center" />
+            <circle cx="100" cy="100" r="58" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.25" />
+            <circle cx="100" cy="100" r="46" stroke="url(#techGlow)" strokeWidth="1" strokeDasharray="3 15" className="animate-spin-fast origin-center" />
+            <circle cx="100" cy="100" r="30" stroke="#22d3ee" strokeWidth="0.5" strokeOpacity="0.3" strokeDasharray="4 4" className="animate-spin-slow origin-center" />
+          </svg>
+        </div>
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold tracking-tight text-white">
@@ -1057,16 +1091,46 @@ export default function LandingPage({ showToast }) {
       <section
         id="features"
         ref={featuresRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative reveal-on-scroll overflow-hidden"
       >
         <canvas ref={featuresCanvasRef} id="features-particles" className="absolute inset-0 pointer-events-none z-0" />
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+          <div className="text-center mb-16 relative">
+            {/* Left 3D Rotating Prism/Tetrahedron */}
+            <div className="absolute left-[-4%] md:left-[2%] lg:left-[6%] top-[35%] -translate-y-1/2 select-none pointer-events-none hidden sm:block">
+              {/* Light Aura Glow */}
+              <div className="absolute w-28 h-28 rounded-full bg-purple-500/20 blur-2xl animate-pulse -z-10"></div>
+              <div className="tetra-container scale-75 md:scale-100">
+                <div className="tetra-3d">
+                  <div className="tetra-face tetra-face-1"></div>
+                  <div className="tetra-face tetra-face-2"></div>
+                  <div className="tetra-face tetra-face-3"></div>
+                  <div className="tetra-face tetra-face-bottom"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right 3D Rotating Glass/Wireframe Cube */}
+            <div className="absolute right-[-4%] md:right-[2%] lg:right-[6%] top-[35%] -translate-y-1/2 select-none pointer-events-none hidden sm:block">
+              {/* Light Aura Glow */}
+              <div className="absolute w-28 h-28 rounded-full bg-cyan-500/20 blur-2xl animate-pulse -z-10"></div>
+              <div className="cube-container scale-75 md:scale-100">
+                <div className="cube-3d">
+                  <div className="cube-face cube-face-front"></div>
+                  <div className="cube-face cube-face-back"></div>
+                  <div className="cube-face cube-face-left"></div>
+                  <div className="cube-face cube-face-right"></div>
+                  <div className="cube-face cube-face-top"></div>
+                  <div className="cube-face cube-face-bottom"></div>
+                </div>
+              </div>
+            </div>
+
+            <h2 className="text-3xl font-extrabold tracking-tight text-white relative z-10">
               Full-Featured Coding Workspaces
             </h2>
-            <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
+            <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto relative z-10">
               We bring professional desktop-grade compilers and frontend previews directly to your modern web browser.
             </p>
           </div>

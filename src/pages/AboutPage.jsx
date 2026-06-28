@@ -99,18 +99,21 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="flex-grow flex flex-col justify-center items-center">
-      {/* Background Blur Orbs */}
+    <div className="flex-grow flex flex-col justify-center items-center w-full bg-[#0b0515] relative overflow-hidden">
+      {/* Background Central Glow Orb */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-purple-600/10 blur-[130px] z-0 pointer-events-none animate-pulse"></div>
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       <section
         id="about"
         ref={aboutRef}
-        className="w-full py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-primary)] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[70vh] overflow-hidden"
+        className="w-full py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0b0515] via-[#120624] to-[#090310] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[70vh] overflow-hidden"
       >
         <canvas ref={aboutCanvasRef} id="about-particles" className="absolute inset-0 pointer-events-none z-0" />
         
+
+
         <div className="max-w-4xl mx-auto text-center relative z-10 animate-fade-in-up">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6">
             About CodeVerse

@@ -988,3 +988,131 @@ input:-webkit-autofill:active {
 .border-beam-purple {
   background: conic-gradient(from 0deg, transparent 40%, #a855f7 70%, #c084fc 95%, transparent 100%);
 }
+
+/* --- High-Tech Rotating Dial Animations --- */
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+.animate-spin-reverse-slow {
+  animation: spin-reverse 20s linear infinite;
+}
+.animate-spin-slow-radar {
+  animation: spin-slow 30s linear infinite;
+}
+.animate-spin-fast {
+  animation: spin-slow 6s linear infinite;
+}
+
+/* ==================== 3D INTERACTIVE COMPONENTS ==================== */
+
+/* 3D Cube Container */
+.cube-container {
+  width: 120px;
+  height: 120px;
+  perspective: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cube-3d {
+  width: 70px;
+  height: 70px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin-cube-3d 14s linear infinite;
+}
+
+@keyframes spin-cube-3d {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+.cube-face {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  /* Glassmorphic Cyan/Green translucent gradient faces */
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(16, 185, 129, 0.25) 100%);
+  border: 1.5px solid rgba(34, 211, 238, 0.85);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.45), inset 0 0 12px rgba(34, 211, 238, 0.3);
+  backdrop-filter: blur(2px);
+  animation: cube-glow-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes cube-glow-pulse {
+  0% {
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.35), inset 0 0 10px rgba(34, 211, 238, 0.25);
+    border-color: rgba(34, 211, 238, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 35px rgba(34, 211, 238, 0.85), inset 0 0 20px rgba(34, 211, 238, 0.55);
+    border-color: rgba(34, 211, 238, 1);
+  }
+}
+
+.cube-face-front  { transform: rotateY(0deg) translateZ(35px); }
+.cube-face-back   { transform: rotateY(180deg) translateZ(35px); }
+.cube-face-left   { transform: rotateY(-90deg) translateZ(35px); }
+.cube-face-right  { transform: rotateY(90deg) translateZ(35px); }
+.cube-face-top    { transform: rotateX(90deg) translateZ(35px); }
+.cube-face-bottom { transform: rotateX(-90deg) translateZ(35px); }
+
+
+/* 3D Tetrahedron Container */
+.tetra-container {
+  width: 120px;
+  height: 120px;
+  perspective: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tetra-3d {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin-tetra-3d 16s linear infinite;
+}
+
+@keyframes spin-tetra-3d {
+  0% { transform: rotateX(20deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(20deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+.tetra-face {
+  position: absolute;
+  width: 80px;
+  height: 69.28px; /* height of equilateral triangle: width * sqrt(3)/2 */
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  /* Translucent Pink/Purple/Indigo gradient faces matching image 1 */
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(236, 72, 153, 0.6) 50%, rgba(99, 102, 241, 0.8) 100%);
+  border-bottom: 2px solid rgba(168, 85, 247, 0.95);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.25);
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.45));
+  animation: tetra-glow-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes tetra-glow-pulse {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4)) drop-shadow(0 0 4px rgba(236, 72, 153, 0.3));
+  }
+  100% {
+    filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.85)) drop-shadow(0 0 12px rgba(236, 72, 153, 0.75));
+  }
+}
+
+.tetra-face-1 { transform: rotateY(0deg) rotateX(30deg) translateZ(16.5px); }
+.tetra-face-2 { transform: rotateY(120deg) rotateX(30deg) translateZ(16.5px); }
+.tetra-face-3 { transform: rotateY(240deg) rotateX(30deg) translateZ(16.5px); }
+.tetra-face-bottom {
+  width: 80px;
+  height: 80px;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform: rotateX(-90deg) translateZ(23.5px);
+  background: rgba(168, 85, 247, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
