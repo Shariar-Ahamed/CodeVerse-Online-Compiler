@@ -331,6 +331,7 @@ export default function ProfilePage({ user, onLogout, showToast }) {
 
       showToast("Profile updated successfully", "success");
       setIsEditing(false);
+      navigate(`/profile/${cleanedUsername}`, { replace: true });
     } catch (err) {
       console.error("Error saving profile:", err);
       showToast("Failed to save changes. Please try again.", "error");
