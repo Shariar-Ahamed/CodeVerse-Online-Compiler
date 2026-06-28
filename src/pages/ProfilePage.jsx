@@ -34,6 +34,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
   // State Management for Profile Data & Editing
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState({
     name: 'Developer',
     username: '',
@@ -63,6 +64,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
         if (isOwnProfile) {
           if (!user?.uid) return;
           const docRef = doc(db, "users", user.uid);
@@ -192,6 +194,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         }
       } catch (err) {
         console.error("Error loading profile:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -349,6 +353,15 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
   };
 
   if (isOwnProfile && !user) return null;
+
+  if (loading) {
+    return (
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center justify-center gap-4 animate-fade-in text-white min-h-[60vh]">
+        <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Syncing profile metadata...</p>
+      </main>
+    );
+  }
 
   // Determinstic opacity list for activity contributions log
   const gridOpacities = [
