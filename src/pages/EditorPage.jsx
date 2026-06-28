@@ -4,6 +4,7 @@ import Editor from '@monaco-editor/react';
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
+import AIPanel from '../components/AIPanel';
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
 
@@ -47,6 +48,8 @@ export default function EditorPage({ user, theme, showToast }) {
   
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  const [aiPromptContext, setAiPromptContext] = useState("");
   const [apiEndpoint, setApiEndpoint] = useState(() => localStorage.getItem("codeverse_api_url") || DEFAULT_API_URL);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("codeverse_api_key") || "");
   
@@ -803,6 +806,26 @@ export default function EditorPage({ user, theme, showToast }) {
     showToast("Settings updated successfully", "success");
   };
 
+  const handleAIDebug = () => {
+    const codeToDebug = currentLanguage === "html" ? (activeWebTab === "html" ? htmlCode : activeWebTab === "css" ? cssCode : jsCode) : code;
+    const promptText = `I got a "${statusBadge.text}" error in my ${LANGUAGES[currentLanguage]?.name || currentLanguage} compiler. 
+
+Here is my code:
+\`\`\`${currentLanguage}
+${codeToDebug}
+\`\`\`
+
+Here is the terminal error message:
+\`\`\`
+${consoleOutput}
+\`\`\`
+
+Explain why this error occurred and how to fix it.`;
+    
+    setAiPromptContext(promptText);
+    setShowAIPanel(true);
+  };
+
   return (
     <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
       {/* Background Blur Orbs */}
@@ -881,6 +904,19 @@ export default function EditorPage({ user, theme, showToast }) {
                 <i className="fas fa-sliders text-sm"></i>
               </button>
 
+              {/* AI Code Assistant Toggle Button */}
+              <button
+                onClick={() => setShowAIPanel(prev => !prev)}
+                className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                  showAIPanel
+                    ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400 shadow-md shadow-indigo-500/10'
+                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-white bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+                }`}
+                title="AI Code Assistant"
+              >
+                <i className="fas fa-brain text-sm"></i>
+              </button>
+
               {/* Execute / Run Code Trigger Button */}
               <button
                 onClick={runCode}
@@ -903,8 +939,10 @@ export default function EditorPage({ user, theme, showToast }) {
           )}
         </div>
       </div>
-      {currentLanguage === "text" ? (
-        <div className="flex-grow flex flex-col md:flex-row border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border min-h-[500px]">
+      <div className="flex flex-col lg:flex-row items-stretch flex-grow gap-6 w-full relative z-10 min-h-[500px]">
+        <div className="flex-grow flex flex-col min-w-0">
+          {currentLanguage === "text" ? (
+            <div className="flex-grow flex flex-col md:flex-row border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border h-full">
           {/* Notes Sidebar */}
           <div className="w-full md:w-80 border-r border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex flex-col">
             <div className="p-4 flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30">
@@ -1199,9 +1237,20 @@ export default function EditorPage({ user, theme, showToast }) {
                     <i id="console-header-icon" className="fas fa-terminal text-emerald-400 text-xs"></i>
                     <span id="console-header-title" className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
                   </div>
-                  <span id="status-badge" className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge.className}`}>
-                    {statusBadge.text}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {statusBadge.text !== 'Idle' && statusBadge.text !== 'Compiling...' && statusBadge.text !== 'Accepted' && (
+                      <button
+                        onClick={handleAIDebug}
+                        className="px-2.5 py-0.5 rounded text-[10px] font-bold text-white bg-rose-600 hover:bg-rose-500 active:scale-95 shadow-md shadow-rose-600/10 flex items-center gap-1 transition-all duration-200 cursor-pointer animate-pulse"
+                      >
+                        <i className="fas fa-bug text-[9px]"></i>
+                        <span>Debug with AI</span>
+                      </button>
+                    )}
+                    <span id="status-badge" className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge.className}`}>
+                      {statusBadge.text}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Console Output box */}
@@ -1306,7 +1355,23 @@ export default function EditorPage({ user, theme, showToast }) {
           )}
         </div>
       </div>
-      )}
+          )}
+        </div>
+
+        {showAIPanel && (
+          <div className="w-full lg:w-[380px] min-h-[500px] lg:min-h-0 relative flex-shrink-0 min-w-0">
+            <div className="lg:absolute lg:inset-0 flex flex-col h-full">
+              <AIPanel
+                onClose={() => setShowAIPanel(false)}
+                activeCode={currentLanguage === "html" ? (activeWebTab === "html" ? htmlCode : activeWebTab === "css" ? cssCode : jsCode) : code}
+                activeLanguage={LANGUAGES[currentLanguage]?.name || currentLanguage}
+                initialContextPrompt={aiPromptContext}
+                clearInitialContextPrompt={() => setAiPromptContext("")}
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
