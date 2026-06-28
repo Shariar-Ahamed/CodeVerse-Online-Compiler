@@ -28,8 +28,14 @@ export default function AdminPage({ user, showToast }) {
   useEffect(() => {
     fetchChallenges();
     fetchUsers();
-    fetchContacts();
   }, []);
+
+  // Lazy load contacts when tab switches to contacts
+  useEffect(() => {
+    if (activeTab === 'contacts') {
+      fetchContacts();
+    }
+  }, [activeTab]);
 
   const fetchUsers = async () => {
     try {
