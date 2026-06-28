@@ -1201,7 +1201,7 @@ export default function LandingPage({ showToast }) {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 select-none">
         {/* Sliding AI Panel Container */}
         {showHomeAI && (
-          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-fade-in-up relative rounded-2xl overflow-hidden glass-panel border border-[var(--border-color)]">
+          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-fade-in-up relative rounded-2xl overflow-hidden bg-[#0b0f19] border border-[var(--border-color)]">
             <AIPanel
               onClose={() => setShowHomeAI(false)}
               activeCode=""
