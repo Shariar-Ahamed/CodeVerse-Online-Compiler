@@ -7,7 +7,11 @@ import { db, auth } from '../firebase';
 export default function ProfilePage({ user, onLogout, showToast }) {
   const navigate = useNavigate();
   const { username } = useParams();
-  const isOwnProfile = !username || (user && user.username && username.toLowerCase() === user.username.toLowerCase());
+  const isOwnProfile = !username || 
+    (user && (
+      username.toLowerCase() === user.uid.toLowerCase() || 
+      (user.username && username.toLowerCase() === user.username.toLowerCase())
+    ));
 
   // Auth Guard: Redirect to login if user is not signed in and trying to view own profile
   useEffect(() => {
@@ -62,17 +66,67 @@ export default function ProfilePage({ user, onLogout, showToast }) {
           
           if (docSnap.exists()) {
             const data = docSnap.data();
+            
+            // Auto-repair missing username/name in database
+            if (!data.username || !data.name) {
+              const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+              const finalUsername = data.username || `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+              const finalName = data.name || user.name || baseUsername;
+              
+              await setDoc(docRef, {
+                name: finalName,
+                username: finalUsername,
+                email: user.email.toLowerCase()
+              }, { merge: true });
+              
+              data.name = finalName;
+              data.username = finalUsername;
+              
+              user.username = finalUsername;
+              localStorage.setItem("codeverse_user", JSON.stringify(user));
+            }
+
             setProfileData({
-              name: data.name || 'Developer',
+              name: data.name || user.name || 'Developer',
               username: data.username || '',
-              email: data.email || '',
+              email: data.email || user.email || '',
               title: data.title || 'Premium Developer',
               bio: data.bio || '',
               skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
-              photoURL: data.photoURL || '',
+              photoURL: data.photoURL || user.photoURL || '',
               github: data.socials?.github || '',
               linkedin: data.socials?.linkedin || '',
               website: data.socials?.website || ''
+            });
+          } else {
+            // Document doesn't exist, set from auth state
+            const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+            const finalUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+            
+            await setDoc(docRef, {
+              name: user.name || baseUsername,
+              email: user.email.toLowerCase(),
+              username: finalUsername,
+              role: 'user',
+              score: 0,
+              solvedChallenges: [],
+              createdAt: new Date().toISOString()
+            });
+
+            user.username = finalUsername;
+            localStorage.setItem("codeverse_user", JSON.stringify(user));
+
+            setProfileData({
+              name: user.name || baseUsername,
+              username: finalUsername,
+              email: user.email,
+              title: 'Premium Developer',
+              bio: '',
+              skills: ['JavaScript', 'React', 'C++'],
+              photoURL: user.photoURL || '',
+              github: '',
+              linkedin: '',
+              website: ''
             });
           }
         } else {
