@@ -8,6 +8,11 @@ export default function AdminPage({ user, showToast }) {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  // User management states
+  const [activeTab, setActiveTab] = useState('challenges'); // 'challenges' or 'users'
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+
   // Form states
   const [editingId, setEditingId] = useState(null); // null means creating new
   const [title, setTitle] = useState('');
@@ -17,10 +22,50 @@ export default function AdminPage({ user, showToast }) {
   const [order, setOrder] = useState(1);
   const [testCases, setTestCases] = useState([{ input: '', output: '', isHidden: false }]);
 
-  // Load challenges on mount
+  // Load data on mount
   useEffect(() => {
     fetchChallenges();
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setUsersLoading(true);
+      const usersCol = collection(db, "users");
+      const snapshot = await getDocs(usersCol);
+      const list = [];
+      snapshot.forEach(docSnap => {
+        list.push({ uid: docSnap.id, ...docSnap.data() });
+      });
+      // Sort users by score descending
+      list.sort((a, b) => (b.score || 0) - (a.score || 0));
+      setUsers(list);
+    } catch (err) {
+      console.error("Error loading users in admin:", err);
+      showToast("Error loading users list", "error");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleToggleVerification = async (targetUser) => {
+    try {
+      const userDocRef = doc(db, "users", targetUser.uid);
+      const newStatus = !targetUser.isVerified;
+      
+      await setDoc(userDocRef, {
+        isVerified: newStatus
+      }, { merge: true });
+      
+      // Update local state list
+      setUsers(prev => prev.map(u => u.uid === targetUser.uid ? { ...u, isVerified: newStatus } : u));
+      
+      showToast(`${targetUser.name || 'User'} is now ${newStatus ? 'Verified' : 'Unverified'}!`, "success");
+    } catch (err) {
+      console.error("Error updating user verification:", err);
+      showToast("Failed to update user verification", "error");
+    }
+  };
 
   const fetchChallenges = async () => {
     try {
@@ -188,116 +233,242 @@ export default function AdminPage({ user, showToast }) {
       <div className="max-w-6xl mx-auto mt-6 relative z-10">
         
         {/* Header section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-[var(--border-color)]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-[var(--border-color)]/30">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
               <i className="fas fa-crown text-indigo-400 text-2xl"></i>
-              <span>Admin Challenge Manager</span>
+              <span>Admin Workspace Manager</span>
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Add, edit, or delete algorithmic problems and configure test cases dynamically in Firestore.
+              Configure algorithmic coding challenges and verify platform developer profiles dynamically.
             </p>
           </div>
 
-          <button
-            onClick={handleCreateNew}
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-lg shadow-indigo-600/25 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2"
-          >
-            <i className="fas fa-plus"></i>
-            <span>Add New Challenge</span>
-          </button>
-        </div>
-
-        {/* Dashboard Statistics summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#0d1321]/30 glass-panel border border-[var(--border-color)] rounded-xl p-5 text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider mb-1">Total Problems</span>
-            <span className="text-2xl font-black text-white">{challenges.length}</span>
-          </div>
-          <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 text-center">
-            <span className="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider mb-1">Easy</span>
-            <span className="text-2xl font-black text-emerald-300">{easyCount}</span>
-          </div>
-          <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-5 text-center">
-            <span className="text-[10px] uppercase font-bold text-amber-400 block tracking-wider mb-1">Medium</span>
-            <span className="text-2xl font-black text-amber-300">{mediumCount}</span>
-          </div>
-          <div className="bg-rose-500/5 border border-rose-500/10 rounded-xl p-5 text-center">
-            <span className="text-[10px] uppercase font-bold text-rose-400 block tracking-wider mb-1">Hard</span>
-            <span className="text-2xl font-black text-rose-300">{hardCount}</span>
-          </div>
-        </div>
-
-        {/* Challenges table view */}
-        <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
-          {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-4">
-              <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Challenges list...</p>
-            </div>
-          ) : challenges.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 text-xs italic">
-              No challenges loaded. Click Add New Challenge to populate.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-[var(--border-color)] bg-[#0d1321]/50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    <th className="px-6 py-4"># Order</th>
-                    <th className="px-6 py-4">Title</th>
-                    <th className="px-6 py-4">ID / Slug</th>
-                    <th className="px-6 py-4">Difficulty</th>
-                    <th className="px-6 py-4">Points</th>
-                    <th className="px-6 py-4">Test Cases</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-color)]/30 text-xs">
-                  {challenges.map((c) => (
-                    <tr key={c.id} className="hover:bg-slate-900/20 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-indigo-400">#{c.order || 0}</td>
-                      <td className="px-6 py-4 font-bold text-white">{c.title}</td>
-                      <td className="px-6 py-4 font-mono text-[10px] text-slate-500">{c.id}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          c.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                          c.difficulty === 'Medium' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                          'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}>
-                          {c.difficulty}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-indigo-400">+{c.points} pts</td>
-                      <td className="px-6 py-4 font-semibold text-slate-300">
-                        {Array.isArray(c.testCases) ? c.testCases.length : 0} Cases
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleEdit(c)}
-                            className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-indigo-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 active:scale-95 transition-all cursor-pointer"
-                            title="Edit Challenge"
-                          >
-                            <i className="fas fa-edit text-xs"></i>
-                          </button>
-                          <button
-                            onClick={() => handleDelete(c.id)}
-                            className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
-                            title="Delete Challenge"
-                          >
-                            <i className="fas fa-trash text-xs"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {activeTab === 'challenges' && (
+            <button
+              onClick={handleCreateNew}
+              className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white shadow-lg shadow-indigo-600/25 active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2 self-start md:self-auto"
+            >
+              <i className="fas fa-plus"></i>
+              <span>Add New Challenge</span>
+            </button>
           )}
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex gap-4 mb-8 border-b border-[var(--border-color)]/20 pb-3">
+          <button
+            onClick={() => setActiveTab('challenges')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
+              activeTab === 'challenges'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <i className="fas fa-code"></i>
+            <span>Challenge Manager</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
+              activeTab === 'users'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <i className="fas fa-user-check"></i>
+            <span>User Verification Manager</span>
+          </button>
+        </div>
+
+        {/* Dynamic Tab Render */}
+        {activeTab === 'challenges' ? (
+          <>
+            {/* Dashboard Statistics summary */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-[#0d1321]/30 glass-panel border border-[var(--border-color)] rounded-xl p-5 text-center">
+                <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider mb-1">Total Problems</span>
+                <span className="text-2xl font-black text-white">{challenges.length}</span>
+              </div>
+              <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 text-center">
+                <span className="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider mb-1">Easy</span>
+                <span className="text-2xl font-black text-emerald-300">{easyCount}</span>
+              </div>
+              <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-5 text-center">
+                <span className="text-[10px] uppercase font-bold text-amber-400 block tracking-wider mb-1">Medium</span>
+                <span className="text-2xl font-black text-amber-300">{mediumCount}</span>
+              </div>
+              <div className="bg-rose-500/5 border border-rose-500/10 rounded-xl p-5 text-center">
+                <span className="text-[10px] uppercase font-bold text-rose-400 block tracking-wider mb-1">Hard</span>
+                <span className="text-2xl font-black text-rose-300">{hardCount}</span>
+              </div>
+            </div>
+
+            {/* Challenges table view */}
+            <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+              {loading ? (
+                <div className="py-20 flex flex-col items-center justify-center gap-4">
+                  <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Challenges list...</p>
+                </div>
+              ) : challenges.length === 0 ? (
+                <div className="py-16 text-center text-slate-400 text-xs italic">
+                  No challenges loaded. Click Add New Challenge to populate.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Order</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Title</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Difficulty</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Score Reward</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Test Cases</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
+                      {challenges.map((c) => (
+                        <tr key={c.id} className="hover:bg-slate-900/30 transition-all">
+                          <td className="px-6 py-4 text-xs font-bold text-slate-400">
+                            #{c.order}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-bold text-xs text-white">{c.title}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold border ${
+                              c.difficulty === 'Easy' 
+                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                : c.difficulty === 'Medium'
+                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                            }`}>
+                              {c.difficulty}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-xs font-bold text-indigo-400 font-mono">
+                            {c.points} pts
+                          </td>
+                          <td className="px-6 py-4 text-xs font-semibold text-slate-300 text-center font-mono">
+                            {Array.isArray(c.testCases) ? c.testCases.length : 0}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleEdit(c)}
+                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-indigo-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 active:scale-95 transition-all cursor-pointer"
+                                title="Edit Challenge"
+                              >
+                                <i className="fas fa-edit text-xs"></i>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(c.id)}
+                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                                title="Delete Challenge"
+                              >
+                                <i className="fas fa-trash text-xs"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+            {usersLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-4">
+                <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Users list...</p>
+              </div>
+            ) : users.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-xs italic">
+                No user records loaded.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Developer</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Email</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Score</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Solved</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Verification Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
+                    {users.map((u) => (
+                      <tr key={u.uid} className="hover:bg-slate-900/30 transition-all">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {u.photoURL ? (
+                              <img src={u.photoURL} alt={u.name} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10">
+                                {(u.name || 'U').charAt(0)}
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-bold text-xs text-white flex items-center gap-1.5">
+                                <span>{u.name || 'Developer'}</span>
+                                {u.isVerified && (
+                                  <span className="text-sky-400 text-[10px]" title="Verified Creator">
+                                    <i className="fas fa-circle-check animate-pulse"></i>
+                                  </span>
+                                )}
+                              </span>
+                              {u.username && (
+                                <span className="text-[10px] text-slate-400 font-mono block">@{u.username}</span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-xs font-mono text-slate-400">
+                          {u.email || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-xs font-bold text-indigo-400 font-mono text-center">
+                          {u.score || 0} pts
+                        </td>
+                        <td className="px-6 py-4 text-xs font-semibold text-emerald-400 font-mono text-center">
+                          {Array.isArray(u.solvedChallenges) ? u.solvedChallenges.length : 0} problems
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => handleToggleVerification(u)}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border active:scale-95 transition-all duration-200 cursor-pointer ${
+                              u.isVerified
+                                ? 'border-rose-500/30 bg-rose-500/5 text-rose-400 hover:bg-rose-500/10'
+                                : 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400 hover:bg-indigo-500/10'
+                            }`}
+                          >
+                            {u.isVerified ? (
+                              <>
+                                <i className="fas fa-user-xmark mr-1"></i>
+                                <span>Remove Tick</span>
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-user-check mr-1"></i>
+                                <span>Grant Verified Tick</span>
+                              </>
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Add / Edit Challenge Form Modal Overlay */}

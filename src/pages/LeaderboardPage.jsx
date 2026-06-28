@@ -32,7 +32,8 @@ export default function LeaderboardPage({ user, showToast }) {
               photoURL: data.photoURL || "",
               title: data.title || "Premium Developer",
               score: data.score || 0,
-              solvedCount: Array.isArray(data.solvedChallenges) ? data.solvedChallenges.length : 0
+              solvedCount: Array.isArray(data.solvedChallenges) ? data.solvedChallenges.length : 0,
+              isVerified: !!data.isVerified
             });
           }
         });
@@ -161,13 +162,18 @@ export default function LeaderboardPage({ user, showToast }) {
                                 </div>
                               )}
                               <div>
-                                <span className={`font-bold block group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
-                                  {player.name}
+                                <span className={`font-bold flex items-center gap-1.5 group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
+                                  <span>{player.name}</span>
+                                  {player.isVerified && (
+                                    <span className="text-sky-400 text-xs" title="Verified Creator">
+                                      <i className="fas fa-circle-check animate-pulse"></i>
+                                    </span>
+                                  )}
                                   {player.username && (
-                                    <span className="text-slate-400 font-mono font-semibold text-[11px] ml-2 select-all">@{player.username}</span>
+                                    <span className="text-slate-400 font-mono font-semibold text-[11px] ml-1.5 select-all">@{player.username}</span>
                                   )}
                                   {isCurrentUser && (
-                                    <span className="ml-2 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                                    <span className="ml-1.5 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                                       You
                                     </span>
                                   )}

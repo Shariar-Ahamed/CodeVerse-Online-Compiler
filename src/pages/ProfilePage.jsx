@@ -45,7 +45,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     photoURL: '',
     github: '',
     linkedin: '',
-    website: ''
+    website: '',
+    isVerified: false
   });
 
   const [inputs, setInputs] = useState({
@@ -102,7 +103,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               photoURL: data.photoURL || user.photoURL || '',
               github: data.socials?.github || '',
               linkedin: data.socials?.linkedin || '',
-              website: data.socials?.website || ''
+              website: data.socials?.website || '',
+              isVerified: !!data.isVerified
             });
           } else {
             // Document doesn't exist, set from auth state
@@ -132,7 +134,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               photoURL: user.photoURL || '',
               github: '',
               linkedin: '',
-              website: ''
+              website: '',
+              isVerified: false
             });
           }
         } else {
@@ -155,7 +158,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               photoURL: data.photoURL || '',
               github: data.socials?.github || '',
               linkedin: data.socials?.linkedin || '',
-              website: data.socials?.website || ''
+              website: data.socials?.website || '',
+              isVerified: !!data.isVerified
             });
           } else {
             // Try fallback fetch by doc ID (in case it is a UID instead of a username)
@@ -173,7 +177,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 photoURL: data.photoURL || '',
                 github: data.socials?.github || '',
                 linkedin: data.socials?.linkedin || '',
-                website: data.socials?.website || ''
+                website: data.socials?.website || '',
+                isVerified: !!data.isVerified
               });
             } else {
               // Profile not found
@@ -187,7 +192,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 photoURL: '',
                 github: '',
                 linkedin: '',
-                website: ''
+                website: '',
+                isVerified: false
               });
             }
           }
@@ -603,7 +609,14 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
 
               {/* User Text Details */}
               <div className="flex flex-col gap-0.5 w-full">
-                <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate">{profileData.name || 'Developer'}</h3>
+                <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate flex items-center justify-center gap-1.5">
+                  <span>{profileData.name || 'Developer'}</span>
+                  {profileData.isVerified && (
+                    <span className="text-sky-400 text-sm" title="Verified Creator">
+                      <i className="fas fa-circle-check"></i>
+                    </span>
+                  )}
+                </h3>
                 {profileData.username && (
                   <p className="text-xs text-indigo-400 font-mono font-bold">@{profileData.username}</p>
                 )}
