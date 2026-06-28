@@ -9,9 +9,11 @@ export default function AdminPage({ user, showToast }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   // User management states
-  const [activeTab, setActiveTab] = useState('challenges'); // 'challenges' or 'users'
+  const [activeTab, setActiveTab] = useState('challenges'); // 'challenges', 'users', 'contacts'
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [contactsLoading, setContactsLoading] = useState(false);
 
   // Form states
   const [editingId, setEditingId] = useState(null); // null means creating new
@@ -26,6 +28,7 @@ export default function AdminPage({ user, showToast }) {
   useEffect(() => {
     fetchChallenges();
     fetchUsers();
+    fetchContacts();
   }, []);
 
   const fetchUsers = async () => {
@@ -64,6 +67,38 @@ export default function AdminPage({ user, showToast }) {
     } catch (err) {
       console.error("Error updating user verification:", err);
       showToast("Failed to update user verification", "error");
+    }
+  };
+
+  const fetchContacts = async () => {
+    try {
+      setContactsLoading(true);
+      const contactsCol = collection(db, "contacts");
+      const snapshot = await getDocs(contactsCol);
+      const list = [];
+      snapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      // Sort by date descending
+      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setContacts(list);
+    } catch (err) {
+      console.error("Error loading contact messages:", err);
+      showToast("Error loading contact messages list", "error");
+    } finally {
+      setContactsLoading(false);
+    }
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    if (!window.confirm("Are you sure you want to permanently delete this message?")) return;
+    try {
+      await deleteDoc(doc(db, "contacts", contactId));
+      setContacts(prev => prev.filter(c => c.id !== contactId));
+      showToast("Message deleted successfully", "success");
+    } catch (err) {
+      console.error("Error deleting message:", err);
+      showToast("Failed to delete message", "error");
     }
   };
 
@@ -279,6 +314,17 @@ export default function AdminPage({ user, showToast }) {
             <i className="fas fa-user-check"></i>
             <span>User Verification Manager</span>
           </button>
+          <button
+            onClick={() => setActiveTab('contacts')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
+              activeTab === 'contacts'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <i className="fas fa-envelope-open-text"></i>
+            <span>Contact Messages</span>
+          </button>
         </div>
 
         {/* Dynamic Tab Render */}
@@ -459,6 +505,61 @@ export default function AdminPage({ user, showToast }) {
                                 <span>Grant Verified Tick</span>
                               </>
                             )}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'contacts' && (
+          <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+            {contactsLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-4">
+                <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Messages list...</p>
+              </div>
+            ) : contacts.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-xs italic">
+                No contact messages found.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Date</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Sender Details</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Message Content</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
+                    {contacts.map((c) => (
+                      <tr key={c.id} className="hover:bg-slate-900/30 transition-all align-top">
+                        <td className="px-6 py-4 text-xs text-slate-400 font-mono">
+                          {c.createdAt ? new Date(c.createdAt).toLocaleString() : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-xs text-white">{c.name}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">{c.email}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-xs text-slate-300 whitespace-pre-wrap leading-relaxed max-w-md">
+                          {c.message}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => handleDeleteContact(c.id)}
+                            className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                            title="Delete Message"
+                          >
+                            <i className="fas fa-trash-can text-xs"></i>
                           </button>
                         </td>
                       </tr>

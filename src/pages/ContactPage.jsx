@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default function ContactPage({ showToast }) {
   const contactRef = useRef(null);
@@ -7,6 +9,7 @@ export default function ContactPage({ showToast }) {
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   useEffect(() => {
     const parentEl = contactRef.current;
@@ -80,6 +83,7 @@ export default function ContactPage({ showToast }) {
           }
         }
       }
+      ctx.save();
       ctx.restore();
 
       for (let p of particles) p.draw();
@@ -115,12 +119,32 @@ export default function ContactPage({ showToast }) {
     };
   }, []);
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
-    showToast(`Thank you, ${contactName}! Your message was sent successfully.`, 'success');
-    setContactName('');
-    setContactEmail('');
-    setContactMessage('');
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
+      showToast("Please fill in all fields", "error");
+      return;
+    }
+
+    try {
+      setSubmitLoading(true);
+      await addDoc(collection(db, "contacts"), {
+        name: contactName.trim(),
+        email: contactEmail.trim().toLowerCase(),
+        message: contactMessage.trim(),
+        createdAt: new Date().toISOString()
+      });
+
+      showToast(`Thank you, ${contactName}! Your message was sent successfully.`, 'success');
+      setContactName('');
+      setContactEmail('');
+      setContactMessage('');
+    } catch (err) {
+      console.error("Error sending contact message:", err);
+      showToast("Failed to send message. Please try again.", "error");
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   return (
@@ -235,9 +259,17 @@ export default function ContactPage({ showToast }) {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200 btn-premium-glow"
+                disabled={submitLoading}
+                className="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200 btn-premium-glow disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
-                Send Message
+                {submitLoading ? (
+                  <>
+                    <i className="fas fa-circle-notch animate-spin"></i>
+                    <span>Sending Message...</span>
+                  </>
+                ) : (
+                  <span>Send Message</span>
+                )}
               </button>
             </form>
 
