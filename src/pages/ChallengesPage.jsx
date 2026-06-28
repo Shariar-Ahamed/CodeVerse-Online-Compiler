@@ -158,7 +158,8 @@ export default function ChallengesPage({ user, showToast }) {
                   <div className="flex-grow space-y-1.5 min-w-0">
                     <div className="flex items-center gap-3">
                       <h3 className="font-extrabold text-white text-base tracking-tight flex items-center gap-2">
-                        {item.title}
+                        <span className="text-slate-300 font-mono font-bold">#{item.order || 0}.</span>
+                        <span>{item.title}</span>
                         {isSolved && (
                           <i className="fas fa-circle-check text-emerald-400 text-sm" title="Solved successfully"></i>
                         )}
