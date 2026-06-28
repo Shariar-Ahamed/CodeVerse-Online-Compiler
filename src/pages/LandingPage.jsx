@@ -1022,35 +1022,33 @@ export default function LandingPage({ showToast }) {
             </button>
           </div>
 
-          {/* Infinite Marquee of Languages for Milestone 1 */}
-          {currentMilestoneIndex === 0 && (
-            <div className={`mt-10 overflow-hidden relative w-full mask-gradient transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-              <div className="animate-marquee-rtl hover:[animation-play-state:paused] flex gap-4">
-                {/* 1st list */}
-                {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
-                  <div
-                    key={`mar1-${lang.id}-${idx}`}
-                    onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
-                  >
-                    <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
-                    <span className="text-xs font-semibold">{lang.name}</span>
-                  </div>
-                ))}
-                {/* 2nd list for looping */}
-                {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
-                  <div
-                    key={`mar2-${lang.id}-${idx}`}
-                    onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
-                  >
-                    <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
-                    <span className="text-xs font-semibold">{lang.name}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Infinite Marquee of Languages */}
+          <div className="mt-10 overflow-hidden relative w-full mask-gradient">
+            <div className="animate-marquee-rtl hover:[animation-play-state:paused] flex gap-4">
+              {/* 1st list */}
+              {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
+                <div
+                  key={`mar1-${lang.id}-${idx}`}
+                  onClick={() => navigate(`/editor?lang=${lang.id}`)}
+                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                >
+                  <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
+                  <span className="text-xs font-semibold">{lang.name}</span>
+                </div>
+              ))}
+              {/* 2nd list for looping */}
+              {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
+                <div
+                  key={`mar2-${lang.id}-${idx}`}
+                  onClick={() => navigate(`/editor?lang=${lang.id}`)}
+                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                >
+                  <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
+                  <span className="text-xs font-semibold">{lang.name}</span>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
         </div>
       </section>
