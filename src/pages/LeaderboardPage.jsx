@@ -165,7 +165,7 @@ export default function LeaderboardPage({ user, showToast }) {
                                 <span className={`font-bold flex items-center gap-1.5 group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
                                   <span>{player.name}</span>
                                   {player.isVerified && (
-                                    <span className="text-sky-400 text-xs" title="Verified Creator">
+                                    <span className="text-xs" style={{ color: '#08CB00' }} title="Verified Creator">
                                       <i className="fas fa-circle-check animate-pulse"></i>
                                     </span>
                                   )}
