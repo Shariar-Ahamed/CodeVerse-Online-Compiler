@@ -44,12 +44,15 @@ export default function ChallengesPage({ user, showToast }) {
           } catch (writeErr) {
             console.warn("Unable to auto-seed challenges database (permission restricted). Loaded locally.", writeErr);
           }
-          setChallenges(INITIAL_CHALLENGES);
+          const sortedInitial = [...INITIAL_CHALLENGES].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+          setChallenges(sortedInitial);
         } else {
           const list = [];
           querySnapshot.forEach((doc) => {
             list.push({ id: doc.id, ...doc.data() });
           });
+          // Sort by order number ascending
+          list.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
           setChallenges(list);
         }
 
@@ -57,7 +60,8 @@ export default function ChallengesPage({ user, showToast }) {
         console.error("Error loading challenges data:", err);
         showToast("Error loading challenges database.", "error");
         // Fallback to static list for safety
-        setChallenges(INITIAL_CHALLENGES);
+        const sortedInitial = [...INITIAL_CHALLENGES].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+        setChallenges(sortedInitial);
       } finally {
         setLoading(false);
       }

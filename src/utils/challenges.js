@@ -2,6 +2,7 @@ export const INITIAL_CHALLENGES = [
   {
     id: "fizzbuzz",
     title: "FizzBuzz",
+    order: 1,
     description: "Read a number N from standard input. Print numbers from 1 to N line by line. But for multiples of three, print 'Fizz' instead of the number, and for the multiples of five, print 'Buzz'. For numbers which are multiples of both three and five, print 'FizzBuzz'.",
     difficulty: "Easy",
     points: 50,
@@ -20,6 +21,7 @@ export const INITIAL_CHALLENGES = [
   {
     id: "palindrome",
     title: "Palindrome Check",
+    order: 2,
     description: "Read a string from standard input. Print 'true' if the string is a palindrome (reads the same backward as forward, case-insensitive and ignoring spaces), otherwise print 'false'.",
     difficulty: "Easy",
     points: 70,
@@ -38,6 +40,7 @@ export const INITIAL_CHALLENGES = [
   {
     id: "fibonacci",
     title: "Fibonacci Number",
+    order: 3,
     description: "Read an integer N from standard input. Print the N-th Fibonacci number, where F(0) = 0, F(1) = 1, and F(n) = F(n-1) + F(n-2) for n > 1.",
     difficulty: "Easy",
     points: 80,
@@ -56,6 +59,7 @@ export const INITIAL_CHALLENGES = [
   {
     id: "arraysum",
     title: "Sum of Array",
+    order: 4,
     description: "Read the input representing a list of numbers. The first line of input is the number of elements N. The second line contains N space-separated integers. Print the sum of these integers.",
     difficulty: "Easy",
     points: 60,
@@ -74,6 +78,7 @@ export const INITIAL_CHALLENGES = [
   {
     id: "factorial",
     title: "Factorial",
+    order: 5,
     description: "Read an integer N from standard input. Print the factorial of N (N! = N * (N-1) * ... * 1). Note that 0! = 1.",
     difficulty: "Easy",
     points: 50,

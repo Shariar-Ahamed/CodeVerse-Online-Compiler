@@ -14,6 +14,7 @@ export default function AdminPage({ user, showToast }) {
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState('Easy');
   const [points, setPoints] = useState(50);
+  const [order, setOrder] = useState(1);
   const [testCases, setTestCases] = useState([{ input: '', output: '', isHidden: false }]);
 
   // Load challenges on mount
@@ -29,18 +30,21 @@ export default function AdminPage({ user, showToast }) {
       
       if (snapshot.empty) {
         // Fallback/Seed standard
-        setChallenges(INITIAL_CHALLENGES);
+        const sortedInitial = [...INITIAL_CHALLENGES].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+        setChallenges(sortedInitial);
       } else {
         const list = [];
         snapshot.forEach(docSnap => {
           list.push({ id: docSnap.id, ...docSnap.data() });
         });
+        list.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
         setChallenges(list);
       }
     } catch (err) {
       console.error("Error loading challenges in admin: ", err);
       showToast("Error loading challenges database", "error");
-      setChallenges(INITIAL_CHALLENGES);
+      const sortedInitial = [...INITIAL_CHALLENGES].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+      setChallenges(sortedInitial);
     } finally {
       setLoading(false);
     }
@@ -53,6 +57,7 @@ export default function AdminPage({ user, showToast }) {
     setDescription('');
     setDifficulty('Easy');
     setPoints(50);
+    setOrder(challenges.length + 1);
     setTestCases([{ input: '', output: '', isHidden: false }]);
     setIsFormOpen(true);
   };
@@ -64,6 +69,7 @@ export default function AdminPage({ user, showToast }) {
     setDescription(challenge.description || '');
     setDifficulty(challenge.difficulty || 'Easy');
     setPoints(challenge.points || 50);
+    setOrder(challenge.order || 1);
     
     // Check if test cases exist, format if they don't
     const cases = Array.isArray(challenge.testCases) && challenge.testCases.length > 0 
@@ -144,6 +150,7 @@ export default function AdminPage({ user, showToast }) {
       description: description.trim(),
       difficulty: difficulty,
       points: Number(points),
+      order: Number(order) || 1,
       testCases: testCases.map(tc => ({
         input: tc.input.trim(),
         output: tc.output.trim(),
@@ -237,6 +244,7 @@ export default function AdminPage({ user, showToast }) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[var(--border-color)] bg-[#0d1321]/50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <th className="px-6 py-4"># Order</th>
                     <th className="px-6 py-4">Title</th>
                     <th className="px-6 py-4">ID / Slug</th>
                     <th className="px-6 py-4">Difficulty</th>
@@ -248,6 +256,7 @@ export default function AdminPage({ user, showToast }) {
                 <tbody className="divide-y divide-[var(--border-color)]/30 text-xs">
                   {challenges.map((c) => (
                     <tr key={c.id} className="hover:bg-slate-900/20 transition-colors">
+                      <td className="px-6 py-4 font-mono font-bold text-indigo-400">#{c.order || 0}</td>
                       <td className="px-6 py-4 font-bold text-white">{c.title}</td>
                       <td className="px-6 py-4 font-mono text-[10px] text-slate-500">{c.id}</td>
                       <td className="px-6 py-4">
@@ -313,8 +322,8 @@ export default function AdminPage({ user, showToast }) {
             {/* Modal Scrollable Body */}
             <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-800 text-left">
               
-              {/* Row 1: Title & Points */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Row 1: Title & Points & Order */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-2 flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Challenge Title</label>
                   <input
@@ -327,7 +336,7 @@ export default function AdminPage({ user, showToast }) {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Difficulty & Score Reward</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Difficulty & Score</label>
                   <div className="flex gap-2">
                     <select
                       value={difficulty}
@@ -347,6 +356,17 @@ export default function AdminPage({ user, showToast }) {
                       required
                     />
                   </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sequence Order</label>
+                  <input
+                    type="number"
+                    value={order}
+                    onChange={(e) => setOrder(e.target.value)}
+                    min="1"
+                    className="px-3 py-2.5 rounded-xl bg-[#090d16]/70 border border-slate-800/80 text-white focus:outline-none focus:border-indigo-500/70 font-bold text-xs transition-all text-center w-full shadow-inner"
+                    required
+                  />
                 </div>
               </div>
 
