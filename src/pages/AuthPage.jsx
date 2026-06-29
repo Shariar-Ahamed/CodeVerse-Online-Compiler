@@ -467,9 +467,8 @@ export default function AuthPage({ user, onLogin, showToast }) {
       <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-[130px] z-0 pointer-events-none"></div>
       <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-cyan-600/10 blur-[130px] z-0 pointer-events-none"></div>
 
-      {/* Main Split Grid Card */}
       <div
-        id="auth-card"
+        id="auth-card-solid"
         className="w-full max-w-5xl min-h-[600px] lg:min-h-[680px] grid grid-cols-1 lg:grid-cols-12 gap-0 z-10 overflow-visible relative bg-transparent"
       >
         

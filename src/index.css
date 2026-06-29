@@ -1246,6 +1246,6 @@ input:-webkit-autofill:active {
 }
 
 /* Fully Opaque Panels for Auth Page in Open State */
-#auth-card .glass-panel {
+#auth-card-solid .glass-panel {
   background: rgba(15, 22, 36, 1) !important;
 }
