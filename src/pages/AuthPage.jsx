@@ -905,7 +905,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
           {/* Forgot Password Overlay */}
           {activeTab === 'forgot' && (
-            <div className="absolute inset-0 bg-[#172035] z-20 p-6 sm:p-10 flex flex-col justify-center gap-5 animate-scale-up">
+            <div className="absolute inset-0 bg-[#0f1624] z-20 p-6 sm:p-10 flex flex-col justify-center gap-5 animate-scale-up rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px]">
               
               {/* Header */}
               <div className="text-center flex flex-col items-center gap-2">
@@ -951,7 +951,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   <button
                     type="button"
                     onClick={() => setActiveTab('login')}
-                    className="w-full py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-900 border border-slate-800 transition-all duration-200 cursor-pointer"
+                    className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-900/50 hover:bg-indigo-600/20 border border-slate-800/80 hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
                   >
                     Back to Login
                   </button>
