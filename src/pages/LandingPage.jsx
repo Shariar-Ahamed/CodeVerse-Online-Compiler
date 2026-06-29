@@ -1201,7 +1201,7 @@ export default function LandingPage({ showToast }) {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 select-none">
         {/* Sliding AI Panel Container */}
         {showHomeAI && (
-          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-fade-in-up relative rounded-2xl overflow-hidden bg-[#0b0f19] border border-[var(--border-color)]">
+          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-mac-dock relative rounded-2xl rounded-br-none overflow-visible bg-[#0b0f19] border border-[var(--border-color)]">
             <AIPanel
               onClose={() => setShowHomeAI(false)}
               activeCode=""
@@ -1210,6 +1210,11 @@ export default function LandingPage({ showToast }) {
               clearInitialContextPrompt={() => {}}
               isHome={true}
             />
+            {/* Curved speech-bubble tail pointing down to the brain icon */}
+            <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-[-15.5px] right-[-1px] pointer-events-none overflow-visible z-40">
+              <path d="M0 0 C8 0, 12 12, 16 16 C18 12, 21 4, 24 0" stroke="var(--border-color)" strokeWidth="1.5" fill="#0b0f19" />
+              <path d="M-1 -2 L25 -2 L25 0.5 L-1 0.5 Z" fill="#0b0f19" />
+            </svg>
           </div>
         )}
 

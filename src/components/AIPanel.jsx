@@ -250,7 +250,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
   };
 
   return (
-    <div className="w-full h-full border border-[var(--border-color)] rounded-2xl bg-[#0b0f19] shadow-xl flex flex-col relative z-30 transition-all duration-300 overflow-hidden">
+    <div className={`w-full h-full border border-[var(--border-color)] bg-[#0b0f19] shadow-xl flex flex-col relative z-30 transition-all duration-300 overflow-hidden ${isHome ? 'rounded-2xl rounded-br-none' : 'rounded-2xl'}`}>
       {/* Side Glow Effects */}
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-indigo-500/5 blur-2xl pointer-events-none z-0"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-cyan-500/5 blur-2xl pointer-events-none z-0"></div>
