@@ -36,6 +36,7 @@ const getPasswordStrength = (password) => {
 export default function AuthPage({ user, onLogin, showToast }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
+  const [animationPaused, setAnimationPaused] = useState(false);
 
   // Redirect if already logged in (ignore guest mode)
   useEffect(() => {
@@ -407,7 +408,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden overflow-y-auto">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden overflow-y-auto" onMouseDown={() => setAnimationPaused(true)} onMouseUp={() => setAnimationPaused(false)} onMouseLeave={() => setAnimationPaused(false)} onTouchStart={() => setAnimationPaused(true)} onTouchEnd={() => setAnimationPaused(false)}>
       {/* Particles Background */}
       <AuthParticles />
 
@@ -418,96 +419,115 @@ export default function AuthPage({ user, onLogin, showToast }) {
       {/* Main Split Grid Card */}
       <div
         id="auth-card"
-        className="glass-panel neon-glow-card w-full max-w-5xl min-h-[600px] lg:min-h-[680px] grid grid-cols-1 lg:grid-cols-12 gap-0 z-10 rounded-[32px] border border-[var(--border-color)] overflow-hidden shadow-2xl relative"
+        className="w-full max-w-5xl min-h-[600px] lg:min-h-[680px] grid grid-cols-1 lg:grid-cols-12 gap-0 z-10 overflow-visible relative bg-transparent"
       >
         
-        {/* Left Side: Brand Visuals & Features (Desktop Only) */}
-        <div className="hidden lg:flex lg:col-span-6 p-10 flex-col justify-between relative overflow-hidden border-r border-[var(--border-color)]/20 bg-gradient-to-br from-indigo-950/20 via-slate-900/10 to-cyan-950/10 select-none">
+        {/* Left Side: 3D Flipping Book Cover */}
+        <div className="hidden lg:block lg:col-span-6 relative select-none animate-book-left z-20 book-cover-3d" style={{ animationPlayState: animationPaused ? 'paused' : 'running' }}>
           
-          {/* Logo Brand at top left */}
-          <div className="flex items-center gap-3 cursor-pointer text-left" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-md shadow-indigo-500/25">
-              <i className="fas fa-cubes text-white text-base"></i>
-            </div>
-            <div>
-              <span className="text-base font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                CodeVerse
-              </span>
-              <span className="text-[10px] block text-[var(--text-secondary)] font-medium leading-none">Online Compiler</span>
-            </div>
-          </div>
-
-          {/* Visual Showcase Center */}
-          <div className="my-auto flex flex-col gap-6 relative z-10 text-left">
-            <div className="space-y-3">
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 uppercase tracking-wider inline-block">
-                Developer Workbench
-              </span>
-              <h2 className="text-3xl font-black tracking-tight leading-tight text-white">
-                Write Code. Compile Live.<br />
-                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  No Local Setup.
+          {/* INNER FACE (Visible when open) */}
+          <div className="book-face-inner p-10 flex flex-col justify-between glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-br from-indigo-950/20 via-slate-900/10 to-cyan-950/10 shadow-2xl">
+            {/* Logo Brand at top left */}
+            <div className="flex items-center gap-3 cursor-pointer text-left" onClick={() => navigate('/')}>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-md shadow-indigo-500/25">
+                <i className="fas fa-cubes text-white text-base"></i>
+              </div>
+              <div>
+                <span className="text-base font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                  CodeVerse
                 </span>
-              </h2>
-              <p className="text-slate-400 text-xs max-w-sm leading-relaxed">
-                Experience a fast, secure, and fully-featured cloud compilation platform with support for over 30+ languages, web sandboxes, and personalized activity stats.
-              </p>
-            </div>
-
-            {/* Feature Checkmarks */}
-            <div className="grid grid-cols-2 gap-3.5 mt-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-6.5 h-6.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <i className="fas fa-check text-[10px]"></i>
-                </div>
-                <span className="text-xs font-semibold text-slate-300">30+ Languages</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-6.5 h-6.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                  <i className="fas fa-bolt text-[10px]"></i>
-                </div>
-                <span className="text-xs font-semibold text-slate-300">Instant Execution</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-6.5 h-6.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                  <i className="fas fa-code text-[10px]"></i>
-                </div>
-                <span className="text-xs font-semibold text-slate-300">Live Web Sandbox</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-6.5 h-6.5 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                  <i className="fas fa-chart-line text-[10px]"></i>
-                </div>
-                <span className="text-xs font-semibold text-slate-300">Activity Analytics</span>
+                <span className="text-[10px] block text-[var(--text-secondary)] font-medium leading-none">Online Compiler</span>
               </div>
             </div>
 
-            {/* Glowing Code Block Mockup */}
-            <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-4 font-mono text-[10px] text-slate-300 relative overflow-hidden backdrop-blur-md max-w-sm shadow-lg mt-1">
-              <div className="absolute top-3 left-3 flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
+            {/* Visual Showcase Center */}
+            <div className="my-auto flex flex-col gap-6 relative z-10 text-left">
+              <div className="space-y-3">
+                <span className="px-3 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 uppercase tracking-wider inline-block">
+                  Developer Workbench
+                </span>
+                <h2 className="text-3xl font-black tracking-tight leading-tight text-white">
+                  Write Code. Compile Live.<br />
+                  <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    No Local Setup.
+                  </span>
+                </h2>
+                <p className="text-slate-400 text-xs max-w-sm leading-relaxed">
+                  Experience a fast, secure, and fully-featured cloud compilation platform with support for over 30+ languages, web sandboxes, and personalized activity stats.
+                </p>
               </div>
-              <span className="absolute top-2.5 right-4 text-[9px] text-slate-500 select-none">workspace.py</span>
-              <div className="mt-3.5 space-y-1">
-                <p className="text-slate-500"><span className="text-pink-400">import</span> codeverse <span className="text-pink-400">as</span> cv</p>
-                <p className="text-slate-500"><span className="text-pink-400">def</span> <span className="text-blue-400">compile_now</span>(user_id):</p>
-                <p className="pl-4 text-slate-300">env = cv.connect(user_id)</p>
-                <p className="pl-4 text-slate-300">print(<span className="text-green-300">f"Connecting to {"{env.name}"}..."</span>)</p>
-                <p className="pl-4 text-indigo-400">env.run() <span className="text-slate-500"># Success!</span></p>
+
+              {/* Feature Checkmarks */}
+              <div className="grid grid-cols-2 gap-3.5 mt-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i className="fas fa-check text-[10px]"></i>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-300">30+ Languages</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <i className="fas fa-bolt text-[10px]"></i>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-300">Instant Execution</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <i className="fas fa-code text-[10px]"></i>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-300">Live Web Sandbox</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                    <i className="fas fa-chart-line text-[10px]"></i>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-300">Activity Analytics</span>
+                </div>
               </div>
+
+              {/* Glowing Code Block Mockup */}
+              <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-4 font-mono text-[10px] text-slate-300 relative overflow-hidden backdrop-blur-md max-w-sm shadow-lg mt-1">
+                <div className="absolute top-3 left-3 flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
+                </div>
+                <span className="absolute top-2.5 right-4 text-[9px] text-slate-500 select-none">workspace.py</span>
+                <div className="mt-3.5 space-y-1">
+                  <p className="text-slate-500"><span className="text-pink-400">import</span> codeverse <span className="text-pink-400">as</span> cv</p>
+                  <p className="text-slate-500"><span className="text-pink-400">def</span> <span className="text-blue-400">compile_now</span>(user_id):</p>
+                  <p className="pl-4 text-slate-300">env = cv.connect(user_id)</p>
+                  <p className="pl-4 text-slate-300">print(<span className="text-green-300">f"Connecting to {"{env.name}"}..."</span>)</p>
+                  <p className="pl-4 text-indigo-400">env.run() <span className="text-slate-500"># Success!</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer inside Left visual */}
+            <div className="text-[9px] text-slate-500 text-left">
+              &copy; {new Date().getFullYear()} CodeVerse. Built for developers worldwide.
             </div>
           </div>
 
-          {/* Footer inside Left visual */}
-          <div className="text-[9px] text-slate-500 text-left">
-            &copy; {new Date().getFullYear()} CodeVerse. Built for developers worldwide.
+          {/* OUTER COVER FACE (Visible when closed / folded over the login form) */}
+          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-bl from-[#0c0f17] via-[#111726] to-[#1e2942] shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-5 relative group">
+              <div className="absolute inset-0 rounded-2xl bg-indigo-400/20 blur-md animate-pulse"></div>
+              <i className="fas fa-cubes text-white text-3xl animate-pulse relative z-10"></i>
+            </div>
+            <h1 className="text-3xl font-black tracking-wider text-white bg-gradient-to-r from-slate-100 to-indigo-100 bg-clip-text text-transparent">CodeVerse</h1>
+            <p className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-[0.25em] mt-2">Online Compiler</p>
+            <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent my-6"></div>
+            <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase animate-pulse">{animationPaused ? "Hold to Inspect - Release to Resume" : "Opening Workbench... Hold to Inspect"}</p>
           </div>
+
         </div>
 
+        {/* 3D Book Spine/Crease shadow overlay */}
+        <div className="book-spine-crease"></div>
+
         {/* Right Side: Auth Card Form */}
-        <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-center relative overflow-y-auto w-full min-h-[550px] lg:min-h-0">
+        <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-center relative overflow-y-auto w-full min-h-[550px] lg:min-h-0 glass-panel border border-[var(--border-color)] lg:border-l-0 rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px] shadow-2xl" onMouseDown={(e) => e.stopPropagation()} onMouseUp={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
           
           {/* Back Button */}
           <div className="absolute top-6 left-6">

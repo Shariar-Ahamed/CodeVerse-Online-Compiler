@@ -1187,3 +1187,73 @@ input:-webkit-autofill:active {
 .cube-face-right  { transform: rotateY(90deg) translateZ(25px); border-color: #ec4899; box-shadow: 0 0 12px rgba(236, 72, 153, 0.4), inset 0 0 6px rgba(236, 72, 153, 0.2); }
 .cube-face-top    { transform: rotateX(90deg) translateZ(25px); border-color: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4), inset 0 0 6px rgba(245, 158, 11, 0.2); }
 .cube-face-bottom { transform: rotateX(-90deg) translateZ(25px); border-color: #06b6d4; box-shadow: 0 0 12px rgba(6, 182, 212, 0.4), inset 0 0 6px rgba(6, 182, 212, 0.2); }
+
+/* ==================== 3D BOOK OPEN ANIMATION FOR AUTHPAGE ==================== */
+/* 3D Book Layout classes (Desktop only) */
+@media (min-width: 1024px) {
+  .book-cover-3d {
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 2000px;
+    z-index: 25;
+  }
+
+  .book-face-inner {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: rotateY(0deg);
+    z-index: 2;
+  }
+
+  .book-face-outer {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: rotateY(180deg);
+    z-index: 1;
+  }
+
+  .animate-book-left {
+    animation: bookOpenLeft 2.2s cubic-bezier(0.25, 1, 0.3, 1) 0.6s both;
+    transform-origin: right center;
+  }
+}
+
+@keyframes bookOpenLeft {
+  from {
+    transform: perspective(2000px) rotateY(180deg);
+  }
+  to {
+    transform: perspective(2000px) rotateY(0deg);
+  }
+}
+
+/* Realistic 3D Book Spine Crease */
+.book-spine-crease {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .book-spine-crease {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    background: linear-gradient(to right, 
+      rgba(0, 0, 0, 0) 0%, 
+      rgba(0, 0, 0, 0.45) 30%, 
+      rgba(0, 0, 0, 0.85) 50%, 
+      rgba(255, 255, 255, 0.08) 54%, 
+      rgba(0, 0, 0, 0.35) 70%, 
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 20;
+  }
+}
