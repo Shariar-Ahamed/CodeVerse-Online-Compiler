@@ -600,9 +600,9 @@ export default function AuthPage({ user, onLogin, showToast }) {
           <div className="absolute top-6 left-6">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 text-[10px] font-bold text-slate-100 hover:text-white transition-all duration-200 bg-indigo-950/80 hover:bg-indigo-900/80 border border-indigo-500/50 px-3.5 py-1.5 rounded-lg backdrop-blur-md cursor-pointer hover:border-indigo-500/80 focus:outline-none shadow-md shadow-indigo-950/60 hover:shadow-indigo-500/20"
+              className="inline-flex items-center gap-1.5 text-[9px] font-bold text-slate-400 hover:text-white transition-all duration-200 bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800/80 hover:border-indigo-500/30 px-3 py-1.5 rounded-lg cursor-pointer focus:outline-none shadow-sm hover:-translate-x-0.5"
             >
-              <i className="fas fa-arrow-left text-[9px] text-indigo-400"></i>
+              <i className="fas fa-arrow-left text-[8px] text-indigo-400"></i>
               <span>BACK HOME</span>
             </button>
           </div>
@@ -896,7 +896,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 showToast("Entering Workspace as Guest", "info");
                 navigate('/editor');
               }}
-              className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-100 hover:text-white bg-indigo-950/80 hover:bg-indigo-600/20 border border-indigo-500/50 hover:border-indigo-500/80 active:scale-95 transition-all duration-200 cursor-pointer text-center mt-2.5 shadow-md shadow-indigo-950/50"
+              className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-900/50 hover:bg-indigo-600/20 border border-slate-800/80 hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer text-center mt-2.5 shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
             >
               <i className="fas fa-user-secret mr-1.5 text-indigo-400"></i>
               <span>Continue as Guest</span>
