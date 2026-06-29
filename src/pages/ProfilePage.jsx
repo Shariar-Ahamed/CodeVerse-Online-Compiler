@@ -290,11 +290,15 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         .map(s => s.trim())
         .filter(s => s.length > 0);
 
-      // 1. Update Firebase Auth display profile (name and photo URL)
+      // 1. Update Firebase Auth display profile (name only, avoiding Base64 photoURL due to 2048 char limit)
       if (auth.currentUser) {
         const updatePayload = {};
         if (inputs.name !== user.name) updatePayload.displayName = inputs.name;
-        if (inputs.photoURL !== user.photoURL) updatePayload.photoURL = inputs.photoURL;
+        
+        // Only update photoURL in Auth if it's a standard URL (not a massive Base64 Data URL)
+        if (inputs.photoURL !== user.photoURL && inputs.photoURL && !inputs.photoURL.startsWith('data:image/')) {
+          updatePayload.photoURL = inputs.photoURL;
+        }
 
         if (Object.keys(updatePayload).length > 0) {
           await updateProfile(auth.currentUser, updatePayload);
