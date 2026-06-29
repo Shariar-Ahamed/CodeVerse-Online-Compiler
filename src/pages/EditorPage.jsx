@@ -1231,26 +1231,37 @@ Explain why this error occurred and how to fix it.`;
 
               {/* Output Terminal Panel */}
               <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
-                {/* Terminal Header Bar */}
-                <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-                  <div className="flex items-center gap-2">
-                    <i id="console-header-icon" className="fas fa-terminal text-emerald-400 text-xs"></i>
-                    <span id="console-header-title" className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Output Console</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {statusBadge.text !== 'Idle' && statusBadge.text !== 'Compiling...' && statusBadge.text !== 'Accepted' && (
+                <div className="h-auto py-2 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex flex-col gap-2 px-4 justify-center">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <i id="console-header-icon" className="fas fa-terminal text-emerald-400 text-xs"></i>
+                      <span id="console-header-title" className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] whitespace-nowrap">Output Console</span>
+                    </div>
+                    {statusBadge.text !== 'Idle' && statusBadge.text !== 'Compiling...' && statusBadge.text !== 'Accepted' ? (
                       <button
                         onClick={handleAIDebug}
-                        className="px-2.5 py-0.5 rounded text-[10px] font-bold text-white bg-rose-600 hover:bg-rose-500 active:scale-95 shadow-md shadow-rose-600/10 flex items-center gap-1 transition-all duration-200 cursor-pointer animate-pulse"
+                        className={`rounded font-bold text-white bg-rose-600 hover:bg-rose-500 active:scale-95 shadow-md shadow-rose-600/10 flex items-center gap-1 transition-all duration-200 cursor-pointer animate-pulse whitespace-nowrap flex-shrink-0 ${
+                          showAIPanel 
+                            ? 'px-2.5 py-0.5 text-[9px]' 
+                            : 'px-4 py-1.5 text-[11px]'
+                        }`}
                       >
-                        <i className="fas fa-bug text-[9px]"></i>
+                        <i className={`fas fa-bug ${showAIPanel ? 'text-[8px]' : 'text-[10px]'}`}></i>
                         <span>Debug with AI</span>
                       </button>
+                    ) : (
+                      <span id="status-badge" className={`px-2 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap flex-shrink-0 uppercase tracking-wider ${statusBadge.className}`}>
+                        {statusBadge.text}
+                      </span>
                     )}
-                    <span id="status-badge" className={`px-2 py-0.5 rounded text-xs font-semibold ${statusBadge.className}`}>
-                      {statusBadge.text}
-                    </span>
                   </div>
+                  {statusBadge.text !== 'Idle' && statusBadge.text !== 'Compiling...' && statusBadge.text !== 'Accepted' && (
+                    <div className="flex justify-center w-full">
+                      <span id="status-badge" className={`px-2.5 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap flex-shrink-0 uppercase tracking-wider ${statusBadge.className}`}>
+                        {statusBadge.text}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Console Output box */}
