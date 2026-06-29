@@ -1215,21 +1215,8 @@ input:-webkit-autofill:active {
     transform: rotateY(180deg);
     z-index: 1;
   }
-
-  .animate-book-left {
-    animation: bookOpenLeft 2.2s cubic-bezier(0.25, 1, 0.3, 1) 0.6s both;
-    transform-origin: right center;
-  }
 }
 
-@keyframes bookOpenLeft {
-  from {
-    transform: perspective(2000px) rotateY(180deg);
-  }
-  to {
-    transform: perspective(2000px) rotateY(0deg);
-  }
-}
 
 /* Realistic 3D Book Spine Crease */
 .book-spine-crease {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthParticles from '../components/AuthParticles';
 import { 
@@ -36,7 +36,51 @@ const getPasswordStrength = (password) => {
 export default function AuthPage({ user, onLogin, showToast }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
-  const [animationPaused, setAnimationPaused] = useState(false);
+  
+  const [dragAngle, setDragAngle] = useState(180);
+  const [isDragging, setIsDragging] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
+  
+  const startXRef = useRef(0);
+  const startAngleRef = useRef(180);
+
+  const handleDragStart = (clientX) => {
+    if (hasOpened) return;
+    setIsDragging(true);
+    startXRef.current = clientX;
+    startAngleRef.current = dragAngle;
+  };
+
+  const handleDragMove = (clientX) => {
+    if (!isDragging || hasOpened) return;
+    const diffX = clientX - startXRef.current;
+    const containerWidth = 480; 
+    let newAngle = startAngleRef.current + (diffX / containerWidth) * 180;
+    if (newAngle < 0) newAngle = 0;
+    if (newAngle > 180) newAngle = 180;
+    setDragAngle(newAngle);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setDragAngle(0);
+  };
+
+  const handleTransitionEnd = (e) => {
+    if (e.propertyName === 'transform' && dragAngle === 0 && !isDragging) {
+      setHasOpened(true);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isDragging && !hasOpened) {
+        setDragAngle(0);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Redirect if already logged in (ignore guest mode)
   useEffect(() => {
@@ -408,7 +452,14 @@ export default function AuthPage({ user, onLogin, showToast }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden overflow-y-auto" onMouseDown={() => setAnimationPaused(true)} onMouseUp={() => setAnimationPaused(false)} onMouseLeave={() => setAnimationPaused(false)} onTouchStart={() => setAnimationPaused(true)} onTouchEnd={() => setAnimationPaused(false)}>
+    <div 
+      className="min-h-screen w-full flex items-center justify-center p-4 transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden overflow-y-auto"
+      onMouseMove={(e) => handleDragMove(e.clientX)}
+      onMouseUp={handleDragEnd}
+      onMouseLeave={handleDragEnd}
+      onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+      onTouchEnd={handleDragEnd}
+    >
       {/* Particles Background */}
       <AuthParticles />
 
@@ -423,7 +474,18 @@ export default function AuthPage({ user, onLogin, showToast }) {
       >
         
         {/* Left Side: 3D Flipping Book Cover */}
-        <div className="hidden lg:block lg:col-span-6 relative select-none animate-book-left z-20 book-cover-3d" style={{ animationPlayState: animationPaused ? 'paused' : 'running' }}>
+        <div 
+          className="hidden lg:block lg:col-span-6 relative select-none book-cover-3d"
+          onMouseDown={(e) => handleDragStart(e.clientX)}
+          onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+          onTransitionEnd={handleTransitionEnd}
+          style={{
+            transform: `perspective(2000px) rotateY(${dragAngle}deg)`,
+            transformOrigin: 'right center',
+            transition: isDragging ? 'none' : 'transform 2.0s cubic-bezier(0.25, 1, 0.3, 1)',
+            cursor: hasOpened ? 'default' : isDragging ? 'grabbing' : 'grab'
+          }}
+        >
           
           {/* INNER FACE (Visible when open) */}
           <div className="book-face-inner p-10 flex flex-col justify-between glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-br from-indigo-950/20 via-slate-900/10 to-cyan-950/10 shadow-2xl">
@@ -510,7 +572,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
           </div>
 
           {/* OUTER COVER FACE (Visible when closed / folded over the login form) */}
-          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-bl from-[#0c0f17] via-[#111726] to-[#1e2942] shadow-2xl">
+          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center glass-panel border border-[var(--border-color)] rounded-r-[32px] border-l-0 bg-gradient-to-bl from-[#0c0f17] via-[#111726] to-[#1e2942] shadow-2xl">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-5 relative group">
               <div className="absolute inset-0 rounded-2xl bg-indigo-400/20 blur-md animate-pulse"></div>
               <i className="fas fa-cubes text-white text-3xl animate-pulse relative z-10"></i>
@@ -518,7 +580,13 @@ export default function AuthPage({ user, onLogin, showToast }) {
             <h1 className="text-3xl font-black tracking-wider text-white bg-gradient-to-r from-slate-100 to-indigo-100 bg-clip-text text-transparent">CodeVerse</h1>
             <p className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-[0.25em] mt-2">Online Compiler</p>
             <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent my-6"></div>
-            <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase animate-pulse">{animationPaused ? "Hold to Inspect - Release to Resume" : "Opening Workbench... Hold to Inspect"}</p>
+            <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase animate-pulse">
+              {isDragging ? "Peeling cover... Release to open" : "Opening Workbench... Drag to peel"}
+            </p>
+            {/* Developer Credits */}
+            <div className="text-[9px] text-slate-600 font-mono uppercase tracking-widest mt-2 pointer-events-none select-none">
+              Developed by <span className="text-indigo-400/60 font-semibold">Shariar Ahamed</span>
+            </div>
           </div>
 
         </div>
@@ -527,7 +595,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
         <div className="book-spine-crease"></div>
 
         {/* Right Side: Auth Card Form */}
-        <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-center relative overflow-y-auto w-full min-h-[550px] lg:min-h-0 glass-panel border border-[var(--border-color)] lg:border-l-0 rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px] shadow-2xl" onMouseDown={(e) => e.stopPropagation()} onMouseUp={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
+        <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-center relative overflow-y-auto w-full min-h-[550px] lg:min-h-0 glass-panel border border-[var(--border-color)] lg:border-l-0 rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px] shadow-2xl" onMouseDown={(e) => e.stopPropagation()} onMouseMove={(e) => e.stopPropagation()} onMouseUp={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchMove={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
           
           {/* Back Button */}
           <div className="absolute top-6 left-6">
