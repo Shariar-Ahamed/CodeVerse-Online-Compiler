@@ -52,6 +52,11 @@ function AppContent() {
     localStorage.setItem("codeverse_theme", theme);
   }, [theme]);
 
+  // --- Scroll to Top on Page Navigation ---
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // Toggle Theme Switcher with Maintenance Modal
   const toggleTheme = () => {
     if (theme === 'dark') {

@@ -210,7 +210,7 @@ export default function EditorPage({ user, theme, showToast }) {
   const handleCreateNote = async () => {
     if (!user || user.isGuest) {
       if (notes.length >= 3) {
-        showToast("Guest accounts are limited to 3 notes. Sign in to unlock unlimited notes!", "warning");
+        showToast("Guest accounts are limited to 3 notes. Login to unlock unlimited notes!", "warning");
         return;
       }
       const newNote = {
@@ -425,7 +425,7 @@ export default function EditorPage({ user, theme, showToast }) {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       const editorVal = editor.getValue();
       if (!user || user.isGuest) {
-        showToast("Logged in users can save workspaces to the cloud! Sign in to use this feature.", "info");
+        showToast("Logged in users can save workspaces to the cloud! Login to use this feature.", "info");
       } else {
         if (currentLanguage === "html") {
           if (activeWebTab === "html") {
@@ -833,111 +833,107 @@ Explain why this error occurred and how to fix it.`;
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       {/* ==================== COMPILER CONTROLS PANEL ==================== */}
-      <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 relative z-10">
+      <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-wrap items-center gap-2.5 sm:gap-3 transition-all duration-300 relative z-10">
         {/* Selection of Language with Dynamic Icon badge */}
-        <div className="flex items-center gap-3">
-          <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)]">Language:</label>
-          <div className="relative">
-            <select
-              id="language-select"
-              value={currentLanguage}
-              onChange={handleLanguageChange}
-              className="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-            >
-              <option value="html">HTML/CSS/JS (Web Lab)</option>
-              {Object.keys(LANGUAGES)
-                .filter(lang => lang !== 'html')
-                .map((langKey) => (
-                  <option key={langKey} value={langKey}>
-                    {LANGUAGES[langKey].name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
-              <i className="fas fa-chevron-down text-[10px]"></i>
-            </div>
+        <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)] whitespace-nowrap">Language:</label>
+        <div className="relative">
+          <select
+            id="language-select"
+            value={currentLanguage}
+            onChange={handleLanguageChange}
+            className="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 max-w-[180px] sm:max-w-none"
+          >
+            <option value="html">HTML/CSS/JS (Web Lab)</option>
+            {Object.keys(LANGUAGES)
+              .filter(lang => lang !== 'html')
+              .map((langKey) => (
+                <option key={langKey} value={langKey}>
+                  {LANGUAGES[langKey].name}
+                </option>
+              ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
+            <i className="fas fa-chevron-down text-[10px]"></i>
           </div>
-          <span
-            id="lang-badge"
-            className={`px-2 py-0.5 rounded text-xs font-semibold ${LANGUAGES[currentLanguage]?.badgeClass}`}
-          >
-            {LANGUAGES[currentLanguage]?.name}
-          </span>
         </div>
-        {/* Action Button Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Clear Button */}
-          <button
-            onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-eraser"></i>
-            <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
-          </button>
+        <span
+          id="lang-badge"
+          className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
+        >
+          {LANGUAGES[currentLanguage]?.name}
+        </span>
 
-          {/* Copy Button */}
-          <button
-            onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-copy"></i>
-            <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
-          </button>
+        {/* Clear Button */}
+        <button
+          onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 lg:ml-auto"
+        >
+          <i className="fas fa-eraser"></i>
+          <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
+        </button>
 
-          {/* Download Button */}
-          <button
-            onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-download"></i>
-            <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
-          </button>
+        {/* Copy Button */}
+        <button
+          onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+        >
+          <i className="fas fa-copy"></i>
+          <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
+        </button>
 
-          {currentLanguage !== "text" && (
-            <>
-              {/* Settings Modal Button */}
-              <button
-                onClick={openSettingsModal}
-                className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-                title="API Credentials Configuration"
-              >
-                <i className="fas fa-sliders text-sm"></i>
-              </button>
+        {/* Download Button */}
+        <button
+          onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+        >
+          <i className="fas fa-download"></i>
+          <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
+        </button>
 
-              {/* AI Code Assistant Toggle Button */}
-              <button
-                onClick={() => setShowAIPanel(prev => !prev)}
-                className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
-                  showAIPanel
-                    ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
-                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
-                }`}
-                title="AI Code Assistant"
-              >
-                <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
-              </button>
+        {currentLanguage !== "text" && (
+          <>
+            {/* Settings Modal Button */}
+            <button
+              onClick={openSettingsModal}
+              className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              title="API Credentials Configuration"
+            >
+              <i className="fas fa-sliders text-sm"></i>
+            </button>
 
-              {/* Execute / Run Code Trigger Button */}
-              <button
-                onClick={runCode}
-                disabled={isExecuting}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-              >
-                {isExecuting ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>Compiling...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-play text-xs"></i>
-                    <span>Run Code</span>
-                  </>
-                )}
-              </button>
-            </>
-          )}
-        </div>
+            {/* AI Code Assistant Toggle Button */}
+            <button
+              onClick={() => setShowAIPanel(prev => !prev)}
+              className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                showAIPanel
+                  ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
+                  : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+              }`}
+              title="AI Code Assistant"
+            >
+              <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
+            </button>
+
+            {/* Execute / Run Code Trigger Button */}
+            <button
+              onClick={runCode}
+              disabled={isExecuting}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+            >
+              {isExecuting ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Compiling...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-play text-xs"></i>
+                  <span>Run Code</span>
+                </>
+              )}
+            </button>
+          </>
+        )}
       </div>
       <div className="flex flex-col lg:flex-row items-stretch flex-grow gap-6 w-full relative z-10 min-h-[500px]">
         <div className="flex-grow flex flex-col min-w-0">
@@ -953,7 +949,7 @@ Explain why this error occurred and how to fix it.`;
                   {notes.length}
                 </span>
                 {!user && (
-                  <span className="px-2 py-0.5 rounded-full text-[8px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500 uppercase tracking-wider" title="Sign in to save notes to cloud">
+                  <span className="px-2 py-0.5 rounded-full text-[8px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500 uppercase tracking-wider" title="Login to save notes to cloud">
                     Guest Mode
                   </span>
                 )}
@@ -1370,7 +1366,7 @@ Explain why this error occurred and how to fix it.`;
         </div>
 
         {showAIPanel && (
-          <div className="w-full lg:w-[380px] min-h-[500px] lg:min-h-0 relative flex-shrink-0 min-w-0">
+          <div className="w-full lg:w-[380px] h-[500px] lg:h-auto relative flex-shrink-0 min-w-0">
             <div className="lg:absolute lg:inset-0 flex flex-col h-full">
               <AIPanel
                 onClose={() => setShowAIPanel(false)}

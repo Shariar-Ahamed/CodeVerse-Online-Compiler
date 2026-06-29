@@ -104,7 +104,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 shadow-md shadow-indigo-500/5 active:scale-95 transition-all duration-200"
               >
                 <i className="fas fa-sign-in-alt"></i>
-                <span>Sign In</span>
+                <span>Login</span>
               </button>
             ) : (
               <div id="nav-user-profile" className="flex items-center gap-2.5">
@@ -196,7 +196,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 active:scale-95 transition-all duration-200"
               >
                 <i className="fas fa-sign-in-alt"></i>
-                <span>Sign In</span>
+                <span>Login</span>
               </button>
             ) : (
               <div id="mobile-user-profile" className="flex flex-col gap-2 bg-[var(--bg-tertiary)]/20 p-3 rounded-xl border border-[var(--border-color)]">
@@ -226,15 +226,6 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                     Developer Profile
                   </button>
                 )}
-                <button
-                  onClick={() => {
-                    onLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full py-1.5 mt-1 rounded-lg text-xs font-bold text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 transition-all duration-200"
-                >
-                  Sign Out
-                </button>
               </div>
             )}
           </div>

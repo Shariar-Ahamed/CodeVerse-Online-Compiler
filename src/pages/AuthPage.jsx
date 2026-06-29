@@ -124,7 +124,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
       navigate('/');
     } catch (err) {
       console.error(err);
-      let errMsg = "Failed to sign in. Please check your credentials.";
+      let errMsg = "Failed to login. Please check your credentials.";
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         errMsg = "Invalid email or password.";
       } else if (err.code === 'auth/invalid-email') {
@@ -548,7 +548,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   activeTab === 'login' ? 'text-white' : 'text-[var(--text-secondary)] hover:text-white'
                 }`}
               >
-                Sign In
+                Login
               </button>
               <button
                 onClick={() => setActiveTab('signup')}
@@ -639,7 +639,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                       type="submit"
                       className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow"
                     >
-                      Sign In to Account
+                      Login to Account
                     </button>
                   </form>
                 </div>
@@ -866,7 +866,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                     onClick={() => setActiveTab('login')}
                     className="w-full py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-900 border border-slate-800 transition-all duration-200 cursor-pointer"
                   >
-                    Back to Sign In
+                    Back to Login
                   </button>
                 </div>
               </form>

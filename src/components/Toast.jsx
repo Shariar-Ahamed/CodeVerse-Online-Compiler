@@ -18,7 +18,7 @@ export default function Toast({ message, type, onClose }) {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+    <div className="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none">
       <div className="px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-300 pointer-events-auto max-w-sm glass-panel text-sm animate-fade-in-up">
         {icon}
         <span className="text-slate-100">{message}</span>
