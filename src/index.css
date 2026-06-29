@@ -96,7 +96,7 @@ body::before {
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(22, 32, 51, 0.65) !important;
+  background: rgba(15, 22, 36, 0.94) !important; /* Higher opacity to prevent background particles bleeding on live environments */
   backdrop-filter: blur(24px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
   border: 1px solid rgba(255, 255, 255, 0.13) !important;
@@ -556,7 +556,7 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   align-items: center;
   position: relative;
-  background: rgba(23, 32, 53, 0.5) !important;
+  background: #090d16 !important; /* Solid dark background to prevent transparency and match localhost autocomplete look */
   border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px;
   padding: 0 14px;
@@ -578,7 +578,7 @@ input:focus, select:focus, textarea:focus {
 
 .auth-input-wrapper:hover {
   border-color: rgba(99, 102, 241, 0.4) !important;
-  background: rgba(23, 32, 53, 0.7) !important;
+  background: #0d1320 !important; /* Slightly lighter on hover */
 }
 
 .light .auth-input-wrapper:hover {
@@ -588,7 +588,7 @@ input:focus, select:focus, textarea:focus {
 
 .auth-input-wrapper:focus-within {
   border-color: #6366f1 !important;
-  background: rgba(15, 23, 42, 0.8) !important;
+  background: #05070b !important; /* Darker on focus */
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
