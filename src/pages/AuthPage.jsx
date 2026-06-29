@@ -572,7 +572,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
           </div>
 
           {/* OUTER COVER FACE (Visible when closed / folded over the login form) */}
-          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center glass-panel border border-[var(--border-color)] rounded-r-[32px] border-l-0 bg-gradient-to-bl from-[#0c0f17] via-[#111726] to-[#1e2942] shadow-2xl">
+          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center border border-[var(--border-color)] rounded-r-[32px] border-l-0 shadow-2xl bg-[#0c101d]" style={{ background: 'linear-gradient(135deg, #0c101d 0%, #070a12 100%)' }}>
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-5 relative group">
               <div className="absolute inset-0 rounded-2xl bg-indigo-400/20 blur-md animate-pulse"></div>
               <i className="fas fa-cubes text-white text-3xl animate-pulse relative z-10"></i>
