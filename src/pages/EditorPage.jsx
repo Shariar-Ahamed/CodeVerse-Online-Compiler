@@ -575,7 +575,7 @@ export default function EditorPage({ user, theme, showToast }) {
   };
 
   const pollSubmission = async (token, headers) => {
-    const maxAttempts = 15;
+    const maxAttempts = 40;
     let attempts = 0;
 
     const pollInterval = setInterval(async () => {
@@ -583,7 +583,7 @@ export default function EditorPage({ user, theme, showToast }) {
 
       if (attempts > maxAttempts) {
         clearInterval(pollInterval);
-        setConsoleOutput(`[Timeout Error]\nExecution exceeded standard queue wait times. Please try again.`);
+        setConsoleOutput(`[Timeout Error]\nExecution exceeded standard queue wait times. The free public Judge0 API demo server is currently experiencing heavy load or rate limits.\n\n💡 Tip: Try again shortly, or click the gear settings icon at the top right to configure your own self-hosted Docker URL or RapidAPI proxy key for instant executions.`);
         setStatusBadge({
           text: 'Timeout',
           className: 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
