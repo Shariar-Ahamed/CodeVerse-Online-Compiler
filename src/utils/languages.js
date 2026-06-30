@@ -92,9 +92,9 @@ int main() {
     defaultCode: `console.log("Hello, World!");`
   },
   java: {
-    id: 97,
+    id: 91,
     name: "Java",
-    desc: "JDK 21.0.4 Runtime",
+    desc: "JDK 17.0.6 Runtime",
     monacoId: "java",
     extension: "java",
     badgeClass: "bg-red-500/10 border-red-500/20 text-red-500",
@@ -231,17 +231,7 @@ echo "Hello, World!"`
            DISPLAY 'Hello, World!'.
            STOP RUN.`
   },
-  coffeescript: {
-    id: 48,
-    name: "CoffeeScript",
-    desc: "2.4.1 JS Transpiler",
-    monacoId: "coffeescript",
-    extension: "coffee",
-    badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-600",
-    icon: "fab fa-js",
-    categories: ["programming", "web"],
-    defaultCode: `console.log "Hello, World!"`
-  },
+
   d: {
     id: 56,
     name: "D",
@@ -258,9 +248,9 @@ void main() {
 }`
   },
   dart: {
-    id: 115,
+    id: 90,
     name: "Dart",
-    desc: "3.5.2 Runtime",
+    desc: "2.19.2 Runtime",
     monacoId: "dart",
     extension: "dart",
     badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
