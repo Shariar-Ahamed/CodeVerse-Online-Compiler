@@ -1250,3 +1250,19 @@ input:-webkit-autofill:active {
 #auth-card-solid .glass-panel {
   background: rgba(15, 22, 36, 1) !important;
 }
+
+/* Global Shimmering/Twinkling Magical Star Animations */
+@keyframes twinkle {
+  0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.3; filter: drop-shadow(0 0 1px rgba(253, 224, 71, 0.2)); }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.8)); }
+}
+@keyframes twinkle-slow {
+  0%, 100% { transform: scale(0.5) rotate(0deg); opacity: 0.2; }
+  50% { transform: scale(1) rotate(-180deg); opacity: 0.9; filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.7)); }
+}
+.animate-twinkle {
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+.animate-twinkle-slow {
+  animation: twinkle-slow 3.5s ease-in-out infinite;
+}
