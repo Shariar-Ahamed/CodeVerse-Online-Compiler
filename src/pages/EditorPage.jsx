@@ -853,7 +853,7 @@ Explain why this error occurred and how to fix it.`;
   };
 
   return (
-    <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
+    <main className="flex-grow w-full px-4 lg:px-6 py-4 flex flex-col gap-4 animate-fade-in-up">
       {/* Background Blur Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
