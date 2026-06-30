@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
-import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import AIPanel from '../components/AIPanel';
 
@@ -512,6 +512,18 @@ export default function EditorPage({ user, theme, showToast }) {
 
     if (user && !user.isGuest) {
       saveCodeToFirestore(currentLanguage, { code: codeToCompile });
+      try {
+        const d = new Date();
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, {
+          activityLogs: {
+            [dateKey]: increment(1)
+          }
+        }, { merge: true });
+      } catch (err) {
+        console.error("Error logging activity: ", err);
+      }
     }
 
     setIsExecuting(true);

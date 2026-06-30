@@ -47,7 +47,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     linkedin: '',
     website: '',
     isVerified: false,
-    lastSeen: ''
+    lastSeen: '',
+    activityLogs: {}
   });
 
   const [inputs, setInputs] = useState({
@@ -137,7 +138,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               linkedin: data.socials?.linkedin || '',
               website: data.socials?.website || '',
               isVerified: !!data.isVerified,
-              lastSeen: data.lastSeen || ''
+              lastSeen: data.lastSeen || '',
+              activityLogs: data.activityLogs || {}
             });
           } else {
             // Document doesn't exist, set from auth state
@@ -169,7 +171,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               linkedin: '',
               website: '',
               isVerified: false,
-              lastSeen: new Date().toISOString()
+              lastSeen: new Date().toISOString(),
+              activityLogs: {}
             });
           }
         } else {
@@ -194,7 +197,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               linkedin: data.socials?.linkedin || '',
               website: data.socials?.website || '',
               isVerified: !!data.isVerified,
-              lastSeen: data.lastSeen || ''
+              lastSeen: data.lastSeen || '',
+              activityLogs: data.activityLogs || {}
             });
           } else {
             // Try fallback fetch by doc ID (in case it is a UID instead of a username)
@@ -214,7 +218,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 linkedin: data.socials?.linkedin || '',
                 website: data.socials?.website || '',
                 isVerified: !!data.isVerified,
-                lastSeen: data.lastSeen || ''
+                lastSeen: data.lastSeen || '',
+                activityLogs: data.activityLogs || {}
               });
             } else {
               // Profile not found
@@ -230,7 +235,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 linkedin: '',
                 website: '',
                 isVerified: false,
-                lastSeen: ''
+                lastSeen: '',
+                activityLogs: {}
               });
             }
           }
@@ -421,23 +427,51 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     );
   }
 
-  // Determinstic opacity list for activity contributions log
-  const gridOpacities = [
-    "bg-indigo-900/10 border-slate-800",
-    "bg-indigo-600/30 border-indigo-500/20",
-    "bg-indigo-600/60 border-indigo-500/30",
-    "bg-indigo-500 border-indigo-400/40",
-    "bg-cyan-400 border-cyan-300/40"
-  ];
-  
+  // Dynamic contribution grid map matching the last 112 days (16 weeks)
   const contributionGrid = Array.from({ length: 112 }).map((_, i) => {
-    const key = (i * 7 + 13) % gridOpacities.length;
-    const count = (i * 3 + 2) % 9;
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() - (111 - i));
+    
+    const dateKey = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}-${String(targetDate.getDate()).padStart(2, '0')}`;
+    const count = (profileData.activityLogs && profileData.activityLogs[dateKey]) || 0;
+    
+    // Assign color class based on count intensity
+    let colorClass = "bg-indigo-900/10 border-slate-800"; // 0 compilations
+    if (count > 0 && count <= 2) {
+      colorClass = "bg-indigo-600/30 border-indigo-500/20"; // 1-2
+    } else if (count >= 3 && count <= 5) {
+      colorClass = "bg-indigo-600/60 border-indigo-500/30"; // 3-5
+    } else if (count >= 6 && count <= 9) {
+      colorClass = "bg-indigo-500 border-indigo-400/40"; // 6-9
+    } else if (count >= 10) {
+      colorClass = "bg-cyan-400 border-cyan-300/40"; // 10+
+    }
+    
+    // Formatting date string for title tooltip: e.g. "Jun 30, 2026: 5 compilations"
+    const formattedDate = targetDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
     return {
-      className: gridOpacities[key],
-      title: `Activity: ${count} compilations`
+      className: colorClass,
+      title: `${formattedDate}: ${count} compilation${count === 1 ? '' : 's'}`
     };
   });
+
+  // Calculate dynamic month labels covering the last 112 days (approx 4 months)
+  const getMonthLabels = () => {
+    const labels = [];
+    const now = new Date();
+    for (let i = 0; i < 4; i++) {
+      const d = new Date();
+      d.setDate(now.getDate() - (3 - i) * 30);
+      labels.push(d.toLocaleString('en-US', { month: 'short' }));
+    }
+    return labels;
+  };
+  const monthLabels = getMonthLabels();
 
   return (
     <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
@@ -755,7 +789,9 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               {/* Stats Mini Row */}
               <div className="grid grid-cols-2 divide-x divide-[var(--border-color)] border-y border-[var(--border-color)]/60 w-full py-3 mt-1 text-center">
                 <div>
-                  <span className="block text-lg font-bold text-[var(--text-primary)] font-mono">148</span>
+                  <span className="block text-lg font-bold text-[var(--text-primary)] font-mono">
+                    {Object.values(profileData.activityLogs || {}).reduce((sum, val) => sum + (Number(val) || 0), 0)}
+                  </span>
                   <span className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold">Total Runs</span>
                 </div>
                 <div>
@@ -882,7 +918,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 overflow-x-auto">
             <div className="flex items-center justify-between">
               <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Compiler Activity Logs</h4>
-              <span className="text-[10px] text-[var(--text-muted)] font-mono">Last 12 Weeks</span>
+              <span className="text-[10px] text-[var(--text-muted)] font-mono">Last 16 Weeks</span>
             </div>
 
             <div className="flex flex-col gap-2 min-w-[500px]">
@@ -896,10 +932,11 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 ))}
               </div>
               <div className="flex items-center justify-between text-[9px] font-mono text-[var(--text-muted)] pt-1 select-none">
-                <span>Mar</span>
-                <span>Apr</span>
-                <span>May</span>
-                <span>Jun</span>
+                <div className="flex items-center gap-6">
+                  {monthLabels.map((lbl, idx) => (
+                    <span key={idx}>{lbl}</span>
+                  ))}
+                </div>
                 <div className="flex items-center gap-1 ml-auto">
                   <span>Less</span>
                   <div className="w-2.5 h-2.5 rounded bg-indigo-900/10 border border-slate-800"></div>
