@@ -15,7 +15,7 @@ export default function EditorPage({ user, theme, showToast }) {
   
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     const saved = localStorage.getItem("codeverse_lang");
-    return (saved && LANGUAGES[saved]) ? saved : "html";
+    return (saved && LANGUAGES[saved]) ? saved : "c";
   });
   
   useEffect(() => {
