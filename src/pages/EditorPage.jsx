@@ -869,8 +869,8 @@ Explain why this error occurred and how to fix it.`;
           <span>Back</span>
         </Link>
 
-        {/* Centered: Selection of Language with Dynamic Icon badge */}
-        <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 flex items-center gap-2.5 sm:gap-3 pointer-events-auto relative z-10">
+        {/* Selection of Language next to Back button */}
+        <div className="flex items-center gap-2.5 sm:gap-3 z-20">
           <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)] whitespace-nowrap">Language:</label>
           <div className="relative">
             <select
