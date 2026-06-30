@@ -269,6 +269,7 @@ function AppContent() {
   };
 
   const isAuthPage = location.pathname === '/login';
+  const showFooter = !isAuthPage && location.pathname !== '/editor' && !location.pathname.startsWith('/challenges/');
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden transition-colors duration-300">
@@ -319,7 +320,7 @@ function AppContent() {
       </div>
 
       {/* Shared Footer */}
-      {!isAuthPage && <Footer />}
+      {showFooter && <Footer />}
 
       {/* Theme Maintenance Alert Popup */}
       {showMaintenance && (
