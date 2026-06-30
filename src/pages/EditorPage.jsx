@@ -48,6 +48,8 @@ export default function EditorPage({ user, theme, showToast }) {
   
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [langSearchQuery, setLangSearchQuery] = useState("");
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [aiPromptContext, setAiPromptContext] = useState("");
   const [apiEndpoint, setApiEndpoint] = useState(() => localStorage.getItem("codeverse_api_url") || DEFAULT_API_URL);
@@ -869,29 +871,17 @@ Explain why this error occurred and how to fix it.`;
           <span>Back</span>
         </Link>
 
-        {/* Selection of Language next to Back button */}
+        {/* Selection of Language Trigger Button */}
         <div className="flex items-center gap-2.5 sm:gap-3 z-20">
-          <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)] whitespace-nowrap">Language:</label>
-          <div className="relative">
-            <select
-              id="language-select"
-              value={currentLanguage}
-              onChange={handleLanguageChange}
-              className="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 max-w-[180px] sm:max-w-none"
-            >
-              <option value="html">HTML/CSS/JS (Web Lab)</option>
-              {Object.keys(LANGUAGES)
-                .filter(lang => lang !== 'html')
-                .map((langKey) => (
-                  <option key={langKey} value={langKey}>
-                    {LANGUAGES[langKey].name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
-              <i className="fas fa-chevron-down text-[10px]"></i>
-            </div>
-          </div>
+          <button
+            onClick={() => setShowLanguageModal(true)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
+          >
+            <i className="fas fa-cubes text-xs text-indigo-400"></i>
+            <span className="text-[var(--text-secondary)]">Language:</span>
+            <span className="text-indigo-400 font-extrabold">{LANGUAGES[currentLanguage]?.name}</span>
+            <i className="fas fa-chevron-down text-[10px] text-[var(--text-secondary)] ml-1"></i>
+          </button>
           <span
             id="lang-badge"
             className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
@@ -1482,6 +1472,120 @@ Explain why this error occurred and how to fix it.`;
                 className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
               >
                 Save Configuration
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== LANGUAGE SELECTOR GRID MODAL ==================== */}
+      {showLanguageModal && (
+        <div
+          onClick={() => {
+            setShowLanguageModal(false);
+            setLangSearchQuery("");
+          }}
+          className="modal-overlay fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-4xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/98 backdrop-blur-2xl overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-black/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <i className="fas fa-cubes text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-[var(--text-primary)]">Select Environment</h3>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Choose your programming language workspace</p>
+                </div>
+              </div>
+
+              {/* Live Fuzzy Search Input */}
+              <div className="relative max-w-xs w-full">
+                <input
+                  type="text"
+                  placeholder="Search languages..."
+                  value={langSearchQuery}
+                  onChange={(e) => setLangSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-4 py-1.5 rounded-xl text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                />
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-[var(--text-secondary)]">
+                  <i className="fas fa-search text-[10px]"></i>
+                </div>
+                {langSearchQuery && (
+                  <button
+                    onClick={() => setLangSearchQuery("")}
+                    className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-white transition-colors duration-200"
+                  >
+                    <i className="fas fa-times text-[10px]"></i>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Body: Cards Grid */}
+            <div className="p-6 overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-indigo-500/20 scrollbar-track-transparent">
+              {filteredLanguages.length === 0 ? (
+                <div className="text-center py-12 text-slate-500 text-xs flex flex-col items-center gap-2">
+                  <i className="fas fa-search text-lg text-slate-600 animate-bounce"></i>
+                  <span>No matches found for "{langSearchQuery}"</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredLanguages.map((langKey) => {
+                    const lang = LANGUAGES[langKey];
+                    const isSelected = currentLanguage === langKey;
+                    return (
+                      <div
+                        key={langKey}
+                        onClick={() => {
+                          handleLanguageSwitch(langKey);
+                          setShowLanguageModal(false);
+                          setLangSearchQuery("");
+                        }}
+                        className={`group flex items-center gap-3.5 p-4 rounded-2xl border transition-all duration-300 cursor-pointer select-none active:scale-98 ${
+                          isSelected
+                            ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/5 text-white'
+                            : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 hover:bg-[var(--bg-tertiary)]/65 hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {/* Dynamic Colored Icon Container using badgeClass */}
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+                          isSelected ? lang.badgeClass : `${lang.badgeClass} opacity-80 group-hover:opacity-100`
+                        }`}>
+                          <i className={lang.icon || "fas fa-code"}></i>
+                        </div>
+
+                        {/* Name and Compiler Details */}
+                        <div className="text-left overflow-hidden">
+                          <h4 className={`text-xs font-black tracking-wide truncate ${isSelected ? 'text-indigo-400' : 'text-[var(--text-primary)] group-hover:text-indigo-400'}`}>
+                            {lang.name}
+                          </h4>
+                          <p className="text-[10px] text-[var(--text-muted)] truncate mt-1 tracking-wide font-medium">
+                            {lang.desc || "Interactive Sandbox"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 border-t border-[var(--border-color)] bg-black/10 flex items-center justify-between shrink-0 text-[10px] text-[var(--text-secondary)]">
+              <span>{filteredLanguages.length} environments available</span>
+              <button
+                onClick={() => {
+                  setShowLanguageModal(false);
+                  setLangSearchQuery("");
+                }}
+                className="px-3.5 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200"
+              >
+                Close
               </button>
             </div>
           </div>
