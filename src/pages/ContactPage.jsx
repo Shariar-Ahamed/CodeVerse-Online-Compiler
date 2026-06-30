@@ -372,7 +372,7 @@ export default function ContactPage({ showToast }) {
                 className="flex flex-col gap-4"
               >
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
                     Your Name
                   </label>
                   <input
@@ -380,13 +380,13 @@ export default function ContactPage({ showToast }) {
                     required
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
-                    className="w-full px-6 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200"
+                    className="w-full px-6 py-3 rounded-full text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
                     placeholder="Write your name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
                     Your Email
                   </label>
                   <input
@@ -394,13 +394,13 @@ export default function ContactPage({ showToast }) {
                     required
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    className="w-full px-6 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200"
+                    className="w-full px-6 py-3 rounded-full text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
                     placeholder="abc@yourdomain.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
                     Your Message
                   </label>
                   <textarea
@@ -408,7 +408,7 @@ export default function ContactPage({ showToast }) {
                     rows="4"
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
-                    className="w-full px-6 py-3.5 rounded-2xl text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200 resize-none"
+                    className="w-full px-6 py-3.5 rounded-2xl text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200 resize-none"
                     placeholder="Type something if you want..."
                   ></textarea>
                 </div>
