@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function Header({ user, onLogout, toggleTheme, theme }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isEditorPage = location.pathname === '/editor' || location.pathname.startsWith('/challenges/');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -62,8 +63,8 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           </div>
         </div>
 
-        {/* Navigation Links (Hidden on mobile) */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        {/* Navigation Links (Hidden on mobile or editor pages) */}
+        <nav className={`${isEditorPage ? 'hidden' : 'hidden md:flex'} items-center gap-6 text-sm font-medium`}>
           <button onClick={() => handleNavClick('hero')} className="nav-link text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none">
             Home
           </button>
@@ -156,7 +157,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
           <button
             id="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none"
+            className={`${isEditorPage ? 'flex' : 'md:hidden'} p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none`}
           >
             <i className="fas fa-bars text-sm"></i>
           </button>
@@ -167,7 +168,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
       {mobileMenuOpen && (
         <div
           id="mobile-nav"
-          className="md:hidden border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50 backdrop-blur-xl px-4 py-3 flex flex-col gap-3 text-sm font-medium animate-scale-up"
+          className={`${isEditorPage ? 'flex' : 'md:hidden'} border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50 backdrop-blur-xl px-4 py-3 flex flex-col gap-3 text-sm font-medium animate-scale-up`}
         >
           <button onClick={() => handleNavClick('hero')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Home</button>
           <button onClick={() => handleNavClick('languages')} className="mobile-nav-link text-left text-[var(--text-secondary)] py-1.5 block focus:outline-none">Languages</button>
