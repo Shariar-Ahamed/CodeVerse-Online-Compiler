@@ -53,6 +53,16 @@ export default function AIPanel({
   const [isGenerating, setIsGenerating] = useState(false);
   const messageContainerRef = useRef(null);
   const textareaRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
@@ -237,16 +247,22 @@ Respond in clean markdown format. When providing code fixes or optimized version
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendPrompt();
+      if (!isMobile) {
+        e.preventDefault();
+        handleSendPrompt();
+      }
     }
   };
 
   const handleTextareaChange = (e) => {
     setInput(e.target.value);
     const textarea = e.target;
-    textarea.style.height = '34px'; // Reset
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    if (!e.target.value) {
+      textarea.style.height = '34px';
+    } else {
+      textarea.style.height = '34px'; // Reset
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    }
   };
 
   return (
@@ -343,7 +359,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
           value={input}
           onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
-          placeholder="Ask CodeVerse AI... (Shift + Enter for new line)"
+          placeholder={isMobile ? "Ask CodeVerse AI..." : "Ask CodeVerse AI... (Shift + Enter for new line)"}
           disabled={isGenerating}
           rows={1}
           className="flex-grow px-3 py-2 rounded-xl text-xs bg-[#121826] border border-white/5 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/30 text-white placeholder-slate-500 transition-all duration-200 resize-none h-[34px] min-h-[34px] max-h-[120px] overflow-y-auto scrollbar-none py-2"
