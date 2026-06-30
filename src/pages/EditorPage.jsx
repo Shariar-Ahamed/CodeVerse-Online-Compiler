@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment } from 'firebase/firestore';
@@ -860,106 +860,120 @@ Explain why this error occurred and how to fix it.`;
 
       {/* ==================== COMPILER CONTROLS PANEL ==================== */}
       <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-wrap items-center gap-2.5 sm:gap-3 transition-all duration-300 relative z-10">
-        {/* Selection of Language with Dynamic Icon badge */}
-        <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)] whitespace-nowrap">Language:</label>
-        <div className="relative">
-          <select
-            id="language-select"
-            value={currentLanguage}
-            onChange={handleLanguageChange}
-            className="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 max-w-[180px] sm:max-w-none"
-          >
-            <option value="html">HTML/CSS/JS (Web Lab)</option>
-            {Object.keys(LANGUAGES)
-              .filter(lang => lang !== 'html')
-              .map((langKey) => (
-                <option key={langKey} value={langKey}>
-                  {LANGUAGES[langKey].name}
-                </option>
-              ))}
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
-            <i className="fas fa-chevron-down text-[10px]"></i>
+        {/* Left Side: Back button */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
+        >
+          <i className="fas fa-arrow-left text-xs"></i>
+          <span>Back</span>
+        </Link>
+
+        {/* Centered: Selection of Language with Dynamic Icon badge */}
+        <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 flex items-center gap-2.5 sm:gap-3 pointer-events-auto relative z-10">
+          <label htmlFor="language-select" className="text-sm font-semibold text-[var(--text-secondary)] whitespace-nowrap">Language:</label>
+          <div className="relative">
+            <select
+              id="language-select"
+              value={currentLanguage}
+              onChange={handleLanguageChange}
+              className="appearance-none pl-3 pr-10 py-2 rounded-xl text-sm font-medium bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 max-w-[180px] sm:max-w-none"
+            >
+              <option value="html">HTML/CSS/JS (Web Lab)</option>
+              {Object.keys(LANGUAGES)
+                .filter(lang => lang !== 'html')
+                .map((langKey) => (
+                  <option key={langKey} value={langKey}>
+                    {LANGUAGES[langKey].name}
+                  </option>
+                ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[var(--text-secondary)]">
+              <i className="fas fa-chevron-down text-[10px]"></i>
+            </div>
           </div>
+          <span
+            id="lang-badge"
+            className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
+          >
+            {LANGUAGES[currentLanguage]?.name}
+          </span>
         </div>
-        <span
-          id="lang-badge"
-          className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
-        >
-          {LANGUAGES[currentLanguage]?.name}
-        </span>
 
-        {/* Clear Button */}
-        <button
-          onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 lg:ml-auto"
-        >
-          <i className="fas fa-eraser"></i>
-          <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
-        </button>
+        {/* Right Side: Action items wrapper */}
+        <div className="flex items-center gap-2.5 sm:gap-3 ml-auto relative z-20">
+          {/* Clear Button */}
+          <button
+            onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          >
+            <i className="fas fa-eraser"></i>
+            <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
+          </button>
 
-        {/* Copy Button */}
-        <button
-          onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-        >
-          <i className="fas fa-copy"></i>
-          <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
-        </button>
+          {/* Copy Button */}
+          <button
+            onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          >
+            <i className="fas fa-copy"></i>
+            <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
+          </button>
 
-        {/* Download Button */}
-        <button
-          onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-        >
-          <i className="fas fa-download"></i>
-          <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
-        </button>
+          {/* Download Button */}
+          <button
+            onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          >
+            <i className="fas fa-download"></i>
+            <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
+          </button>
 
-        {currentLanguage !== "text" && (
-          <>
-            {/* Settings Modal Button */}
-            <button
-              onClick={openSettingsModal}
-              className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-              title="API Credentials Configuration"
-            >
-              <i className="fas fa-sliders text-sm"></i>
-            </button>
+          {currentLanguage !== "text" && (
+            <>
+              {/* Settings Modal Button */}
+              <button
+                onClick={openSettingsModal}
+                className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                title="API Credentials Configuration"
+              >
+                <i className="fas fa-sliders text-sm"></i>
+              </button>
 
-            {/* AI Code Assistant Toggle Button */}
-            <button
-              onClick={() => setShowAIPanel(prev => !prev)}
-              className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
-                showAIPanel
-                  ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
-                  : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
-              }`}
-              title="AI Code Assistant"
-            >
-              <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
-            </button>
+              {/* AI Code Assistant Toggle Button */}
+              <button
+                onClick={() => setShowAIPanel(prev => !prev)}
+                className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                  showAIPanel
+                    ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
+                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+                }`}
+                title="AI Code Assistant"
+              >
+                <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
+              </button>
 
-            {/* Execute / Run Code Trigger Button */}
-            <button
-              onClick={runCode}
-              disabled={isExecuting}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-            >
-              {isExecuting ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>Compiling...</span>
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-play text-xs"></i>
-                  <span>Run Code</span>
-                </>
-              )}
-            </button>
-          </>
-        )}
+              {/* Execute / Run Code Trigger Button */}
+              <button
+                onClick={runCode}
+                disabled={isExecuting}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+              >
+                {isExecuting ? (
+                  <>
+                    <div className="spinner"></div>
+                    <span>Compiling...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-play text-xs"></i>
+                    <span>Run Code</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
+        </div>
       </div>
       <div className="flex flex-col lg:flex-row items-stretch flex-grow gap-6 w-full relative z-10 min-h-[500px]">
         <div className="flex-grow flex flex-col min-w-0">
