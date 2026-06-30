@@ -168,6 +168,14 @@ export default function ContactPage({ showToast }) {
           0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.5; }
           50% { transform: translateY(10px) translateX(-8px) scale(0.85); opacity: 0.8; }
         }
+        @keyframes twinkle {
+          0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.3; filter: drop-shadow(0 0 1px rgba(253, 224, 71, 0.2)); }
+          50% { transform: scale(1.2) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.8)); }
+        }
+        @keyframes twinkle-slow {
+          0%, 100% { transform: scale(0.5) rotate(0deg); opacity: 0.2; }
+          50% { transform: scale(1) rotate(-180deg); opacity: 0.9; filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.7)); }
+        }
         .animate-float-main {
           animation: float-main 6s ease-in-out infinite;
         }
@@ -176,6 +184,12 @@ export default function ContactPage({ showToast }) {
         }
         .animate-bubble-fast {
           animation: float-bubble-fast 4s ease-in-out infinite;
+        }
+        .animate-twinkle {
+          animation: twinkle 2.5s ease-in-out infinite;
+        }
+        .animate-twinkle-slow {
+          animation: twinkle-slow 3.5s ease-in-out infinite;
         }
       `}</style>
 
@@ -237,7 +251,21 @@ export default function ContactPage({ showToast }) {
           {/* Centered Header Section for the Entire Card */}
           <div className="text-center mb-10 relative z-10 md:px-12">
             <h2 className="text-3xl font-extrabold tracking-tight text-white mb-2.5 font-sans">
-              Connect with <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">CodeVerse</span>
+              Connect with{' '}
+              <span className="relative inline-block select-none">
+                {/* Twinkling Magical Yellow Star (Top-Right) */}
+                <span className="absolute -top-3 -right-2.5 text-[10px] text-yellow-300 animate-twinkle pointer-events-none">
+                  <i className="fas fa-star"></i>
+                </span>
+                {/* Twinkling Magical Indigo Star (Top-Left) */}
+                <span className="absolute -top-1 -left-3 text-[7px] text-indigo-300/80 animate-twinkle-slow pointer-events-none">
+                  <i className="fas fa-star"></i>
+                </span>
+                
+                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                  CodeVerse
+                </span>
+              </span>
             </h2>
             <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
               Have queries about our sandbox runtime compiler, custom coding challenges, leaderboard rankings, or developer ticket support? Send us a message and our dev support crew will get back to you shortly.
