@@ -37,7 +37,7 @@
   CodeVerse is a premium, high-performance web-based Integrated Development Environment (IDE) and real-time frontend playground. Built using <b>React + Vite</b>, it features a gorgeous custom glassmorphic UI, Microsoft's Monaco Editor engine, sandboxed code compilation, database activity tracking, and a secure administration panel.
 </p>
 
-> **Live Production Demo**: **[code-verse-online.vercel.app](https://code-verse-online.vercel.app/)**
+> **Live Production Demo**: **[code-verse-online.vercel.app](https://code-verse-online.vercel.app/#/login)**
 
 
 
