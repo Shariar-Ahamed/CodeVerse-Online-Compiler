@@ -664,7 +664,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 <h3 id="profile-name" className="font-bold text-lg text-[var(--text-primary)] truncate flex items-center justify-center gap-1.5">
                   <span>{profileData.name || 'Developer'}</span>
                   {profileData.isVerified && (
-                    <span className="text-sm" style={{ color: '#08CB00' }} title="Verified Creator">
+                    <span className="text-sm" style={{ color: '#1D9BF0' }} title="Verified Creator">
                       <i className="fas fa-circle-check"></i>
                     </span>
                   )}

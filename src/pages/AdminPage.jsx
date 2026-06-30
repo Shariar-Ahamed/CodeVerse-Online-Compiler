@@ -488,7 +488,7 @@ export default function AdminPage({ user, showToast }) {
                               <span className="font-bold text-xs text-white flex items-center gap-1.5">
                                 <span>{u.name || 'Developer'}</span>
                                 {u.isVerified && (
-                                  <span className="text-[10px]" style={{ color: '#08CB00' }} title="Verified Creator">
+                                  <span className="text-[10px]" style={{ color: '#1D9BF0' }} title="Verified Creator">
                                     <i className="fas fa-circle-check animate-pulse"></i>
                                   </span>
                                 )}
