@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import { LANGUAGES } from '../utils/languages';
 
@@ -194,6 +194,21 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     setIsExecuting(true);
     setActiveTab('testcases');
     
+    if (user && !user.isGuest) {
+      try {
+        const d = new Date();
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, {
+          activityLogs: {
+            [dateKey]: increment(1)
+          }
+        }, { merge: true });
+      } catch (err) {
+        console.error("Error logging activity: ", err);
+      }
+    }
+    
     const runLabel = useCustomStdin ? "Custom Test Case" : "Sample Test Case";
     setTestResults([{ label: runLabel, status: "Compiling...", isRunning: true }]);
 
@@ -300,6 +315,21 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
 
     setIsExecuting(true);
     setActiveTab('testcases');
+
+    if (user && !user.isGuest) {
+      try {
+        const d = new Date();
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, {
+          activityLogs: {
+            [dateKey]: increment(1)
+          }
+        }, { merge: true });
+      } catch (err) {
+        console.error("Error logging activity: ", err);
+      }
+    }
 
     // Setup initial pending states for all test cases
     const initialStates = challenge.testCases.map((tc, idx) => ({
