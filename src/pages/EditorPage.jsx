@@ -346,6 +346,7 @@ export default function EditorPage({ user, theme, showToast }) {
   // Refs
   const editorRef = useRef(null);
   const previewFrameRef = useRef(null);
+  const selectedCardRef = useRef(null);
 
   // Sync settings inputs in state
   const [settingsUrlInput, setSettingsUrlInput] = useState(apiEndpoint);
@@ -380,6 +381,20 @@ export default function EditorPage({ user, theme, showToast }) {
       setCode(savedCode);
     }
   }, [currentLanguage]);
+
+  // Scroll to active selected language card inside selection modal
+  useEffect(() => {
+    if (showLanguageModal) {
+      setTimeout(() => {
+        if (selectedCardRef.current) {
+          selectedCardRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+          });
+        }
+      }, 120);
+    }
+  }, [showLanguageModal]);
 
   // Define Dracula theme and cache editor reference
   const handleEditorDidMount = (editor, monaco) => {
@@ -1548,6 +1563,7 @@ Explain why this error occurred and how to fix it.`;
                     return (
                       <div
                         key={langKey}
+                        ref={isSelected ? selectedCardRef : null}
                         onClick={() => {
                           handleLanguageSwitch(langKey);
                           setShowLanguageModal(false);
