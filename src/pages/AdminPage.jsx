@@ -76,6 +76,21 @@ export default function AdminPage({ user, showToast }) {
     }
   };
 
+  const handleDeleteUser = async (uid, name) => {
+    if (!window.confirm(`Are you sure you want to permanently delete user "${name || 'Developer'}" from the database? This will remove them from the Leaderboard.`)) {
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, "users", uid));
+      setUsers(prev => prev.filter(u => u.uid !== uid));
+      showToast("User deleted from database successfully", "success");
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      showToast("Failed to delete user from database", "error");
+    }
+  };
+
+
   const fetchContacts = async () => {
     try {
       setContactsLoading(true);
@@ -494,26 +509,35 @@ export default function AdminPage({ user, showToast }) {
                           {Array.isArray(u.solvedChallenges) ? u.solvedChallenges.length : 0} problems
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => handleToggleVerification(u)}
-                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border active:scale-95 transition-all duration-200 cursor-pointer ${
-                              u.isVerified
-                                ? 'border-rose-500/30 bg-rose-500/5 text-rose-400 hover:bg-rose-500/10'
-                                : 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400 hover:bg-indigo-500/10'
-                            }`}
-                          >
-                            {u.isVerified ? (
-                              <>
-                                <i className="fas fa-user-xmark mr-1"></i>
-                                <span>Remove Tick</span>
-                              </>
-                            ) : (
-                              <>
-                                <i className="fas fa-user-check mr-1"></i>
-                                <span>Grant Verified Tick</span>
-                              </>
-                            )}
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleToggleVerification(u)}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border active:scale-95 transition-all duration-200 cursor-pointer ${
+                                u.isVerified
+                                  ? 'border-rose-500/30 bg-rose-500/5 text-rose-400 hover:bg-rose-500/10'
+                                  : 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400 hover:bg-indigo-500/10'
+                              }`}
+                            >
+                              {u.isVerified ? (
+                                <>
+                                  <i className="fas fa-user-xmark mr-1"></i>
+                                  <span>Remove Tick</span>
+                                </>
+                              ) : (
+                                <>
+                                  <i className="fas fa-user-check mr-1"></i>
+                                  <span>Grant Verified Tick</span>
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u.uid, u.name)}
+                              className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                              title="Delete User from Leaderboard"
+                            >
+                              <i className="fas fa-trash text-xs"></i>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
