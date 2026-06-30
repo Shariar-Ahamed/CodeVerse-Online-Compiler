@@ -137,25 +137,31 @@ function AppContent() {
         try {
           const userDocRef = doc(db, "users", firebaseUser.uid);
           const docSnap = await getDoc(userDocRef);
+          const isAdminEmail = firebaseUser.email && (
+            firebaseUser.email.toLowerCase() === 'ripon23105101019@diu.edu.bd' ||
+            firebaseUser.email.toLowerCase().includes('admin')
+          );
+
           if (docSnap.exists()) {
             const data = docSnap.data();
-            userData.role = data.role || 'user';
+            userData.role = isAdminEmail ? 'admin' : (data.role || 'user');
             userData.username = data.username || '';
           } else {
             // Document doesn't exist, create it!
             const baseUsername = firebaseUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
             const finalUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+            const assignedRole = isAdminEmail ? 'admin' : 'user';
             
             await setDoc(userDocRef, {
               name: firebaseUser.displayName || baseUsername,
               email: firebaseUser.email.toLowerCase(),
               username: finalUsername,
-              role: 'user',
+              role: assignedRole,
               score: 0,
               solvedChallenges: [],
               createdAt: new Date().toISOString()
             });
-            userData.role = 'user';
+            userData.role = assignedRole;
             userData.username = finalUsername;
           }
         } catch (e) {

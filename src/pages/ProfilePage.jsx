@@ -458,13 +458,24 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           </p>
         </div>
         {isOwnProfile && (
-          <button
-            onClick={() => navigate('/editor')}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/15 cursor-pointer relative z-20"
-          >
-            <i className="fas fa-terminal"></i>
-            <span>Launch Code Editor</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {user && user.role === 'admin' && (
+              <button
+                onClick={() => navigate('/admin')}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 shadow-md active:scale-95 transition-all duration-200 cursor-pointer relative z-20"
+              >
+                <i className="fas fa-crown text-amber-400"></i>
+                <span>Admin Panel</span>
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/editor')}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/15 cursor-pointer relative z-20"
+            >
+              <i className="fas fa-terminal"></i>
+              <span>Launch Code Editor</span>
+            </button>
+          </div>
         )}
       </div>
 
