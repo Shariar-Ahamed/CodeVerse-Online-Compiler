@@ -281,9 +281,9 @@ void main() {
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `-module(main).
--export([start/0]).
+-export([main/1]).
 
-start() ->
+main(_) ->
     io:fwrite("Hello, World!~n").`
   },
   fortran: {
