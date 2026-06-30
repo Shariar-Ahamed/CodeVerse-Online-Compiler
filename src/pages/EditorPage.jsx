@@ -1395,9 +1395,9 @@ Explain why this error occurred and how to fix it.`;
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
         <div className="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
-          <div className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-xl overflow-hidden shadow-2xl animate-fade-in-up">
+          <div className="w-full max-w-md rounded-2xl border border-indigo-500/20 bg-[var(--bg-tertiary)]/98 backdrop-blur-2xl overflow-hidden shadow-2xl animate-fade-in-up">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-black/15 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <i className="fas fa-sliders text-indigo-400"></i>
                 <h3 className="font-bold text-[var(--text-primary)]">Compiler Settings</h3>
@@ -1421,7 +1421,7 @@ Explain why this error occurred and how to fix it.`;
                   id="api-url-input"
                   value={settingsUrlInput}
                   onChange={(e) => setSettingsUrlInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
                   placeholder="https://ce.judge0.com"
                 />
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
@@ -1438,7 +1438,7 @@ Explain why this error occurred and how to fix it.`;
                   id="api-key-input"
                   value={settingsKeyInput}
                   onChange={(e) => setSettingsKeyInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
                   placeholder="••••••••••••••••••••••••••••••••"
                 />
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
