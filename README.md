@@ -14,14 +14,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/Shariar-Ahamed/CodeVerse-Online-Compiler">
-  <img src="https://img.shields.io/github/repo-size/Shariar-Ahamed/CodeVerse-Online-Compiler">
-  <img src="https://img.shields.io/github/last-commit/Shariar-Ahamed/CodeVerse-Online-Compiler">
+  <img src="https://img.shields.io/github/license/Shariar-Ahamed/CodeVerse-Online-Compiler?style=for-the-badge&color=emerald">
+  <img src="https://img.shields.io/github/repo-size/Shariar-Ahamed/CodeVerse-Online-Compiler?style=for-the-badge&color=blue">
+  <img src="https://img.shields.io/github/last-commit/Shariar-Ahamed/CodeVerse-Online-Compiler?style=for-the-badge&color=orange">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/Shariar-Ahamed/CodeVerse-Online-Compiler?style=social">
-  <img src="https://img.shields.io/github/forks/Shariar-Ahamed/CodeVerse-Online-Compiler?style=social">
+  <img src="https://img.shields.io/github/stars/Shariar-Ahamed/CodeVerse-Online-Compiler?style=for-the-badge&color=gold">
+  <img src="https://img.shields.io/github/forks/Shariar-Ahamed/CodeVerse-Online-Compiler?style=for-the-badge&color=purple">
 </p>
 
 <p align="center">
