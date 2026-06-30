@@ -1,430 +1,21 @@
+// Pre-configured Compiler Profiles for Judge0 REST Execution engine
 export const LANGUAGES = {
-  c: {
-    id: 50, // C (GCC 9.2.0)
-    name: "C",
-    monacoId: "c",
-    extension: "c",
-    badgeClass: "badge-c",
-    defaultCode: `#include <stdio.h>
-
-int main() {
-    char name[100];
-    printf("Enter your name: ");
-    
-    // Read from standard input (stdin)
-    if (scanf("%s", name) == 1) {
-        printf("Hello, %s! Welcome to CodeVerse Online Compiler.\\n", name);
-    } else {
-        printf("Hello, World! Welcome to CodeVerse.\\n");
-    }
-    
-    return 0;
-}`
-  },
-  cpp: {
-    id: 54, // C++ (GCC 9.2.0)
-    name: "C++",
-    monacoId: "cpp",
-    extension: "cpp",
-    badgeClass: "badge-cpp",
-    defaultCode: `#include <iostream>
-
-using namespace std;
-
-int main() {
-    cout << "Hello, World! Welcome to CodeVerse C++ Environment." << endl;
-    return 0;
-}`
-  },
-  python: {
-    id: 71, // Python (3.8.1)
-    name: "Python 3",
-    monacoId: "python",
-    extension: "py",
-    badgeClass: "badge-python",
-    defaultCode: `# Python program execution
-import sys
-
-print("Enter your name: ", end="")
-sys.stdout.flush()
-
-# Read from standard input (stdin)
-line = sys.stdin.readline().strip()
-
-if line:
-    print(f"Hello, {line}! Welcome to CodeVerse Online Compiler.")
-else:
-    print("Hello, World! Welcome to CodeVerse Python Playground.")
-
-# Example loop
-print("\\nCounting 1 to 5:")
-for i in range(1, 6):
-    print(f"Step: {i}")
-`
-  },
-  javascript: {
-    id: 63, // JavaScript (Node.js 12.14.0)
-    name: "JavaScript (NodeJS)",
-    monacoId: "javascript",
-    extension: "js",
-    badgeClass: "badge-js",
-    defaultCode: `// JavaScript Code Execution (NodeJS Environment)
-// In batch compilers like Judge0, we read standard input (stdin) synchronously using fs.readFileSync.
-const fs = require('fs');
-
-function main() {
-    // Read all inputs from standard input (stdin)
-    const name = fs.readFileSync(0, 'utf-8').trim();
-    
-    console.log(\`Hello, \${name || 'World'}! Welcome to CodeVerse Online Compiler.\`);
-    
-    // Demonstration of calculations
-    const result = factorial(5);
-    console.log(\`Factorial of 5 is: \${result}\`);
-}
-
-function factorial(n) {
-    if (n <= 1) return 1;
-    return n * factorial(n - 1);
-}
-
-main();`
-  },
-  java: {
-    id: 62, // Java (OpenJDK 13.0.1)
-    name: "Java",
-    monacoId: "java",
-    extension: "java",
-    badgeClass: "badge-java",
-    defaultCode: `import java.util.Scanner;
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your name: ");
-        
-        // Read from standard input (stdin)
-        if (scanner.hasNextLine()) {
-            String name = scanner.nextLine();
-            System.out.println("Hello, " + name + "! Welcome to CodeVerse Online Compiler.");
-        } else {
-            System.out.println("Hello, World! Welcome to CodeVerse Java Environment.");
-        }
-        
-        scanner.close();
-    }
-}`
-  },
-  php: {
-    id: 68, // PHP (7.4.1)
-    name: "PHP",
-    monacoId: "php",
-    extension: "php",
-    badgeClass: "badge-php",
-    defaultCode: `<?php
-// PHP Script Execution
-echo "Enter your name: ";
-
-// Read standard input
-$name = trim(fgets(STDIN));
-
-if (!empty($name)) {
-    echo "Hello, " . $name . "! Welcome to CodeVerse Online Compiler.\\n";
-} else {
-    echo "Hello, World! Welcome to CodeVerse PHP Console.\\n";
-}
-
-$numbers = [1, 2, 3, 4, 5];
-echo "Sum of array values: " . array_sum($numbers) . "\\n";
-?>`
-  },
-  bash: {
-    id: 46, // Bash (5.0.0)
-    name: "Bash Shell",
-    monacoId: "shell",
-    extension: "sh",
-    badgeClass: "badge-bash",
-    defaultCode: `#!/bin/bash
-# Bash script execution
-
-echo -n "Enter your name: "
-read name
-
-if [ -n "$name" ]; then
-    echo "Hello, $name! Welcome to CodeVerse Online Compiler."
-else
-    echo "Hello, World! Welcome to CodeVerse Bash Environment."
-fi
-
-echo "Current System Path:"
-echo $PATH | cut -d':' -f1-3
-`
-  },
-  csharp: {
-    id: 51, // C# (Mono 6.6.0)
-    name: "C#",
-    monacoId: "csharp",
-    extension: "cs",
-    badgeClass: "badge-csharp",
-    defaultCode: `using System;
-
-class Program {
-    static void Main(string[] args) {
-        Console.Write("Enter your name: ");
-        string name = Console.ReadLine();
-        if (!string.IsNullOrEmpty(name)) {
-            Console.WriteLine($"Hello, {name}! Welcome to CodeVerse C# Environment.");
-        } else {
-            Console.WriteLine("Hello, World! Welcome to CodeVerse C#.");
-        }
-    }
-}`
-  },
-  go: {
-    id: 60, // Go (1.13.5)
-    name: "Go (Golang)",
-    monacoId: "go",
-    extension: "go",
-    badgeClass: "badge-go",
-    defaultCode: `package main
-
-import (
-    "bufio"
-    "fmt"
-    "os"
-    "strings"
-)
-
-func main() {
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Enter your name: ")
-    name, _ := reader.ReadString('\\n')
-    name = strings.TrimSpace(name)
-    
-    if name != "" {
-        fmt.Printf("Hello, %s! Welcome to CodeVerse Go Compiler.\\n", name)
-    } else {
-        fmt.Println("Hello, World! Welcome to CodeVerse Go.")
-    }
-}`
-  },
-  rust: {
-    id: 73, // Rust (1.40.0)
-    name: "Rust",
-    monacoId: "rust",
-    extension: "rs",
-    badgeClass: "badge-rust",
-    defaultCode: `use std::io::{self, Write};
-
-fn main() {
-    print!("Enter your name: ");
-    io::stdout().flush().unwrap();
-    
-    let mut name = String::new();
-    io::stdin().read_line(&mut name).unwrap();
-    let name = name.trim();
-    
-    if !name.is_empty() {
-        println!("Hello, {}! Welcome to CodeVerse Rust Environment.", name);
-    } else {
-        println!("Hello, World! Welcome to CodeVerse Rust.");
-    }
-}`
-  },
-  typescript: {
-    id: 74, // TypeScript (3.7.4)
-    name: "TypeScript",
-    monacoId: "typescript",
-    extension: "ts",
-    badgeClass: "badge-typescript",
-    defaultCode: `// TypeScript Execution Environment
-interface User {
-    name: string;
-    isAdmin: boolean;
-}
-
-function greetUser(user: User): string {
-    return \`Hello, \${user.name}! Welcome to CodeVerse TypeScript Playground. Admin status: \${user.isAdmin}\`;
-}
-
-const guest: User = { name: "Developer", isAdmin: true };
-console.log(greetUser(guest));`
-  },
-  ruby: {
-    id: 72, // Ruby (2.7.0)
-    name: "Ruby",
-    monacoId: "ruby",
-    extension: "rb",
-    badgeClass: "badge-ruby",
-    defaultCode: `# Ruby execution code
-print "Enter your name: "
-name = gets.chomp
-
-if !name.empty?
-  puts "Hello, #{name}! Welcome to CodeVerse Ruby Compiler."
-else
-  puts "Hello, World! Welcome to CodeVerse Ruby."
-end`
-  },
-  swift: {
-    id: 83, // Swift (5.1.4)
-    name: "Swift",
-    monacoId: "swift",
-    extension: "swift",
-    badgeClass: "badge-swift",
-    defaultCode: `import Foundation
-
-// Swift execution console
-print("Enter your name: ", terminator: "")
-if let name = readLine(), !name.isEmpty {
-    print("Hello, \\(name)! Welcome to CodeVerse Swift Environment.")
-} else {
-    print("Hello, World! Welcome to CodeVerse Swift.")
-}`
-  },
-  kotlin: {
-    id: 78, // Kotlin (1.3.70)
-    name: "Kotlin",
-    monacoId: "kotlin",
-    extension: "kt",
-    badgeClass: "badge-kotlin",
-    defaultCode: `import java.util.Scanner
-
-fun main(args: Array<String>) {
-    val scanner = Scanner(System.\`in\`)
-    print("Enter your name: ")
-    if (scanner.hasNextLine()) {
-        val name = scanner.nextLine()
-        println("Hello, $name! Welcome to CodeVerse Kotlin Environment.")
-    } else {
-        println("Hello, World! Welcome to CodeVerse Kotlin.")
-    }
-}`
-  },
-  sql: {
-    id: 82, // SQL (SQLite 3.31.1)
-    name: "SQL (SQLite)",
-    monacoId: "sql",
-    extension: "sql",
-    badgeClass: "badge-sql",
-    defaultCode: `-- SQL Database script execution (SQLite)
-CREATE TABLE developers (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    language TEXT NOT NULL
-);
-
-INSERT INTO developers (name, language) VALUES ('Shariar', 'C++');
-INSERT INTO developers (name, language) VALUES ('Developer', 'Python');
-INSERT INTO developers (name, language) VALUES ('Guest', 'Rust');
-
-SELECT * FROM developers WHERE id > 0;`
-  },
-  scala: {
-    id: 81, // Scala (2.13.0)
-    name: "Scala",
-    monacoId: "scala",
-    extension: "scala",
-    badgeClass: "badge-scala",
-    defaultCode: `object Main {
-  def main(args: Array[String]): Unit = {
-    println("Hello, CodeVerse Scala Environment!")
-  }
-}`
-  },
-  objectivec: {
-    id: 79, // Objective-C (Clang 7.0.1)
-    name: "Objective-C",
-    monacoId: "objective-c",
-    extension: "m",
-    badgeClass: "badge-objectivec",
-    defaultCode: `#import <Foundation/Foundation.h>
-
-int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-        NSLog(@"Hello, CodeVerse Objective-C Workspace!");
-    }
-    return 0;
-}`
-  },
-  haskell: {
-    id: 61, // Haskell (GHC 8.8.1)
-    name: "Haskell",
-    monacoId: "haskell",
-    extension: "hs",
-    badgeClass: "badge-haskell",
-    defaultCode: `main :: IO ()
-main = putStrLn "Hello, CodeVerse Haskell Workspace!"`
-  },
-  pascal: {
-    id: 67, // Pascal (FPC 3.0.4)
-    name: "Pascal",
-    monacoId: "pascal",
-    extension: "pas",
-    badgeClass: "badge-pascal",
-    defaultCode: `program HelloWorld;
-begin
-  writeln('Hello, CodeVerse Pascal Environment!');
-end.`
-  },
-  perl: {
-    id: 85, // Perl (5.28.1)
-    name: "Perl",
-    monacoId: "perl",
-    extension: "pl",
-    badgeClass: "badge-perl",
-    defaultCode: `use strict;
-use warnings;
-
-print "Hello, CodeVerse Perl Console!\\n";`
-  },
-  r: {
-    id: 80, // R (3.6.1)
-    name: "R",
-    monacoId: "r",
-    extension: "r",
-    badgeClass: "badge-r",
-    defaultCode: `cat("Hello, CodeVerse R Workspace!\\n")`
-  },
-  lisp: {
-    id: 55, // Lisp (SBCL 2.0.0)
-    name: "Lisp",
-    monacoId: "lisp",
-    extension: "lisp",
-    badgeClass: "badge-lisp",
-    defaultCode: `(format t "Hello, CodeVerse Common Lisp Workspace!~%")`
-  },
-  fortran: {
-    id: 59, // Fortran (GFortran 9.2.0)
-    name: "Fortran",
-    monacoId: "fortran",
-    extension: "f90",
-    badgeClass: "badge-fortran",
-    defaultCode: `program hello
-  print *, "Hello, CodeVerse Fortran Workspace!"
-end program hello`
-  },
-  lua: {
-    id: 64, // Lua (5.3.5)
-    name: "Lua",
-    monacoId: "lua",
-    extension: "lua",
-    badgeClass: "badge-lua",
-    defaultCode: `print("Hello, CodeVerse Lua Script Console!")`
-  },
   assembly: {
-    id: 45, // Assembly (NASM 2.14.02)
+    id: 45,
     name: "Assembly",
-    monacoId: "assembly",
+    desc: "NASM 2.14.02 Compiler",
+    monacoId: "plaintext",
     extension: "asm",
-    badgeClass: "badge-assembly",
-    defaultCode: `section .data
-    msg db 'Hello, CodeVerse Assembly!', 0xa
+    badgeClass: "bg-blue-400/10 border-blue-400/20 text-blue-400",
+    icon: "fas fa-microchip",
+    categories: ["programming"],
+    defaultCode: `; Hello World in NASM Assembly
+section .data
+    msg db 'Hello, World!', 0xa
     len equ $ - msg
 
 section .text
     global _start
-
 _start:
     mov edx, len
     mov ecx, msg
@@ -436,171 +27,453 @@ _start:
     mov eax, 1
     int 0x80`
   },
-  elixir: {
-    id: 57, // Elixir (1.9.4)
-    name: "Elixir",
-    monacoId: "elixir",
-    extension: "ex",
-    badgeClass: "badge-elixir",
-    defaultCode: `IO.puts "Hello, CodeVerse Elixir Console!"`
+  bash: {
+    id: 46,
+    name: "Bash Shell",
+    desc: "5.0.0 Interpreter",
+    monacoId: "shell",
+    extension: "sh",
+    badgeClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+    icon: "fas fa-terminal",
+    categories: ["programming"],
+    defaultCode: `#!/bin/bash
+# Simple shell script
+echo "Hello, World! Welcome to Bash Shell."`
   },
-  erlang: {
-    id: 58, // Erlang (OTP 22.2)
-    name: "Erlang",
-    monacoId: "erlang",
-    extension: "erl",
-    badgeClass: "badge-erlang",
-    defaultCode: `-module(main).
--export([main/1]).
+  basic: {
+    id: 47,
+    name: "Basic",
+    desc: "FBC 1.07.1 Compiler",
+    monacoId: "plaintext",
+    extension: "bas",
+    badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `' FBC Basic hello world
+print "Hello, World! Welcome to Basic."`
+  },
+  c: {
+    id: 103,
+    name: "C",
+    desc: "GCC 14.1.0 Compiler",
+    monacoId: "c",
+    extension: "c",
+    badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["popular", "programming"],
+    defaultCode: `#include <stdio.h>
 
-main(_Args) ->
-    io:fwrite("Hello, CodeVerse Erlang Console!\\n").`
+int main() {
+    printf("Hello, World! Welcome to C.\\n");
+    return 0;
+}`
+  },
+  cpp: {
+    id: 105,
+    name: "C++",
+    desc: "GCC 14.1.0 Compiler",
+    monacoId: "cpp",
+    extension: "cpp",
+    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-400",
+    icon: "fas fa-code",
+    categories: ["popular", "programming"],
+    defaultCode: `#include <iostream>
+
+int main() {
+    std::cout << "Hello, World! Welcome to C++." << std::endl;
+    return 0;
+}`
   },
   clojure: {
-    id: 86, // Clojure (1.10.1)
+    id: 86,
     name: "Clojure",
+    desc: "1.10.1 Workspace",
     monacoId: "clojure",
     extension: "clj",
-    badgeClass: "badge-clojure",
-    defaultCode: `(println "Hello, CodeVerse Clojure Workspace!")`
-  },
-  d: {
-    id: 56, // D (DMD 2.089.1)
-    name: "D",
-    monacoId: "d",
-    extension: "d",
-    badgeClass: "badge-d",
-    defaultCode: `import std.stdio;
-
-void main() {
-    writeln("Hello, CodeVerse D Workspace!");
-}`
+    badgeClass: "bg-blue-400/10 border-blue-400/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `(println "Hello, World! Welcome to Clojure.")`
   },
   cobol: {
     id: 77,
     name: "COBOL",
+    desc: "GnuCOBOL 2.2 Compiler",
     monacoId: "cobol",
     extension: "cbl",
     badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
     defaultCode: `       IDENTIFICATION DIVISION.
        PROGRAM-ID. HELLO-WORLD.
        PROCEDURE DIVISION.
-           DISPLAY 'Hello, World! Welcome to CodeVerse COBOL.'.
+           DISPLAY 'Hello, World! Welcome to COBOL.'.
            STOP RUN.`
   },
-  prolog: {
-    id: 69,
-    name: "Prolog",
-    monacoId: "prolog",
-    extension: "pl",
-    badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
-    defaultCode: `:- initialization(main).
-main :-
-    write('Hello, World! Welcome to CodeVerse Prolog.'), nl.`
+  lisp: {
+    id: 55,
+    name: "Lisp",
+    desc: "SBCL 2.0.0 Interpreter",
+    monacoId: "lisp",
+    extension: "lisp",
+    badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `(write-line "Hello, World! Welcome to Common Lisp.")`
   },
-  scheme: {
-    id: 70,
-    name: "Scheme",
-    monacoId: "scheme",
-    extension: "scm",
-    badgeClass: "bg-cyan-600/10 border-cyan-600/20 text-cyan-500",
-    defaultCode: `(display "Hello, World! Welcome to CodeVerse Scheme.")
-(newline)`
+  dart: {
+    id: 115,
+    name: "Dart",
+    desc: "3.5.2 Runtime",
+    monacoId: "dart",
+    extension: "dart",
+    badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `void main() {
+  print('Hello, World! Welcome to Dart.');
+}`
   },
-  octave: {
-    id: 66,
-    name: "GNU Octave",
-    monacoId: "octave",
-    extension: "m",
-    badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
-    defaultCode: `disp('Hello, World! Welcome to CodeVerse GNU Octave.')`
+  d: {
+    id: 56,
+    name: "D",
+    desc: "DMD 2.089.1 Compiler",
+    monacoId: "d",
+    extension: "d",
+    badgeClass: "bg-slate-500/10 border-slate-500/20 text-slate-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `import std.stdio;
+
+void main() {
+    writeln("Hello, World! Welcome to D.");
+}`
+  },
+  elixir: {
+    id: 57,
+    name: "Elixir",
+    desc: "1.9.4 Compiler",
+    monacoId: "elixir",
+    extension: "ex",
+    badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
+    icon: "fas fa-code",
+    categories: ["programming", "web"],
+    defaultCode: `IO.puts "Hello, World! Welcome to Elixir."`
+  },
+  erlang: {
+    id: 58,
+    name: "Erlang",
+    desc: "OTP 22.2 Runtime",
+    monacoId: "erlang",
+    extension: "erl",
+    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `%- Erlang hello world
+-module(main).
+-export([start/0]).
+
+start() ->
+    io:fwrite("Hello, World! Welcome to Erlang.~n").`
   },
   fsharp: {
     id: 87,
     name: "F#",
+    desc: ".NET Core SDK 3.1.202 Compiler",
     monacoId: "fsharp",
     extension: "fs",
     badgeClass: "bg-purple-600/10 border-purple-600/20 text-purple-500",
-    defaultCode: `printfn "Hello, World! Welcome to CodeVerse F#."`
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `printfn "Hello, World! Welcome to F#."`
   },
-  vbnet: {
-    id: 84,
-    name: "VB.NET",
-    monacoId: "vb",
-    extension: "vb",
-    badgeClass: "bg-indigo-600/10 border-indigo-600/20 text-indigo-500",
-    defaultCode: `Imports System
-
-Module Program
-    Sub Main(args As String())
-        Console.WriteLine("Hello, World! Welcome to CodeVerse VB.NET.")
-    End Sub
-End Module`
+  fortran: {
+    id: 59,
+    name: "Fortran",
+    desc: "GFortran 9.2.0 Compiler",
+    monacoId: "fortran",
+    extension: "f90",
+    badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `program hello
+  print *, "Hello, World! Welcome to Fortran."
+end program hello`
   },
   groovy: {
-    id: 53,
+    id: 88,
     name: "Groovy",
+    desc: "3.0.3 Scripting Engine",
     monacoId: "groovy",
     extension: "groovy",
     badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
-    defaultCode: `println "Hello, World! Welcome to CodeVerse Groovy."`
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `println "Hello, World! Welcome to Groovy."`
   },
-  coffeescript: {
-    id: 48,
-    name: "CoffeeScript",
-    monacoId: "coffeescript",
-    extension: "coffee",
-    badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-600",
-    defaultCode: `console.log "Hello, World! Welcome to CodeVerse CoffeeScript."`
+  haskell: {
+    id: 61,
+    name: "Haskell",
+    desc: "GHC 8.8.1 Compiler",
+    monacoId: "haskell",
+    extension: "hs",
+    badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `main = putStrLn "Hello, World! Welcome to Haskell."`
+  },
+  java: {
+    id: 97,
+    name: "Java",
+    desc: "JDK 21.0.4 Runtime",
+    monacoId: "java",
+    extension: "java",
+    badgeClass: "bg-red-500/10 border-red-500/20 text-red-500",
+    icon: "fab fa-java",
+    categories: ["popular", "programming"],
+    defaultCode: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World! Welcome to Java.");
+    }
+}`
+  },
+  javascript: {
+    id: 102,
+    name: "JavaScript",
+    desc: "NodeJS 22.08.0 Runtime",
+    monacoId: "javascript",
+    extension: "js",
+    badgeClass: "bg-yellow-500/10 border-yellow-500/20 text-yellow-500",
+    icon: "fab fa-js",
+    categories: ["popular", "programming", "web"],
+    defaultCode: `// NodeJS runtime env
+console.log("Hello, World! Welcome to JavaScript.");`
+  },
+  kotlin: {
+    id: 111,
+    name: "Kotlin",
+    desc: "2.1.10 Compiler",
+    monacoId: "kotlin",
+    extension: "kt",
+    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `fun main() {
+    println("Hello, World! Welcome to Kotlin.")
+}`
+  },
+  lua: {
+    id: 64,
+    name: "Lua",
+    desc: "5.3.5 Interpreter",
+    monacoId: "lua",
+    extension: "lua",
+    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `-- Lua script
+print("Hello, World! Welcome to Lua.")`
+  },
+  objectivec: {
+    id: 79,
+    name: "Objective-C",
+    desc: "Clang 7.0.1 Compiler",
+    monacoId: "objective-c",
+    extension: "m",
+    badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `#import <Foundation/Foundation.h>\n\nint main(int argc, const char * argv[]) {\n    @autoreleasepool {\n        NSLog(@"Hello, World! Welcome to Objective-C.");\n    }\n    return 0;\n}`
   },
   ocaml: {
     id: 65,
     name: "OCaml",
+    desc: "4.09.0 Functional Compiler",
     monacoId: "ocaml",
     extension: "ml",
     badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
-    defaultCode: `print_endline "Hello, World! Welcome to CodeVerse OCaml."`
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `print_endline "Hello, World! Welcome to OCaml."`
   },
-  python2: {
-    id: 70,
-    name: "Python 2.7",
+  octave: {
+    id: 66,
+    name: "GNU Octave",
+    desc: "5.1.0 Scientific Workspace",
+    monacoId: "octave",
+    extension: "m",
+    badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
+    icon: "fas fa-calculator",
+    categories: ["programming"],
+    defaultCode: `disp('Hello, World! Welcome to GNU Octave.')`
+  },
+  pascal: {
+    id: 67,
+    name: "Pascal",
+    desc: "FPC 3.0.4 Compiler",
+    monacoId: "pascal",
+    extension: "pas",
+    badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `program Hello;
+begin
+  writeln('Hello, World! Welcome to Pascal.');
+end.`
+  },
+  perl: {
+    id: 85,
+    name: "Perl",
+    desc: "5.28.1 Interpreter",
+    monacoId: "perl",
+    extension: "pl",
+    badgeClass: "bg-teal-500/10 border-teal-500/20 text-teal-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `use strict;
+use warnings;
+print "Hello, World! Welcome to Perl.\\n";`
+  },
+  php: {
+    id: 98,
+    name: "PHP",
+    desc: "8.3.11 Interpreter",
+    monacoId: "php",
+    extension: "php",
+    badgeClass: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400",
+    icon: "fab fa-php",
+    categories: ["programming", "web"],
+    defaultCode: `<?php
+echo "Hello, World! Welcome to PHP.\\n";`
+  },
+  prolog: {
+    id: 69,
+    name: "Prolog",
+    desc: "GNU Prolog 1.4.5 Compiler",
+    monacoId: "prolog",
+    extension: "pl",
+    badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `:- initialization(main).
+main :-
+    write('Hello, World! Welcome to Prolog.'), nl.`
+  },
+  python: {
+    id: 113,
+    name: "Python 3",
+    desc: "3.14.0 Interpreter",
     monacoId: "python",
     extension: "py",
-    badgeClass: "bg-amber-600/10 border-amber-600/20 text-amber-600",
-    defaultCode: `print "Hello, World! Welcome to CodeVerse Python 2."`
+    badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
+    icon: "fab fa-python",
+    categories: ["popular", "programming"],
+    defaultCode: `print("Hello, World! Welcome to Python.")`
   },
-  c_clang: {
-    id: 75,
-    name: "C (Clang)",
-    monacoId: "c",
-    extension: "c",
-    badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
-    defaultCode: `#include <stdio.h>
-
-int main() {
-    printf("Hello, World! Welcome to CodeVerse C (Clang).\\n");
-    return 0;
+  ruby: {
+    id: 72,
+    name: "Ruby",
+    desc: "2.7.0 Interpreter",
+    monacoId: "ruby",
+    extension: "rb",
+    badgeClass: "bg-red-500/10 border-red-500/20 text-red-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `puts "Hello, World! Welcome to Ruby."`
+  },
+  rust: {
+    id: 108,
+    name: "Rust",
+    desc: "1.85.0 Compiler",
+    monacoId: "rust",
+    extension: "rs",
+    badgeClass: "bg-orange-600/10 border-orange-600/20 text-orange-600",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `fn main() {
+    println!("Hello, World! Welcome to Rust.");
 }`
   },
-  cpp_clang: {
-    id: 76,
-    name: "C++ (Clang)",
-    monacoId: "cpp",
-    extension: "cpp",
-    badgeClass: "bg-purple-600/10 border-purple-600/20 text-purple-500",
-    defaultCode: `#include <iostream>
-
-int main() {
-    std::cout << "Hello, World! Welcome to CodeVerse C++ (Clang)." << std::endl;
-    return 0;
+  scala: {
+    id: 112,
+    name: "Scala",
+    desc: "3.4.2 Compiler",
+    monacoId: "scala",
+    extension: "scala",
+    badgeClass: "bg-red-500/10 border-red-500/20 text-red-500",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `object Main extends App {
+  println("Hello, World! Welcome to Scala.")
 }`
+  },
+  sql: {
+    id: 82,
+    name: "SQL",
+    desc: "SQLite 3.27.2 Database",
+    monacoId: "sql",
+    extension: "sql",
+    badgeClass: "bg-sky-500/10 border-sky-500/20 text-sky-400",
+    icon: "fas fa-database",
+    categories: ["popular", "databases"],
+    defaultCode: `-- SQLite database table operations
+CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
+INSERT INTO users (name) VALUES ('Shariar'), ('CodeVerse');
+SELECT * FROM users;`
+  },
+  swift: {
+    id: 83,
+    name: "Swift",
+    desc: "5.2.3 Compiler",
+    monacoId: "swift",
+    extension: "swift",
+    badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
+    icon: "fab fa-swift",
+    categories: ["programming"],
+    defaultCode: `print("Hello, World! Welcome to Swift.")`
+  },
+  typescript: {
+    id: 101,
+    name: "TypeScript",
+    desc: "5.6.2 Compiler",
+    monacoId: "typescript",
+    extension: "ts",
+    badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    icon: "fas fa-code",
+    categories: ["programming", "web"],
+    defaultCode: `const greeting: string = "Hello, World! Welcome to TypeScript.";\nconsole.log(greeting);`
+  },
+  vbnet: {
+    id: 84,
+    name: "VB.NET",
+    desc: "Mono 6.6.0.161 Compiler",
+    monacoId: "plaintext",
+    extension: "bas",
+    badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
+    icon: "fas fa-code",
+    categories: ["programming"],
+    defaultCode: `' FBC Basic hello world\nprint "Hello, World! Welcome to Basic."'`
+  },
+  coffeescript: {
+    id: 48,
+    name: "CoffeeScript",
+    desc: "2.4.1 JS Transpiler",
+    monacoId: "coffeescript",
+    extension: "coffee",
+    badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-600",
+    icon: "fab fa-js",
+    categories: ["programming", "web"],
+    defaultCode: `console.log "Hello, World! Welcome to CoffeeScript."`
   },
   html: {
     id: "html",
     name: "HTML/CSS/JS",
+    desc: "Web Lab Preview",
     monacoId: "html",
     extension: "html",
-    badgeClass: "badge-html",
+    badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
+    icon: "fab fa-html5",
+    categories: ["popular", "web"],
     defaultCode: `<!-- HTML Structure -->
 <!DOCTYPE html>
 <html lang="en">
@@ -621,9 +494,12 @@ int main() {
   text: {
     id: "text",
     name: "Text Notes",
+    desc: "Personal Workspace",
     monacoId: "plaintext",
     extension: "txt",
     badgeClass: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+    icon: "fas fa-file-alt",
+    categories: ["popular"],
     defaultCode: ""
   }
 };
@@ -638,62 +514,42 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0;
-    padding: 20px;
 }
 
 .card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
 }
 
 h1 {
-    font-size: 28px;
-    margin: 0 0 10px 0;
-    background: linear-gradient(45deg, #818cf8, #22d3ee);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-p {
-    font-size: 14px;
-    color: #cbd5e1;
-    margin-bottom: 20px;
+    color: #6366f1;
+    margin-top: 0;
 }
 
 button {
     background: #6366f1;
     color: white;
     border: none;
-    padding: 10px 24px;
+    padding: 10px 20px;
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
 button:hover {
     background: #4f46e5;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-}
-
-button:active {
-    transform: translateY(1px);
+    transform: translateY(-2px);
 }`;
 
-export const DEFAULT_WEB_JS = `// JavaScript logic
-console.log("Hello from CodeVerse Web Lab!");
-
-const btn = document.getElementById("btn");
-if (btn) {
-    btn.addEventListener("click", () => {
-        console.log("Button clicked!");
-        alert("Welcome to the CodeVerse Frontend Playground!");
-    });
-}`;
+export const DEFAULT_WEB_JS = `// Client side scripts
+document.getElementById('btn').addEventListener('click', () => {
+    alert('CodeVerse sandbox interactive action successfully invoked!');
+    console.log('Button clicked inside iframe environment');
+});`;
