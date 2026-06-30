@@ -1394,8 +1394,8 @@ Explain why this error occurred and how to fix it.`;
 
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
-        <div className="modal-overlay fixed inset-0 z-50 bg-black/65 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
-          <div className="w-full max-w-md rounded-2xl border border-slate-700/60 bg-slate-950/95 backdrop-blur-xl overflow-hidden shadow-2xl animate-fade-in-up">
+        <div className="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
+          <div className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/95 backdrop-blur-xl overflow-hidden shadow-2xl animate-fade-in-up">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
