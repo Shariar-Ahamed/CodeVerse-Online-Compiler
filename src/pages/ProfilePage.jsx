@@ -185,7 +185,10 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           if (!querySnapshot.empty) {
             const docSnap = querySnapshot.docs[0];
             const data = docSnap.data();
-            const isProfileAdmin = data.role === 'admin' || (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com');
+            const isProfileAdmin = data.role === 'admin' || 
+                                   (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com') ||
+                                   (data.username && data.username.toLowerCase() === 'admin') ||
+                                   targetUsername === 'admin';
             
             if (isProfileAdmin) {
               setProfileData({
@@ -226,7 +229,10 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             const fallbackSnap = await getDoc(fallbackRef);
             if (fallbackSnap.exists()) {
               const data = fallbackSnap.data();
-              const isProfileAdmin = data.role === 'admin' || (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com');
+              const isProfileAdmin = data.role === 'admin' || 
+                                     (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com') ||
+                                     (data.username && data.username.toLowerCase() === 'admin') ||
+                                     username.toLowerCase() === 'admin';
               
               if (isProfileAdmin) {
                 setProfileData({
