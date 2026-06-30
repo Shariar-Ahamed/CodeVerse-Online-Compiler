@@ -436,15 +436,15 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     const count = (profileData.activityLogs && profileData.activityLogs[dateKey]) || 0;
     
     // Assign color class based on count intensity
-    let colorClass = "bg-indigo-900/10 border-slate-800"; // 0 compilations
+    let colorClass = "bg-slate-900/40 border-slate-800"; // 0 compilations
     if (count > 0 && count <= 2) {
-      colorClass = "bg-indigo-600/30 border-indigo-500/20"; // 1-2
+      colorClass = "bg-emerald-900/30 border-emerald-800/20"; // 1-2
     } else if (count >= 3 && count <= 5) {
-      colorClass = "bg-indigo-600/60 border-indigo-500/30"; // 3-5
+      colorClass = "bg-emerald-700/50 border-emerald-600/30"; // 3-5
     } else if (count >= 6 && count <= 9) {
-      colorClass = "bg-indigo-500 border-indigo-400/40"; // 6-9
+      colorClass = "bg-emerald-500 border-emerald-400/40"; // 6-9
     } else if (count >= 10) {
-      colorClass = "bg-cyan-400 border-cyan-300/40"; // 10+
+      colorClass = "bg-green-400 border-green-300/40"; // 10+
     }
     
     // Formatting date string for title tooltip: e.g. "Jun 30, 2026: 5 compilations"
@@ -939,11 +939,11 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 </div>
                 <div className="flex items-center gap-1 ml-auto">
                   <span>Less</span>
-                  <div className="w-2.5 h-2.5 rounded bg-indigo-900/10 border border-slate-800"></div>
-                  <div className="w-2.5 h-2.5 rounded bg-indigo-600/30 border border-indigo-500/20"></div>
-                  <div className="w-2.5 h-2.5 rounded bg-indigo-600/60 border border-indigo-500/30"></div>
-                  <div className="w-2.5 h-2.5 rounded bg-indigo-500 border border-indigo-400/40"></div>
-                  <div className="w-2.5 h-2.5 rounded bg-cyan-400 border border-cyan-300/40"></div>
+                  <div className="w-2.5 h-2.5 rounded bg-slate-900/40 border border-slate-800"></div>
+                  <div className="w-2.5 h-2.5 rounded bg-emerald-900/30 border border-emerald-800/20"></div>
+                  <div className="w-2.5 h-2.5 rounded bg-emerald-700/50 border border-emerald-600/30"></div>
+                  <div className="w-2.5 h-2.5 rounded bg-emerald-500 border border-emerald-400/40"></div>
+                  <div className="w-2.5 h-2.5 rounded bg-green-400 border border-green-300/40"></div>
                   <span>More</span>
                 </div>
               </div>
