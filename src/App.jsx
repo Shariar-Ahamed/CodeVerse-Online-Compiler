@@ -270,11 +270,12 @@ function AppContent() {
 
   const isAuthPage = location.pathname === '/login';
   const showFooter = !isAuthPage && location.pathname !== '/editor' && !location.pathname.startsWith('/challenges/');
+  const showHeader = showFooter; // Navbar is hidden on the exact same pages as footer
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden transition-colors duration-300">
       {/* Shared Dynamic Header */}
-      {!isAuthPage && (
+      {showHeader && (
         <Header
           user={user}
           onLogout={handleLogout}
@@ -284,7 +285,7 @@ function AppContent() {
       )}
 
       {/* Dynamic Route Content */}
-      <div className={`flex-grow flex flex-col ${isAuthPage ? '' : 'pt-16'}`}>
+      <div className={`flex-grow flex flex-col ${showHeader ? 'pt-16' : ''}`}>
         <Routes>
           <Route path="/" element={<LandingPage showToast={showToast} />} />
           <Route path="/login" element={<AuthPage user={user} onLogin={handleLogin} showToast={showToast} />} />
