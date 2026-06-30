@@ -854,6 +854,13 @@ Explain why this error occurred and how to fix it.`;
     setShowAIPanel(true);
   };
 
+  const filteredLanguages = Object.keys(LANGUAGES).filter((langKey) => {
+    const lang = LANGUAGES[langKey];
+    const nameMatch = lang.name.toLowerCase().includes(langSearchQuery.toLowerCase());
+    const descMatch = (lang.desc || "").toLowerCase().includes(langSearchQuery.toLowerCase());
+    return nameMatch || descMatch;
+  });
+
   return (
     <main className="flex-grow w-full px-4 lg:px-6 py-4 flex flex-col gap-4 animate-fade-in-up">
       {/* Background Blur Orbs */}
