@@ -138,7 +138,6 @@ function AppContent() {
           const userDocRef = doc(db, "users", firebaseUser.uid);
           const docSnap = await getDoc(userDocRef);
           const isAdminEmail = firebaseUser.email && (
-            firebaseUser.email.toLowerCase() === 'ripon23105101019@diu.edu.bd' ||
             firebaseUser.email.toLowerCase() === 'shahriar.diu64@gmail.com' ||
             firebaseUser.email.toLowerCase().includes('admin')
           );
