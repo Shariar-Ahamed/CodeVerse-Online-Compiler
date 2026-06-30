@@ -154,6 +154,31 @@ export default function ContactPage({ showToast }) {
 
   return (
     <div className="flex-grow flex flex-col justify-center items-center">
+      {/* Local custom premium floating animations */}
+      <style>{`
+        @keyframes float-main {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        @keyframes float-bubble-slow {
+          0%, 100% { transform: translateY(0px) translateX(0px) scale(0.9); opacity: 0.6; }
+          50% { transform: translateY(-12px) translateX(6px) scale(1.1); opacity: 0.95; }
+        }
+        @keyframes float-bubble-fast {
+          0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.5; }
+          50% { transform: translateY(10px) translateX(-8px) scale(0.85); opacity: 0.8; }
+        }
+        .animate-float-main {
+          animation: float-main 6s ease-in-out infinite;
+        }
+        .animate-bubble-slow {
+          animation: float-bubble-slow 5s ease-in-out infinite;
+        }
+        .animate-bubble-fast {
+          animation: float-bubble-fast 4s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Background Blur Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
@@ -161,7 +186,7 @@ export default function ContactPage({ showToast }) {
       <section
         id="contact"
         ref={contactRef}
-        className="w-full py-24 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative flex flex-col justify-center min-h-[70vh] overflow-hidden"
+        className="w-full pt-6 pb-6 px-4 sm:px-6 lg:px-8 bg-[var(--bg-primary)] relative flex flex-col justify-center overflow-hidden"
       >
         <canvas
           ref={contactCanvasRef}
@@ -169,135 +194,223 @@ export default function ContactPage({ showToast }) {
           className="absolute inset-0 pointer-events-none z-0"
         />
 
-        <div className="max-w-5xl mx-auto relative z-10 w-full animate-fade-in-up">
+        <div className="w-full max-w-5xl mx-auto relative z-10 w-full animate-fade-in-up bg-[#0d1321]/95 border border-[var(--border-color)]/70 md:border-none md:bg-transparent rounded-3xl md:rounded-none pt-6 pb-12 px-6 md:pt-12 md:pb-20 md:px-16 overflow-visible relative shadow-[0_20px_50px_rgba(99,102,241,0.12)] md:shadow-none">
+          {/* Desktop Custom SVG Background with custom cutouts & tabs */}
+          <div className="absolute inset-0 -z-10 pointer-events-none hidden md:block">
+            <svg
+              className="w-full h-full filter drop-shadow-[0_25px_45px_rgba(99,102,241,0.22)]"
+              viewBox="0 0 1000 620"
+              preserveAspectRatio="none"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M 140,40 
+                   L 860,40 
+                   A 40,40 0 0 1 900,80 
+                   A 25,25 0 0 1 900,130
+                   L 900,420
+                   A 20,20 0 0 0 900,460
+                   A 25,25 0 0 1 900,510
+                   L 900,530
+                   A 40,40 0 0 1 860,570
+                   L 140,570
+                   A 40,40 0 0 1 100,530
+                   L 100,310
+                   A 20,20 0 0 0 100,270
+                   A 25,25 0 0 1 100,220
+                   A 20,20 0 0 0 100,180
+                   L 100,140
+                   A 20,20 0 0 0 100,100
+                   L 100,80
+                   A 40,40 0 0 1 140,40
+                   Z"
+                fill="#0d1321"
+                fillOpacity="0.95"
+                stroke="rgba(99, 102, 241, 0.35)"
+                strokeWidth="1.5"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+          </div>
+
+          {/* Centered Header Section for the Entire Card */}
+          <div className="text-center mb-10 relative z-10 md:px-12">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white mb-2.5 font-sans">
+              Connect with <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">CodeVerse</span>
+            </h2>
+            <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
+              Have queries about our sandbox runtime compiler, custom coding challenges, leaderboard rankings, or developer ticket support? Send us a message and our dev support crew will get back to you shortly.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left Column: Contact details */}
-            <div className="flex flex-col gap-8 text-left">
-              <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-[10px] font-semibold text-indigo-400 mb-4 animate-pulse">
-                  <i className="fas fa-headset text-[9px]"></i>
-                  <span>24/7 Developer Support</span>
+            {/* Left Column: Illustration, Contact Details, Socials */}
+            <div className="flex flex-col gap-3 text-center items-center relative z-10 pl-4 md:pl-28 lg:pl-36 pr-4 md:pr-8">
+              {/* Animated Vector Illustration using PNG */}
+              <div className="relative w-64 h-64 flex items-center justify-center select-none mx-auto mb-0">
+                {/* Outer spinning decorative elements */}
+                <div className="absolute w-48 h-48 rounded-full border border-dashed border-indigo-500/20 animate-spin-slow z-0"></div>
+                <div className="absolute w-56 h-56 rounded-full border border-dotted border-purple-500/15 animate-spin-reverse-slow z-0"></div>
+
+                {/* Ambient background glow aura */}
+                <div className="absolute w-44 h-44 rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/15 to-cyan-500/20 blur-2xl animate-pulse z-0 pointer-events-none"></div>
+
+                {/* Floating Bubbles/Dots/Crosses around the PNG to merge it into the animation */}
+                {/* Bubble 1 (Cyan) */}
+                <div className="absolute top-4 left-6 w-3 h-3 rounded-full bg-cyan-400/40 border border-cyan-300/30 blur-[0.5px] animate-bubble-slow z-10"></div>
+                {/* Bubble 2 (Pink) */}
+                <div className="absolute bottom-22 right-6 w-4 h-4 rounded-full bg-pink-500/35 border border-pink-400/30 blur-[0.5px] animate-bubble-fast z-10"></div>
+                {/* Bubble 3 (Purple) */}
+                <div className="absolute top-8 right-8 w-2.5 h-2.5 rounded-full bg-purple-400/40 border border-purple-300/30 animate-bubble-slow [animation-delay:1s] z-10"></div>
+                {/* Bubble 4 (Yellow) */}
+                <div className="absolute bottom-26 left-8 w-3 h-3 rounded-full bg-yellow-400/30 border border-yellow-300/20 animate-bubble-fast [animation-delay:1.5s] z-10"></div>
+                {/* Cross 1 (Indigo/White) */}
+                <span className="absolute top-2 right-16 text-[10px] text-slate-400/60 animate-bubble-slow [animation-delay:2s] z-10">
+                  <i className="fas fa-plus"></i>
                 </span>
-                <h2 className="text-3xl font-extrabold tracking-tight text-white mb-4">
-                  Get in Touch
-                </h2>
-                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                  Have feedback, suggestions, or API connection issues? Drop us
-                  a message. Our compiler status monitors ensure logical sandbox
-                  resources stay up 24/7.
-                </p>
+                {/* Star 1 (Yellow) */}
+                <span className="absolute bottom-16 left-16 text-[10px] text-yellow-300/50 animate-bubble-fast [animation-delay:0.5s] z-10">
+                  <i className="fas fa-star"></i>
+                </span>
+
+                {/* Main Mail Illustration Image with Float Animation */}
+                <img
+                  src="/contact-img.png"
+                  alt="Contact Illustration"
+                  className="w-52 h-52 object-contain z-10 animate-float-main drop-shadow-[0_12px_28px_rgba(99,102,241,0.25)]"
+                />
               </div>
 
-              {/* Quick Info Cards */}
-              <div className="flex flex-col gap-4">
-                <a
-                  href="mailto:shariaralways@gmail.com"
-                  className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-all duration-300"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-base">
-                    <i className="fas fa-envelope"></i>
+              {/* Unified Contact Info & Socials Container */}
+              <div className="flex flex-col gap-4 items-center w-full mt-[-28px]">
+                {/* Contact Details */}
+                <div className="flex flex-col gap-2 text-center w-full max-w-sm mx-auto">
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="text-indigo-400 text-sm shrink-0">
+                      <i className="fas fa-map-marker-alt"></i>
+                    </div>
+                    <p className="text-[12px] text-slate-300 leading-relaxed">
+                      Dhaka, Bangladesh
+                    </p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">
-                      Direct Support
-                    </h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="text-cyan-400 text-sm shrink-0">
+                      <i className="fas fa-phone-alt"></i>
+                    </div>
+                    <p className="text-[12px] text-slate-300 leading-relaxed">
+                      +8801320916624
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="text-purple-400 text-sm shrink-0">
+                      <i className="fas fa-envelope"></i>
+                    </div>
+                    <a
+                      href="mailto:shariaralways@gmail.com"
+                      className="text-[12px] text-slate-300 hover:text-indigo-400 leading-relaxed transition-colors duration-150"
+                    >
                       shariaralways@gmail.com
-                    </p>
+                    </a>
                   </div>
-                </a>
+                </div>
 
-                <a
-                  href="https://www.linkedin.com/in/shariarahamed/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-panel p-4 rounded-xl border border-[var(--border-color)] flex items-center gap-4 hover:border-cyan-500/30 transition-all duration-300"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-base">
-                    <i className="fab fa-linkedin-in"></i>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">
-                      Professional Profile
-                    </h4>
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
-                      linkedin.com/in/shariarahamed
-                    </p>
-                  </div>
-                </a>
-
-                <div className="flex items-center gap-2 px-1 text-xs text-[var(--text-secondary)] font-medium">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span>All compiler sandboxes fully operational</span>
+                {/* Social icons */}
+                <div className="flex items-center justify-center gap-4 mt-1">
+                  <a
+                    href="https://www.facebook.com/Shahriar.TheBrownCat"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-full bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90 shadow-sm"
+                  >
+                    <i className="fab fa-facebook-f text-sm"></i>
+                  </a>
+                  <a
+                    href="https://x.com/ShariarAlways"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-full bg-cyan-500/10 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90 shadow-sm"
+                  >
+                    <i className="fab fa-twitter text-sm"></i>
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/shariarahamed/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-full bg-purple-500/10 hover:bg-purple-500/25 border border-purple-500/30 text-purple-400 hover:text-white flex items-center justify-center transition-all duration-200 active:scale-90 shadow-sm"
+                  >
+                    <i className="fab fa-linkedin-in text-sm"></i>
+                  </a>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Contact Form */}
-            <form
-              onSubmit={handleContactSubmit}
-              className="glass-panel p-8 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5 shadow-xl text-left"
-            >
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                  placeholder="Write your name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
-                  placeholder="abc@yourdomain.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Message
-                </label>
-                <textarea
-                  required
-                  rows="4"
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
-                  placeholder="Enter your comments or questions..."
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitLoading}
-                className="w-full py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200 btn-premium-glow disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            <div className="flex flex-col gap-6 text-left relative z-10 pr-4 md:pr-20 lg:pr-24 pl-4 md:pl-8">
+              <form
+                onSubmit={handleContactSubmit}
+                className="flex flex-col gap-4"
               >
-                {submitLoading ? (
-                  <>
-                    <i className="fas fa-circle-notch animate-spin"></i>
-                    <span>Sending Message...</span>
-                  </>
-                ) : (
-                  <span>Send Message</span>
-                )}
-              </button>
-            </form>
+                <div>
+                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    className="w-full px-6 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200"
+                    placeholder="Write your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                    Your Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    className="w-full px-6 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200"
+                    placeholder="abc@yourdomain.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[12px] font-semibold text-indigo-200/80 mb-2">
+                    Your Message
+                  </label>
+                  <textarea
+                    required
+                    rows="4"
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    className="w-full px-6 py-3.5 rounded-2xl text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)] transition-all duration-200 resize-none"
+                    placeholder="Type something if you want..."
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitLoading}
+                  className="w-40 py-2.5 rounded-full font-bold text-[11px] uppercase tracking-wider text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:from-indigo-400 hover:to-purple-500 active:scale-95 transition-all duration-300 shadow-[0_4px_15px_rgba(99,102,241,0.35)] hover:shadow-[0_4px_22px_rgba(99,102,241,0.55)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                >
+                  {submitLoading ? (
+                    <>
+                      <i className="fas fa-circle-notch animate-spin text-xs"></i>
+                      <span>Sending Message...</span>
+                    </>
+                  ) : (
+                    <span>Send Message</span>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
