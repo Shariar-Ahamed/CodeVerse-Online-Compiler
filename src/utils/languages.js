@@ -49,7 +49,7 @@ export const LANGUAGES = {
     defaultCode: `#include <stdio.h>
 
 int main() {
-    printf("Hello, World! Welcome to C.\\n");
+    printf("Hello, World!\\n");
     return 0;
 }`
   },
@@ -65,7 +65,7 @@ int main() {
     defaultCode: `#include <iostream>
 
 int main() {
-    std::cout << "Hello, World! Welcome to C++." << std::endl;
+    std::cout << "Hello, World!" << std::endl;
     return 0;
 }`
   },
@@ -78,30 +78,7 @@ int main() {
     badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
     icon: "fab fa-python",
     categories: ["popular", "programming"],
-    defaultCode: `# Python 3 template
-import sys
-
-def main():
-    # Read all inputs from standard input (stdin)
-    input_data = sys.stdin.read().strip()
-    name = input_data if input_data else "World"
-    
-    # Log the greeting message
-    print(f"Hello, {name}! Welcome to CodeVerse Online Compiler.")
-    
-    # Demonstration of calculations
-    result = factorial(5)
-    print(f"Factorial of 5 is: {result}")
-
-# Define the factorial function using iteration for better performance
-def factorial(n):
-    result = 1
-    for i in range(2, n + 1):
-        result *= i
-    return result
-
-if __name__ == "__main__":
-    main()`
+    defaultCode: `print("Hello, World!")`
   },
   javascript: {
     id: 102,
@@ -112,8 +89,7 @@ if __name__ == "__main__":
     badgeClass: "bg-yellow-500/10 border-yellow-500/20 text-yellow-500",
     icon: "fab fa-js",
     categories: ["popular", "programming", "web"],
-    defaultCode: `// NodeJS runtime env
-console.log("Hello, World! Welcome to JavaScript.");`
+    defaultCode: `console.log("Hello, World!");`
   },
   java: {
     id: 97,
@@ -126,7 +102,7 @@ console.log("Hello, World! Welcome to JavaScript.");`
     categories: ["popular", "programming"],
     defaultCode: `public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World! Welcome to Java.");
+        System.out.println("Hello, World!");
     }
 }`
   },
@@ -139,7 +115,7 @@ console.log("Hello, World! Welcome to JavaScript.");`
     badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming", "web"],
-    defaultCode: `const greeting: string = "Hello, World! Welcome to TypeScript.";\nconsole.log(greeting);`
+    defaultCode: `const greeting: string = "Hello, World!";\nconsole.log(greeting);`
   },
   rust: {
     id: 108,
@@ -151,7 +127,7 @@ console.log("Hello, World! Welcome to JavaScript.");`
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `fn main() {
-    println!("Hello, World! Welcome to Rust.");
+    println!("Hello, World!");
 }`
   },
   go: {
@@ -163,7 +139,7 @@ console.log("Hello, World! Welcome to JavaScript.");`
     badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `package main\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World! Welcome to Go.")\n}`
+    defaultCode: `package main\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}`
   },
   sql: {
     id: 82,
@@ -216,8 +192,7 @@ _start:
     icon: "fas fa-terminal",
     categories: ["programming"],
     defaultCode: `#!/bin/bash
-# Simple shell script
-echo "Hello, World! Welcome to Bash Shell."`
+echo "Hello, World!"`
   },
   basic: {
     id: 47,
@@ -228,8 +203,7 @@ echo "Hello, World! Welcome to Bash Shell."`
     badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `' FBC Basic hello world
-print "Hello, World! Welcome to Basic."`
+    defaultCode: `print "Hello, World!"`
   },
   clojure: {
     id: 86,
@@ -240,7 +214,7 @@ print "Hello, World! Welcome to Basic."`
     badgeClass: "bg-blue-400/10 border-blue-400/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `(println "Hello, World! Welcome to Clojure.")`
+    defaultCode: `(println "Hello, World!")`
   },
   cobol: {
     id: 77,
@@ -252,9 +226,9 @@ print "Hello, World! Welcome to Basic."`
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `       IDENTIFICATION DIVISION.
-       PROGRAM-ID. HELLO-WORLD.
+       PROGRAM-ID. HELLO.
        PROCEDURE DIVISION.
-           DISPLAY 'Hello, World! Welcome to COBOL.'.
+           DISPLAY 'Hello, World!'.
            STOP RUN.`
   },
   coffeescript: {
@@ -266,7 +240,7 @@ print "Hello, World! Welcome to Basic."`
     badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-600",
     icon: "fab fa-js",
     categories: ["programming", "web"],
-    defaultCode: `console.log "Hello, World! Welcome to CoffeeScript."`
+    defaultCode: `console.log "Hello, World!"`
   },
   d: {
     id: 56,
@@ -280,7 +254,7 @@ print "Hello, World! Welcome to Basic."`
     defaultCode: `import std.stdio;
 
 void main() {
-    writeln("Hello, World! Welcome to D.");
+    writeln("Hello, World!");
 }`
   },
   dart: {
@@ -293,7 +267,7 @@ void main() {
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `void main() {
-  print('Hello, World! Welcome to Dart.');
+  print('Hello, World!');
 }`
   },
   elixir: {
@@ -305,7 +279,7 @@ void main() {
     badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
     icon: "fas fa-code",
     categories: ["programming", "web"],
-    defaultCode: `IO.puts "Hello, World! Welcome to Elixir."`
+    defaultCode: `IO.puts "Hello, World!"`
   },
   erlang: {
     id: 58,
@@ -316,12 +290,11 @@ void main() {
     badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `%- Erlang hello world
--module(main).
+    defaultCode: `-module(main).
 -export([start/0]).
 
 start() ->
-    io:fwrite("Hello, World! Welcome to Erlang.~n").`
+    io:fwrite("Hello, World!~n").`
   },
   fortran: {
     id: 59,
@@ -333,7 +306,7 @@ start() ->
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `program hello
-  print *, "Hello, World! Welcome to Fortran."
+  print *, "Hello, World!"
 end program hello`
   },
   fsharp: {
@@ -345,7 +318,7 @@ end program hello`
     badgeClass: "bg-purple-600/10 border-purple-600/20 text-purple-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `printfn "Hello, World! Welcome to F#."`
+    defaultCode: `printfn "Hello, World!"`
   },
   groovy: {
     id: 88,
@@ -356,7 +329,7 @@ end program hello`
     badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `println "Hello, World! Welcome to Groovy."`
+    defaultCode: `println "Hello, World!"`
   },
   haskell: {
     id: 61,
@@ -367,7 +340,7 @@ end program hello`
     badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `main = putStrLn "Hello, World! Welcome to Haskell."`
+    defaultCode: `main = putStrLn "Hello, World!"`
   },
   lisp: {
     id: 55,
@@ -378,7 +351,7 @@ end program hello`
     badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `(write-line "Hello, World! Welcome to Common Lisp.")`
+    defaultCode: `(write-line "Hello, World!")`
   },
   kotlin: {
     id: 111,
@@ -390,7 +363,7 @@ end program hello`
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `fun main() {
-    println("Hello, World! Welcome to Kotlin.")
+    println("Hello, World!")
 }`
   },
   lua: {
@@ -402,8 +375,7 @@ end program hello`
     badgeClass: "bg-purple-500/10 border-purple-500/20 text-purple-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `-- Lua script
-print("Hello, World! Welcome to Lua.")`
+    defaultCode: `print("Hello, World!")`
   },
   objectivec: {
     id: 79,
@@ -414,7 +386,7 @@ print("Hello, World! Welcome to Lua.")`
     badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `#import <Foundation/Foundation.h>\n\nint main(int argc, const char * argv[]) {\n    @autoreleasepool {\n        NSLog(@"Hello, World! Welcome to Objective-C.");\n    }\n    return 0;\n}`
+    defaultCode: `#import <Foundation/Foundation.h>\n\nint main() {\n    NSLog(@"Hello, World!");\n    return 0;\n}`
   },
   ocaml: {
     id: 65,
@@ -425,7 +397,7 @@ print("Hello, World! Welcome to Lua.")`
     badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `print_endline "Hello, World! Welcome to OCaml."`
+    defaultCode: `print_endline "Hello, World!"`
   },
   octave: {
     id: 66,
@@ -436,7 +408,7 @@ print("Hello, World! Welcome to Lua.")`
     badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
     icon: "fas fa-calculator",
     categories: ["programming"],
-    defaultCode: `disp('Hello, World! Welcome to GNU Octave.')`
+    defaultCode: `disp('Hello, World!')`
   },
   pascal: {
     id: 67,
@@ -449,7 +421,7 @@ print("Hello, World! Welcome to Lua.")`
     categories: ["programming"],
     defaultCode: `program Hello;
 begin
-  writeln('Hello, World! Welcome to Pascal.');
+  writeln('Hello, World!');
 end.`
   },
   perl: {
@@ -461,9 +433,7 @@ end.`
     badgeClass: "bg-teal-500/10 border-teal-500/20 text-teal-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `use strict;
-use warnings;
-print "Hello, World! Welcome to Perl.\\n";`
+    defaultCode: `print "Hello, World!\\n";`
   },
   php: {
     id: 98,
@@ -475,7 +445,7 @@ print "Hello, World! Welcome to Perl.\\n";`
     icon: "fab fa-php",
     categories: ["programming", "web"],
     defaultCode: `<?php
-echo "Hello, World! Welcome to PHP.\\n";`
+echo "Hello, World!\\n";`
   },
   prolog: {
     id: 69,
@@ -488,7 +458,7 @@ echo "Hello, World! Welcome to PHP.\\n";`
     categories: ["programming"],
     defaultCode: `:- initialization(main).
 main :-
-    write('Hello, World! Welcome to Prolog.'), nl.`
+    write('Hello, World!'), nl.`
   },
   ruby: {
     id: 72,
@@ -499,7 +469,7 @@ main :-
     badgeClass: "bg-red-500/10 border-red-500/20 text-red-500",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `puts "Hello, World! Welcome to Ruby."`
+    defaultCode: `puts "Hello, World!"`
   },
   scala: {
     id: 112,
@@ -511,7 +481,7 @@ main :-
     icon: "fas fa-code",
     categories: ["programming"],
     defaultCode: `object Main extends App {
-  println("Hello, World! Welcome to Scala.")
+  println("Hello, World!")
 }`
   },
   swift: {
@@ -523,7 +493,7 @@ main :-
     badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
     icon: "fab fa-swift",
     categories: ["programming"],
-    defaultCode: `print("Hello, World! Welcome to Swift.")`
+    defaultCode: `print("Hello, World!")`
   },
   vbnet: {
     id: 84,
@@ -534,7 +504,13 @@ main :-
     badgeClass: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `' FBC Basic hello world\nprint "Hello, World! Welcome to Basic."'`
+    defaultCode: `Imports System
+
+Module Program
+    Sub Main()
+        Console.WriteLine("Hello, World!")
+    End Sub
+End Module`
   }
 };
 
