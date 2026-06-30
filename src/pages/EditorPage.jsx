@@ -1492,14 +1492,14 @@ Explain why this error occurred and how to fix it.`;
             setShowLanguageModal(false);
             setLangSearchQuery("");
           }}
-          className="modal-overlay fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-[#0f1524]/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/98 backdrop-blur-2xl overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
+            className="w-full max-w-4xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-black/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                   <i className="fas fa-cubes text-sm"></i>
@@ -1517,7 +1517,7 @@ Explain why this error occurred and how to fix it.`;
                   placeholder="Search languages..."
                   value={langSearchQuery}
                   onChange={(e) => setLangSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-4 py-1.5 rounded-xl text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                  className="w-full pl-8 pr-4 py-1.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
                 />
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-[var(--text-secondary)]">
                   <i className="fas fa-search text-[10px]"></i>
@@ -1555,8 +1555,8 @@ Explain why this error occurred and how to fix it.`;
                         }}
                         className={`group flex items-center gap-3.5 p-4 rounded-2xl border transition-all duration-300 cursor-pointer select-none active:scale-98 ${
                           isSelected
-                            ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/5 text-white'
-                            : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 hover:bg-[var(--bg-tertiary)]/65 hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                            ? 'border-indigo-500 bg-[var(--bg-tertiary)] shadow-lg shadow-indigo-500/5 text-white'
+                            : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                       >
                         {/* Dynamic Colored Icon Container using badgeClass */}
@@ -1583,7 +1583,7 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3.5 border-t border-[var(--border-color)] bg-black/10 flex items-center justify-between shrink-0 text-[10px] text-[var(--text-secondary)]">
+            <div className="px-6 py-3.5 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/40 flex items-center justify-between shrink-0 text-[10px] text-[var(--text-secondary)]">
               <span>{filteredLanguages.length} environments available</span>
               <button
                 onClick={() => {
