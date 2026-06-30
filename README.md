@@ -1,13 +1,58 @@
-# CodeVerse — Online Compiler & Live Web Editor 🚀
+# 
 
 [![Vite Build](https://img.shields.io/badge/Vite-v8.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
 [![React Version](https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Deployment: Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://code-verse-online.vercel.app/)
 
+
+
+
+
+
+
+
+<h1 align="center">CodeVerse — Online Compiler & Live Web Editor 🚀</h1>
+
+<p align="center">
+  <img src="https://i.postimg.cc/65fGfd62/New-Project.png" alt="CodeVerse Banner">
+</p>
+
+---
+
+<p align="center">
+  <img src="https://img.shields.io/badge/CodeVerse-Online%20Compiler-6366f1?style=for-the-badge&logo=visual-studio-code&logoColor=white">
+  <img src="https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black">
+  <img src="https://img.shields.io/badge/Vite-v8.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/license/Shariar-Ahamed/CodeVerse-Online-Compiler">
+  <img src="https://img.shields.io/github/repo-size/Shariar-Ahamed/CodeVerse-Online-Compiler">
+  <img src="https://img.shields.io/github/last-commit/Shariar-Ahamed/CodeVerse-Online-Compiler">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/Shariar-Ahamed/CodeVerse-Online-Compiler?style=social">
+  <img src="https://img.shields.io/github/forks/Shariar-Ahamed/CodeVerse-Online-Compiler?style=social">
+</p>
+
+<p align="center">
+  <a href="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/89483e20-f757-4aff-b9da-3a0683ef6fab">
+    <img src="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/89483e20-f757-4aff-b9da-3a0683ef6fab.svg" alt="wakatime">
+  </a>
+</p>
+
+
+---
+
+<p align="center">
+  CodeVerse is a premium, high-performance web-based Integrated Development Environment (IDE) and real-time frontend playground. Built using <b>React + Vite</b>, it features a gorgeous custom glassmorphic UI, Microsoft's Monaco Editor engine, sandboxed code compilation, database activity tracking, and a secure administration panel.
+</p>
+
 > **Live Production Demo**: **[code-verse-online.vercel.app](https://code-verse-online.vercel.app/)**
 
-CodeVerse is a premium, high-performance web-based Integrated Development Environment (IDE) and real-time frontend playground. Built using **React + Vite**, it features a gorgeous custom glassmorphic UI, Microsoft's Monaco Editor engine, sandboxed code compilation, database activity tracking, and a secure administration panel.
+
 
 ---
 
