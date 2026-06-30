@@ -31,8 +31,9 @@ export default function LeaderboardPage({ user, showToast }) {
         
         snapshot.forEach(docSnap => {
           const data = docSnap.data();
-          // Skip guests or records with null scores
-          if (data.score !== undefined && data.score >= 0) {
+          const isUserAdmin = data.role === 'admin' || (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com');
+          // Skip guests, records with null scores, and admins
+          if (data.score !== undefined && data.score >= 0 && !isUserAdmin) {
             ranks.push({
               uid: docSnap.id,
               name: data.name || "Developer",

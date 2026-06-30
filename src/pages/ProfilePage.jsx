@@ -185,27 +185,25 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           if (!querySnapshot.empty) {
             const docSnap = querySnapshot.docs[0];
             const data = docSnap.data();
-            setProfileData({
-              name: data.name || 'Developer',
-              username: data.username || '',
-              email: data.email || '',
-              title: data.title || 'Premium Developer',
-              bio: data.bio || '',
-              skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
-              photoURL: data.photoURL || '',
-              github: data.socials?.github || '',
-              linkedin: data.socials?.linkedin || '',
-              website: data.socials?.website || '',
-              isVerified: !!data.isVerified,
-              lastSeen: data.lastSeen || '',
-              activityLogs: data.activityLogs || {}
-            });
-          } else {
-            // Try fallback fetch by doc ID (in case it is a UID instead of a username)
-            const fallbackRef = doc(db, "users", username);
-            const fallbackSnap = await getDoc(fallbackRef);
-            if (fallbackSnap.exists()) {
-              const data = fallbackSnap.data();
+            const isProfileAdmin = data.role === 'admin' || (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com');
+            
+            if (isProfileAdmin) {
+              setProfileData({
+                name: 'User Not Found',
+                username: targetUsername,
+                email: '',
+                title: 'Unknown',
+                bio: 'This profile does not exist on CodeVerse.',
+                skills: [],
+                photoURL: '',
+                github: '',
+                linkedin: '',
+                website: '',
+                isVerified: false,
+                lastSeen: '',
+                activityLogs: {}
+              });
+            } else {
               setProfileData({
                 name: data.name || 'Developer',
                 username: data.username || '',
@@ -221,6 +219,48 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 lastSeen: data.lastSeen || '',
                 activityLogs: data.activityLogs || {}
               });
+            }
+          } else {
+            // Try fallback fetch by doc ID (in case it is a UID instead of a username)
+            const fallbackRef = doc(db, "users", username);
+            const fallbackSnap = await getDoc(fallbackRef);
+            if (fallbackSnap.exists()) {
+              const data = fallbackSnap.data();
+              const isProfileAdmin = data.role === 'admin' || (data.email && data.email.toLowerCase() === 'shahriar.diu64@gmail.com');
+              
+              if (isProfileAdmin) {
+                setProfileData({
+                  name: 'User Not Found',
+                  username: username,
+                  email: '',
+                  title: 'Unknown',
+                  bio: 'This profile does not exist on CodeVerse.',
+                  skills: [],
+                  photoURL: '',
+                  github: '',
+                  linkedin: '',
+                  website: '',
+                  isVerified: false,
+                  lastSeen: '',
+                  activityLogs: {}
+                });
+              } else {
+                setProfileData({
+                  name: data.name || 'Developer',
+                  username: data.username || '',
+                  email: data.email || '',
+                  title: data.title || 'Premium Developer',
+                  bio: data.bio || '',
+                  skills: Array.isArray(data.skills) ? data.skills : ['JavaScript', 'React', 'C++'],
+                  photoURL: data.photoURL || '',
+                  github: data.socials?.github || '',
+                  linkedin: data.socials?.linkedin || '',
+                  website: data.socials?.website || '',
+                  isVerified: !!data.isVerified,
+                  lastSeen: data.lastSeen || '',
+                  activityLogs: data.activityLogs || {}
+                });
+              }
             } else {
               // Profile not found
               setProfileData({
