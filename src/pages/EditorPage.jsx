@@ -495,6 +495,22 @@ export default function EditorPage({ user, theme, showToast }) {
     }
   };
 
+  const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(id);
+      return response;
+    } catch (e) {
+      clearTimeout(id);
+      throw e;
+    }
+  };
+
   // Run Code logic
   const runCode = async () => {
     if (currentLanguage === "html") {
@@ -544,7 +560,7 @@ export default function EditorPage({ user, theme, showToast }) {
         headers["X-RapidAPI-Key"] = apiKey;
       }
 
-      const response = await fetch(`${apiEndpoint}/submissions?base64_encoded=true&wait=false`, {
+      const response = await fetchWithTimeout(`${apiEndpoint}/submissions?base64_encoded=true&wait=false`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({
@@ -553,7 +569,7 @@ export default function EditorPage({ user, theme, showToast }) {
           stdin: encodeBase64(stdin),
           redirect_stderr_to_stdout: true
         })
-      });
+      }, 10000);
 
       if (!response.ok) {
         const errData = await response.json();

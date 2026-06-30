@@ -181,6 +181,22 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     editorRef.current = editor;
   };
 
+  const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(id);
+      return response;
+    } catch (e) {
+      clearTimeout(id);
+      throw e;
+    }
+  };
+
   // 3. RUN CODE: Compiles code against only the first (public) test case or custom input
   const handleRunCode = async () => {
     if (isExecuting || !challenge) return;
@@ -228,7 +244,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
         
       const langConfig = SUPPORTED_LANGS.find(l => l.key === selectedLang);
 
-      const response = await fetch(`${apiEndpoint}/submissions?base64_encoded=true&wait=false`, {
+      const response = await fetchWithTimeout(`${apiEndpoint}/submissions?base64_encoded=true&wait=false`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({
@@ -237,7 +253,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           stdin: encodeBase64(sampleCase.input),
           redirect_stderr_to_stdout: true
         })
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`Submit connection error. Status: ${response.status}`);
@@ -356,11 +372,11 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
         redirect_stderr_to_stdout: true
       }));
 
-      const response = await fetch(`${apiEndpoint}/submissions/batch?base64_encoded=true&wait=false`, {
+      const response = await fetchWithTimeout(`${apiEndpoint}/submissions/batch?base64_encoded=true&wait=false`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({ submissions: submissionsPayload })
-      });
+      }, 12000);
 
       if (!response.ok) {
         throw new Error(`Batch submission failed. Status: ${response.status}`);
