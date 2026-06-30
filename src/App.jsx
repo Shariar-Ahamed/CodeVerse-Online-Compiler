@@ -187,6 +187,29 @@ function AppContent() {
     return () => unsubscribe();
   }, []);
 
+  // --- Active Presence Heartbeat Effect ---
+  useEffect(() => {
+    if (!user || user.isGuest || !user.uid) return;
+
+    const updateUserPresence = async () => {
+      try {
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(userRef, {
+          lastSeen: new Date().toISOString()
+        }, { merge: true });
+      } catch (err) {
+        console.error("Failed to update user presence heartbeat:", err);
+      }
+    };
+
+    updateUserPresence();
+
+    // Heartbeat every 2 minutes (120000ms)
+    const interval = setInterval(updateUserPresence, 120000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   const isInitializing = authChecking || redirectChecking;
 
   // Show loading indicator during initial auth state recovery

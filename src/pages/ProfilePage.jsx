@@ -46,7 +46,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     github: '',
     linkedin: '',
     website: '',
-    isVerified: false
+    isVerified: false,
+    lastSeen: ''
   });
 
   const [inputs, setInputs] = useState({
@@ -60,6 +61,37 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     linkedin: '',
     website: ''
   });
+
+  const [timeTick, setTimeTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeTick(prev => prev + 1);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatLastSeen = (lastSeen) => {
+    if (!lastSeen) return "Offline";
+    const lastSeenDate = new Date(lastSeen);
+    const diffMs = Date.now() - lastSeenDate.getTime();
+    
+    if (diffMs < 300000) {
+      return "Active Now";
+    }
+    
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) {
+      return `Active ${diffMins}m ago`;
+    }
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) {
+      return `Active ${diffHours}h ago`;
+    }
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `Active ${diffDays}d ago`;
+  };
 
   // Fetch Custom Profile Metadata from Firestore on mount
   useEffect(() => {
@@ -104,7 +136,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               github: data.socials?.github || '',
               linkedin: data.socials?.linkedin || '',
               website: data.socials?.website || '',
-              isVerified: !!data.isVerified
+              isVerified: !!data.isVerified,
+              lastSeen: data.lastSeen || ''
             });
           } else {
             // Document doesn't exist, set from auth state
@@ -135,7 +168,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               github: '',
               linkedin: '',
               website: '',
-              isVerified: false
+              isVerified: false,
+              lastSeen: new Date().toISOString()
             });
           }
         } else {
@@ -159,7 +193,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               github: data.socials?.github || '',
               linkedin: data.socials?.linkedin || '',
               website: data.socials?.website || '',
-              isVerified: !!data.isVerified
+              isVerified: !!data.isVerified,
+              lastSeen: data.lastSeen || ''
             });
           } else {
             // Try fallback fetch by doc ID (in case it is a UID instead of a username)
@@ -178,7 +213,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 github: data.socials?.github || '',
                 linkedin: data.socials?.linkedin || '',
                 website: data.socials?.website || '',
-                isVerified: !!data.isVerified
+                isVerified: !!data.isVerified,
+                lastSeen: data.lastSeen || ''
               });
             } else {
               // Profile not found
@@ -193,7 +229,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 github: '',
                 linkedin: '',
                 website: '',
-                isVerified: false
+                isVerified: false,
+                lastSeen: ''
               });
             }
           }
@@ -337,7 +374,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
       }
 
       // 3. Update Local state to render immediately
-      setProfileData({
+      setProfileData(prev => ({
+        ...prev,
         name: inputs.name,
         username: cleanedUsername,
         email: user.email,
@@ -348,7 +386,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         github: inputs.github,
         linkedin: inputs.linkedin,
         website: inputs.website
-      });
+      }));
 
       showToast("Profile updated successfully", "success");
       setIsEditing(false);
@@ -634,7 +672,24 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 {profileData.username && (
                   <p className="text-xs text-indigo-400 font-mono font-bold">@{profileData.username}</p>
                 )}
-                {isOwnProfile && <p id="profile-email" className="text-[10px] text-[var(--text-muted)] font-mono truncate mt-0.5">{profileData.email || ''}</p>}
+                {/* Active Presence Badge */}
+                <div className="flex items-center justify-center gap-1.5 mt-1.5 select-none">
+                  {profileData.lastSeen && (Date.now() - new Date(profileData.lastSeen).getTime() < 300000) ? (
+                    <>
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Active Now</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-500"></span>
+                      <span className="text-[10px] text-slate-400 font-semibold">{formatLastSeen(profileData.lastSeen)}</span>
+                    </>
+                  )}
+                </div>
+                {isOwnProfile && <p id="profile-email" className="text-[10px] text-[var(--text-muted)] font-mono truncate mt-1">{profileData.email || ''}</p>}
                 <span className="inline-block mx-auto mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                   {profileData.title || 'Premium Developer'}
                 </span>

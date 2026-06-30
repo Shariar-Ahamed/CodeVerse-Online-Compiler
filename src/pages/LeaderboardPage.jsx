@@ -8,6 +8,14 @@ export default function LeaderboardPage({ user, showToast }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [timeTick, setTimeTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeTick(prev => prev + 1);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const fetchRankings = async () => {
       try {
@@ -33,7 +41,8 @@ export default function LeaderboardPage({ user, showToast }) {
               title: data.title || "Premium Developer",
               score: data.score || 0,
               solvedCount: Array.isArray(data.solvedChallenges) ? data.solvedChallenges.length : 0,
-              isVerified: !!data.isVerified
+              isVerified: !!data.isVerified,
+              lastSeen: data.lastSeen || ""
             });
           }
         });
@@ -160,17 +169,24 @@ export default function LeaderboardPage({ user, showToast }) {
                               onClick={() => navigate(`/profile/${player.username || player.uid}`)}
                               className="flex items-center gap-3 cursor-pointer group/dev hover:scale-[1.03] origin-left transition-all duration-200"
                             >
-                              {player.photoURL ? (
-                                <img
-                                  src={player.photoURL}
-                                  alt={player.name}
-                                  className="w-9 h-9 rounded-full object-cover border border-white/10 group-hover/dev:border-indigo-400 transition-colors"
-                                />
-                              ) : (
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner group-hover/dev:border-indigo-400 transition-colors">
-                                  {player.name.charAt(0)}
-                                </div>
-                              )}
+                              <div className="relative flex-shrink-0">
+                                {player.photoURL ? (
+                                  <img
+                                    src={player.photoURL}
+                                    alt={player.name}
+                                    className="w-9 h-9 rounded-full object-cover border border-white/10 group-hover/dev:border-indigo-400 transition-colors"
+                                  />
+                                ) : (
+                                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner group-hover/dev:border-indigo-400 transition-colors">
+                                    {player.name.charAt(0)}
+                                  </div>
+                                )}
+                                {player.lastSeen && (Date.now() - new Date(player.lastSeen).getTime() < 300000) && (
+                                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[#0d1321] bg-emerald-400">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  </span>
+                                )}
+                              </div>
                               <div>
                                 <span className={`font-bold flex items-center gap-1.5 group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
                                   <span>{player.name}</span>
