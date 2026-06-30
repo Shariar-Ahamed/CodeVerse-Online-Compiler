@@ -78,7 +78,30 @@ int main() {
     badgeClass: "bg-amber-500/10 border-amber-500/20 text-amber-500",
     icon: "fab fa-python",
     categories: ["popular", "programming"],
-    defaultCode: `print("Hello, World! Welcome to Python.")`
+    defaultCode: `# Python 3 template
+import sys
+
+def main():
+    # Read all inputs from standard input (stdin)
+    input_data = sys.stdin.read().strip()
+    name = input_data if input_data else "World"
+    
+    # Log the greeting message
+    print(f"Hello, {name}! Welcome to CodeVerse Online Compiler.")
+    
+    # Demonstration of calculations
+    result = factorial(5)
+    print(f"Factorial of 5 is: {result}")
+
+# Define the factorial function using iteration for better performance
+def factorial(n):
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+if __name__ == "__main__":
+    main()`
   },
   javascript: {
     id: 102,
