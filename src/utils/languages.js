@@ -476,6 +476,125 @@ void main() {
     writeln("Hello, CodeVerse D Workspace!");
 }`
   },
+  cobol: {
+    id: 77,
+    name: "COBOL",
+    monacoId: "cobol",
+    extension: "cbl",
+    badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-500",
+    defaultCode: `       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO-WORLD.
+       PROCEDURE DIVISION.
+           DISPLAY 'Hello, World! Welcome to CodeVerse COBOL.'.
+           STOP RUN.`
+  },
+  prolog: {
+    id: 69,
+    name: "Prolog",
+    monacoId: "prolog",
+    extension: "pl",
+    badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
+    defaultCode: `:- initialization(main).
+main :-
+    write('Hello, World! Welcome to CodeVerse Prolog.'), nl.`
+  },
+  scheme: {
+    id: 70,
+    name: "Scheme",
+    monacoId: "scheme",
+    extension: "scm",
+    badgeClass: "bg-cyan-600/10 border-cyan-600/20 text-cyan-500",
+    defaultCode: `(display "Hello, World! Welcome to CodeVerse Scheme.")
+(newline)`
+  },
+  octave: {
+    id: 66,
+    name: "GNU Octave",
+    monacoId: "octave",
+    extension: "m",
+    badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
+    defaultCode: `disp('Hello, World! Welcome to CodeVerse GNU Octave.')`
+  },
+  fsharp: {
+    id: 87,
+    name: "F#",
+    monacoId: "fsharp",
+    extension: "fs",
+    badgeClass: "bg-purple-600/10 border-purple-600/20 text-purple-500",
+    defaultCode: `printfn "Hello, World! Welcome to CodeVerse F#."`
+  },
+  vbnet: {
+    id: 84,
+    name: "VB.NET",
+    monacoId: "vb",
+    extension: "vb",
+    badgeClass: "bg-indigo-600/10 border-indigo-600/20 text-indigo-500",
+    defaultCode: `Imports System
+
+Module Program
+    Sub Main(args As String())
+        Console.WriteLine("Hello, World! Welcome to CodeVerse VB.NET.")
+    End Sub
+End Module`
+  },
+  groovy: {
+    id: 53,
+    name: "Groovy",
+    monacoId: "groovy",
+    extension: "groovy",
+    badgeClass: "bg-emerald-600/10 border-emerald-600/20 text-emerald-500",
+    defaultCode: `println "Hello, World! Welcome to CodeVerse Groovy."`
+  },
+  coffeescript: {
+    id: 48,
+    name: "CoffeeScript",
+    monacoId: "coffeescript",
+    extension: "coffee",
+    badgeClass: "bg-yellow-600/10 border-yellow-600/20 text-yellow-600",
+    defaultCode: `console.log "Hello, World! Welcome to CodeVerse CoffeeScript."`
+  },
+  ocaml: {
+    id: 65,
+    name: "OCaml",
+    monacoId: "ocaml",
+    extension: "ml",
+    badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
+    defaultCode: `print_endline "Hello, World! Welcome to CodeVerse OCaml."`
+  },
+  python2: {
+    id: 70,
+    name: "Python 2.7",
+    monacoId: "python",
+    extension: "py",
+    badgeClass: "bg-amber-600/10 border-amber-600/20 text-amber-600",
+    defaultCode: `print "Hello, World! Welcome to CodeVerse Python 2."`
+  },
+  c_clang: {
+    id: 75,
+    name: "C (Clang)",
+    monacoId: "c",
+    extension: "c",
+    badgeClass: "bg-blue-600/10 border-blue-600/20 text-blue-500",
+    defaultCode: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World! Welcome to CodeVerse C (Clang).\\n");
+    return 0;
+}`
+  },
+  cpp_clang: {
+    id: 76,
+    name: "C++ (Clang)",
+    monacoId: "cpp",
+    extension: "cpp",
+    badgeClass: "bg-purple-600/10 border-purple-600/20 text-purple-500",
+    defaultCode: `#include <iostream>
+
+int main() {
+    std::cout << "Hello, World! Welcome to CodeVerse C++ (Clang)." << std::endl;
+    return 0;
+}`
+  },
   html: {
     id: "html",
     name: "HTML/CSS/JS",

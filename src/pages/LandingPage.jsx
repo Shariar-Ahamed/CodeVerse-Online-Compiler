@@ -6,11 +6,14 @@ const LANGUAGES = [
   { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400', categories: ['popular'] },
   { id: 'html', name: 'HTML/CSS/JS', desc: 'Web Lab Preview', icon: 'fab fa-html5', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500', categories: ['popular', 'web'] },
   { id: 'c', name: 'C', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['popular', 'programming'] },
+  { id: 'c_clang', name: 'C (Clang)', desc: 'Clang 7.0.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-600/10 border-blue-600/20 text-blue-500', categories: ['programming'] },
   { id: 'cpp', name: 'C++', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400', categories: ['popular', 'programming'] },
+  { id: 'cpp_clang', name: 'C++ (Clang)', desc: 'Clang 7.0.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-600/10 border-purple-600/20 text-purple-500', categories: ['programming'] },
   { id: 'csharp', name: 'C#', desc: 'Mono 6.6.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400', categories: ['programming'] },
   { id: 'go', name: 'Go', desc: '1.13.5 Compiler', icon: 'fas fa-code', colorClass: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400', categories: ['programming'] },
   { id: 'rust', name: 'Rust', desc: '1.40.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-orange-600/10 border-orange-600/20 text-orange-600', categories: ['programming'] },
   { id: 'python', name: 'Python 3', desc: '3.8.1 Interpreter', icon: 'fab fa-python', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500', categories: ['popular', 'programming'] },
+  { id: 'python2', name: 'Python 2.7', desc: '2.7.17 Interpreter', icon: 'fab fa-python', colorClass: 'bg-amber-600/10 border-amber-600/20 text-amber-600', categories: ['programming'] },
   { id: 'javascript', name: 'JavaScript', desc: 'NodeJS 12.14.0 Runtime', icon: 'fab fa-js', colorClass: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', categories: ['popular', 'programming', 'web'] },
   { id: 'typescript', name: 'TypeScript', desc: '3.7.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['programming', 'web'] },
   { id: 'java', name: 'Java', desc: 'OpenJDK 13.0.1 Runtime', icon: 'fab fa-java', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500', categories: ['popular', 'programming'] },
@@ -32,7 +35,16 @@ const LANGUAGES = [
   { id: 'elixir', name: 'Elixir', desc: '1.9.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500', categories: ['programming', 'web'] },
   { id: 'erlang', name: 'Erlang', desc: 'OTP 22.2 Runtime', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500', categories: ['programming'] },
   { id: 'clojure', name: 'Clojure', desc: '1.10.1 Workspace', icon: 'fas fa-code', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400', categories: ['programming'] },
-  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500', categories: ['programming'] }
+  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500', categories: ['programming'] },
+  { id: 'cobol', name: 'COBOL', desc: 'GnuCOBOL 2.2 Compiler', icon: 'fas fa-code', colorClass: 'bg-yellow-600/10 border-yellow-600/20 text-yellow-500', categories: ['programming'] },
+  { id: 'prolog', name: 'Prolog', desc: 'GNU Prolog 1.4.5 Compiler', icon: 'fas fa-code', colorClass: 'bg-emerald-600/10 border-emerald-600/20 text-emerald-500', categories: ['programming'] },
+  { id: 'scheme', name: 'Scheme', desc: 'Gauche 0.9.9 Interpreter', icon: 'fas fa-code', colorClass: 'bg-cyan-600/10 border-cyan-600/20 text-cyan-500', categories: ['programming'] },
+  { id: 'octave', name: 'GNU Octave', desc: '5.2.0 Scientific Workspace', icon: 'fas fa-calculator', colorClass: 'bg-blue-600/10 border-blue-600/20 text-blue-500', categories: ['programming'] },
+  { id: 'fsharp', name: 'F#', desc: '.NET Core 3.1.201 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-600/10 border-purple-600/20 text-purple-500', categories: ['programming'] },
+  { id: 'vbnet', name: 'VB.NET', desc: 'Mono 6.6.0.161 Compiler', icon: 'fas fa-code', colorClass: 'bg-indigo-600/10 border-indigo-600/20 text-indigo-500', categories: ['programming'] },
+  { id: 'groovy', name: 'Groovy', desc: '2.5.8 Scripting Engine', icon: 'fas fa-code', colorClass: 'bg-emerald-600/10 border-emerald-600/20 text-emerald-500', categories: ['programming'] },
+  { id: 'coffeescript', name: 'CoffeeScript', desc: '2.4.1 JS Transpiler', icon: 'fab fa-js', colorClass: 'bg-yellow-600/10 border-yellow-600/20 text-yellow-600', categories: ['programming', 'web'] },
+  { id: 'ocaml', name: 'OCaml', desc: '4.09.0 Functional Compiler', icon: 'fas fa-code', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500', categories: ['programming'] }
 ];
 
 const DEMO_SNIPPETS = [
