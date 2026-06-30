@@ -3,36 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import AIPanel from '../components/AIPanel';
 
 const LANGUAGES = [
-  { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
-  { id: 'html', name: 'HTML/CSS/JS', desc: 'Web Lab Preview', icon: 'fab fa-html5', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500' },
-  { id: 'c', name: 'C', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  { id: 'cpp', name: 'C++', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
-  { id: 'csharp', name: 'C#', desc: 'Mono 6.6.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
-  { id: 'go', name: 'Go', desc: '1.13.5 Compiler', icon: 'fas fa-code', colorClass: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
-  { id: 'rust', name: 'Rust', desc: '1.40.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-orange-600/10 border-orange-600/20 text-orange-600' },
-  { id: 'python', name: 'Python 3', desc: '3.8.1 Interpreter', icon: 'fab fa-python', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
-  { id: 'javascript', name: 'JavaScript', desc: 'NodeJS 12.14.0 Runtime', icon: 'fab fa-js', colorClass: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' },
-  { id: 'typescript', name: 'TypeScript', desc: '3.7.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  { id: 'java', name: 'Java', desc: 'OpenJDK 13.0.1 Runtime', icon: 'fab fa-java', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500' },
-  { id: 'kotlin', name: 'Kotlin', desc: '1.3.70 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500' },
-  { id: 'php', name: 'PHP', desc: '7.4.1 Interpreter', icon: 'fab fa-php', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
-  { id: 'ruby', name: 'Ruby', desc: '2.7.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500' },
-  { id: 'swift', name: 'Swift', desc: '5.2.3 Compiler', icon: 'fab fa-swift', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500' },
-  { id: 'bash', name: 'Bash Shell', desc: '5.0.0 Interpreter', icon: 'fas fa-terminal', colorClass: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
-  { id: 'sql', name: 'SQL', desc: 'SQLite 3.27.2 Database', icon: 'fas fa-database', colorClass: 'bg-sky-500/10 border-sky-500/20 text-sky-400' },
-  { id: 'scala', name: 'Scala', desc: '2.13.2 Compiler', icon: 'fas fa-code', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500' },
-  { id: 'haskell', name: 'Haskell', desc: 'GHC 8.8.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  { id: 'pascal', name: 'Pascal', desc: 'FPC 3.0.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
-  { id: 'perl', name: 'Perl', desc: '5.28.1 Interpreter', icon: 'fas fa-code', colorClass: 'bg-teal-500/10 border-teal-500/20 text-teal-400' },
-  { id: 'r', name: 'R', desc: '4.0.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  { id: 'lisp', name: 'Lisp', desc: 'SBCL 2.0.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  { id: 'fortran', name: 'Fortran', desc: 'GFortran 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
-  { id: 'lua', name: 'Lua', desc: '5.3.5 Interpreter', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500' },
-  { id: 'assembly', name: 'Assembly', desc: 'NASM 2.14.02 Compiler', icon: 'fas fa-microchip', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400' },
-  { id: 'elixir', name: 'Elixir', desc: '1.9.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
-  { id: 'erlang', name: 'Erlang', desc: 'OTP 22.2 Runtime', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500' },
-  { id: 'clojure', name: 'Clojure', desc: '1.10.1 Workspace', icon: 'fas fa-code', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400' },
-  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500' }
+  { id: 'text', name: 'Text Notes', desc: 'Personal Workspace', icon: 'fas fa-file-alt', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400', categories: ['popular'] },
+  { id: 'html', name: 'HTML/CSS/JS', desc: 'Web Lab Preview', icon: 'fab fa-html5', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500', categories: ['popular', 'web'] },
+  { id: 'c', name: 'C', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['popular', 'programming'] },
+  { id: 'cpp', name: 'C++', desc: 'GCC 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400', categories: ['popular', 'programming'] },
+  { id: 'csharp', name: 'C#', desc: 'Mono 6.6.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400', categories: ['programming'] },
+  { id: 'go', name: 'Go', desc: '1.13.5 Compiler', icon: 'fas fa-code', colorClass: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400', categories: ['programming'] },
+  { id: 'rust', name: 'Rust', desc: '1.40.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-orange-600/10 border-orange-600/20 text-orange-600', categories: ['programming'] },
+  { id: 'python', name: 'Python 3', desc: '3.8.1 Interpreter', icon: 'fab fa-python', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500', categories: ['popular', 'programming'] },
+  { id: 'javascript', name: 'JavaScript', desc: 'NodeJS 12.14.0 Runtime', icon: 'fab fa-js', colorClass: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500', categories: ['popular', 'programming', 'web'] },
+  { id: 'typescript', name: 'TypeScript', desc: '3.7.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['programming', 'web'] },
+  { id: 'java', name: 'Java', desc: 'OpenJDK 13.0.1 Runtime', icon: 'fab fa-java', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500', categories: ['popular', 'programming'] },
+  { id: 'kotlin', name: 'Kotlin', desc: '1.3.70 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500', categories: ['programming'] },
+  { id: 'php', name: 'PHP', desc: '7.4.1 Interpreter', icon: 'fab fa-php', colorClass: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400', categories: ['programming', 'web'] },
+  { id: 'ruby', name: 'Ruby', desc: '2.7.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500', categories: ['programming'] },
+  { id: 'swift', name: 'Swift', desc: '5.2.3 Compiler', icon: 'fab fa-swift', colorClass: 'bg-orange-500/10 border-orange-500/20 text-orange-500', categories: ['programming'] },
+  { id: 'bash', name: 'Bash Shell', desc: '5.0.0 Interpreter', icon: 'fas fa-terminal', colorClass: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400', categories: ['programming'] },
+  { id: 'sql', name: 'SQL', desc: 'SQLite 3.27.2 Database', icon: 'fas fa-database', colorClass: 'bg-sky-500/10 border-sky-500/20 text-sky-400', categories: ['popular', 'databases'] },
+  { id: 'scala', name: 'Scala', desc: '2.13.2 Compiler', icon: 'fas fa-code', colorClass: 'bg-red-500/10 border-red-500/20 text-red-500', categories: ['programming'] },
+  { id: 'haskell', name: 'Haskell', desc: 'GHC 8.8.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['programming'] },
+  { id: 'pascal', name: 'Pascal', desc: 'FPC 3.0.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-400', categories: ['programming'] },
+  { id: 'perl', name: 'Perl', desc: '5.28.1 Interpreter', icon: 'fas fa-code', colorClass: 'bg-teal-500/10 border-teal-500/20 text-teal-400', categories: ['programming'] },
+  { id: 'r', name: 'R', desc: '4.0.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['programming'] },
+  { id: 'lisp', name: 'Lisp', desc: 'SBCL 2.0.0 Interpreter', icon: 'fas fa-code', colorClass: 'bg-blue-500/10 border-blue-500/20 text-blue-400', categories: ['programming'] },
+  { id: 'fortran', name: 'Fortran', desc: 'GFortran 9.2.0 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500', categories: ['programming'] },
+  { id: 'lua', name: 'Lua', desc: '5.3.5 Interpreter', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500', categories: ['programming'] },
+  { id: 'assembly', name: 'Assembly', desc: 'NASM 2.14.02 Compiler', icon: 'fas fa-microchip', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400', categories: ['programming'] },
+  { id: 'elixir', name: 'Elixir', desc: '1.9.4 Compiler', icon: 'fas fa-code', colorClass: 'bg-amber-500/10 border-amber-500/20 text-amber-500', categories: ['programming', 'web'] },
+  { id: 'erlang', name: 'Erlang', desc: 'OTP 22.2 Runtime', icon: 'fas fa-code', colorClass: 'bg-purple-500/10 border-purple-500/20 text-purple-500', categories: ['programming'] },
+  { id: 'clojure', name: 'Clojure', desc: '1.10.1 Workspace', icon: 'fas fa-code', colorClass: 'bg-blue-400/10 border-blue-400/20 text-blue-400', categories: ['programming'] },
+  { id: 'd', name: 'D', desc: 'DMD 2.089.1 Compiler', icon: 'fas fa-code', colorClass: 'bg-slate-500/10 border-slate-500/20 text-slate-500', categories: ['programming'] }
 ];
 
 const DEMO_SNIPPETS = [
@@ -122,6 +122,10 @@ const MILESTONES = [
 export default function LandingPage({ showToast }) {
   const navigate = useNavigate();
   const [showHomeAI, setShowHomeAI] = useState(false);
+
+  // --- Languages Search & Filter States ---
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
 
   // --- Milestone Roadmap States ---
   const [currentMilestoneIndex, setCurrentMilestoneIndex] = useState(0);
@@ -761,25 +765,85 @@ export default function LandingPage({ showToast }) {
             </p>
           </div>
 
-          {/* Grid of Languages */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {LANGUAGES.map(lang => (
-              <div
-                key={lang.id}
-                data-lang={lang.id}
-                onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                className="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 cursor-pointer group transition-all duration-300"
+          {/* Search bar inside compiler selection */}
+          <div className="relative max-w-lg mx-auto mb-6">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+              <i className="fas fa-search text-sm"></i>
+            </div>
+            <input
+              type="text"
+              placeholder="Search by Language/ DB/ Template etc..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-11 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_20px_rgba(99,102,241,0.1)] transition-all duration-200"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white"
               >
-                <div className={`w-9 h-9 rounded-lg border flex items-center justify-center text-base group-hover:scale-110 transition-transform duration-300 ${lang.colorClass}`}>
-                  <i className={lang.icon}></i>
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-white text-xs">{lang.name}</h3>
-                  <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">{lang.desc}</p>
-                </div>
-              </div>
+                <i className="fas fa-times-circle text-xs"></i>
+              </button>
+            )}
+          </div>
+
+          {/* Category Filter Selector Pills */}
+          <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none select-none">
+            {['all', 'popular', 'programming', 'web', 'databases'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${
+                  activeCategory === cat
+                    ? 'bg-indigo-600/90 text-white border-indigo-500 shadow-md shadow-indigo-600/10'
+                    : 'bg-[#121826]/40 text-slate-400 hover:text-white border-slate-800/60 hover:bg-[#121826]/80'
+                }`}
+              >
+                {cat === 'all' ? 'All' : cat}
+              </button>
             ))}
           </div>
+
+          {/* Grid of Languages */}
+          {(() => {
+            const filtered = LANGUAGES.filter(lang => {
+              const matchesSearch = lang.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    lang.desc.toLowerCase().includes(searchQuery.toLowerCase());
+              const matchesCategory = activeCategory === 'all' || (lang.categories && lang.categories.includes(activeCategory));
+              return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+              return (
+                <div className="text-center py-16 text-slate-500 bg-[#121826]/20 border border-slate-800/40 rounded-2xl max-w-md mx-auto">
+                  <i className="fas fa-search text-3xl mb-3 text-indigo-500/30 animate-pulse"></i>
+                  <p className="text-xs font-semibold">No matching environments found.</p>
+                  <p className="text-[10px] text-slate-600 mt-1">Try resetting your search query or filters.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                {filtered.map(lang => (
+                  <div
+                    key={lang.id}
+                    data-lang={lang.id}
+                    onClick={() => navigate(`/editor?lang=${lang.id}`)}
+                    className="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 cursor-pointer group transition-all duration-300 animate-fade-in"
+                  >
+                    <div className={`w-9 h-9 rounded-lg border flex items-center justify-center text-base group-hover:scale-110 transition-transform duration-300 ${lang.colorClass}`}>
+                      <i className={lang.icon}></i>
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-bold text-white text-xs">{lang.name}</h3>
+                      <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">{lang.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
