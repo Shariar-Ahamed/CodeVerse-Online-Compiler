@@ -1,16 +1,3 @@
-# 
-
-[![Vite Build](https://img.shields.io/badge/Vite-v8.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
-[![React Version](https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Deployment: Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://code-verse-online.vercel.app/)
-
-
-
-
-
-
-
 
 <h1 align="center">CodeVerse — Online Compiler & Live Web Editor 🚀</h1>
 
@@ -38,8 +25,8 @@
 </p>
 
 <p align="center">
-  <a href="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/89483e20-f757-4aff-b9da-3a0683ef6fab">
-    <img src="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/89483e20-f757-4aff-b9da-3a0683ef6fab.svg" alt="wakatime">
+  <a href="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/4316e712-87fa-4094-a525-e18b160d62b1">
+    <img src="https://wakatime.com/badge/user/c7433bc5-6f12-4c97-baea-430790fa608c/project/4316e712-87fa-4094-a525-e18b160d62b1.svg" alt="wakatime">
   </a>
 </p>
 
