@@ -767,7 +767,7 @@ export default function LandingPage({ showToast }) {
 
           {/* Search bar inside compiler selection */}
           <div className="relative max-w-lg mx-auto mb-6">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
               <i className="fas fa-search text-sm"></i>
             </div>
             <input
@@ -775,12 +775,12 @@ export default function LandingPage({ showToast }) {
               placeholder="Search by Language/ DB/ Template etc..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-11 py-3 rounded-full text-xs bg-[#121826]/75 border border-slate-700/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 focus:shadow-[0_0_20px_rgba(99,102,241,0.1)] transition-all duration-200"
+              className="w-full pl-11 pr-11 py-3 rounded-full text-xs bg-[#121826]/90 border border-slate-600/70 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 focus:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all duration-200"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white"
               >
                 <i className="fas fa-times-circle text-xs"></i>
               </button>
@@ -796,7 +796,7 @@ export default function LandingPage({ showToast }) {
                 className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${
                   activeCategory === cat
                     ? 'bg-indigo-600/90 text-white border-indigo-500 shadow-md shadow-indigo-600/10'
-                    : 'bg-[#121826]/40 text-slate-400 hover:text-white border-slate-800/60 hover:bg-[#121826]/80'
+                    : 'bg-[#162032]/60 text-slate-300 hover:text-white border-slate-700/60 hover:bg-[#162032]/90 hover:border-slate-600/80'
                 }`}
               >
                 {cat === 'all' ? 'All' : cat}
@@ -815,10 +815,10 @@ export default function LandingPage({ showToast }) {
 
             if (filtered.length === 0) {
               return (
-                <div className="text-center py-16 text-slate-500 bg-[#121826]/20 border border-slate-800/40 rounded-2xl max-w-md mx-auto">
-                  <i className="fas fa-search text-3xl mb-3 text-indigo-500/30 animate-pulse"></i>
-                  <p className="text-xs font-semibold">No matching environments found.</p>
-                  <p className="text-[10px] text-slate-600 mt-1">Try resetting your search query or filters.</p>
+                <div className="text-center py-16 text-slate-300 bg-[#121826]/45 border border-slate-700/50 rounded-2xl max-w-md mx-auto">
+                  <i className="fas fa-search text-3xl mb-3 text-indigo-400/50 animate-pulse"></i>
+                  <p className="text-xs font-bold">No matching environments found.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Try resetting your search query or filters.</p>
                 </div>
               );
             }
