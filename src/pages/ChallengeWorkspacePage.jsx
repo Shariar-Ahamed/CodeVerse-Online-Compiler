@@ -195,18 +195,16 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     setActiveTab('testcases');
     
     if (user && !user.isGuest) {
-      try {
-        const d = new Date();
-        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const userRef = doc(db, "users", user.uid);
-        await setDoc(userRef, {
-          activityLogs: {
-            [dateKey]: increment(1)
-          }
-        }, { merge: true });
-      } catch (err) {
+      const d = new Date();
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const userRef = doc(db, "users", user.uid);
+      setDoc(userRef, {
+        activityLogs: {
+          [dateKey]: increment(1)
+        }
+      }, { merge: true }).catch(err => {
         console.error("Error logging activity: ", err);
-      }
+      });
     }
     
     const runLabel = useCustomStdin ? "Custom Test Case" : "Sample Test Case";
@@ -317,18 +315,16 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
     setActiveTab('testcases');
 
     if (user && !user.isGuest) {
-      try {
-        const d = new Date();
-        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const userRef = doc(db, "users", user.uid);
-        await setDoc(userRef, {
-          activityLogs: {
-            [dateKey]: increment(1)
-          }
-        }, { merge: true });
-      } catch (err) {
+      const d = new Date();
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const userRef = doc(db, "users", user.uid);
+      setDoc(userRef, {
+        activityLogs: {
+          [dateKey]: increment(1)
+        }
+      }, { merge: true }).catch(err => {
         console.error("Error logging activity: ", err);
-      }
+      });
     }
 
     // Setup initial pending states for all test cases
