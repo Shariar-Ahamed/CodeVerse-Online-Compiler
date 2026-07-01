@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 
 function CodeBlock({ code, language }) {
   const [copied, setCopied] = useState(false);
@@ -41,19 +43,30 @@ export default function AIPanel({
   clearInitialContextPrompt,
   isHome = false
 }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: isHome
-        ? "Hello! I am **CodeVerse AI** (powered by Llama 3.3 70B). Ask me any coding or development questions right here!"
-        : "Hello! I am **CodeVerse AI** (powered by Llama 3.3 70B). Ask me any questions about your code, or click one of the quick actions below to analyze your active workspace."
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const messageContainerRef = useRef(null);
   const textareaRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Dynamically update greeting when Auth state resolves
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const name = user ? (user.displayName || user.email.split('@')[0]) : '';
+      const welcomeName = name ? `, **${name}**` : '';
+      
+      setMessages([
+        {
+          role: 'assistant',
+          content: isHome
+            ? `Welcome${welcomeName}! I'm **CodeVerse AI**. How can I help you write, debug, or optimize code today?`
+            : `Welcome${welcomeName}! I'm **CodeVerse AI**. Ask me anything about your workspace, or use the quick actions below.`
+        }
+      ]);
+    });
+    return () => unsubscribe();
+  }, [isHome]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -139,11 +152,17 @@ Respond in clean markdown format. When providing code fixes or optimized version
       setMessages((prev) => [...prev, { role: 'assistant', content: aiReply }]);
     } catch (err) {
       console.error("Groq AI Error:", err);
+      let errorMsg = err.message || 'Unknown network error. Please try again.';
+      
+      if (errorMsg.toLowerCase().includes('rate limit') || errorMsg.includes('429')) {
+        errorMsg = `⚠️ **AI is taking a short breath!** We've reached the temporary Groq API rate limit. Please wait about 15-20 seconds before sending your next prompt. *Tip: Clearing chat history resets token usage instantly.*`;
+      }
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: `❌ **AI Connection Failed**: ${err.message || 'Unknown network error. Please try again.'}`
+          content: errorMsg.startsWith('⚠️') ? errorMsg : `❌ **AI Connection Failed**: ${errorMsg}`
         }
       ]);
     } finally {
@@ -233,12 +252,36 @@ Respond in clean markdown format. When providing code fixes or optimized version
       }
 
       let formatted = token.text;
+      
+      // Header converter (strip # hashes and determine hierarchy)
+      const headerMatch = formatted.match(/^(#{1,6})\s+(.*)$/);
+      let isHeader = false;
+      let headerLevel = 0;
+      if (headerMatch) {
+        isHeader = true;
+        headerLevel = headerMatch[1].length;
+        formatted = headerMatch[2];
+      }
+
       // Bold converter
       formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       // Inline code converter
       formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-indigo-500/10 px-1.5 py-0.5 rounded text-[10px] text-indigo-400 font-mono font-bold">$1</code>');
 
       if (!formatted.trim()) return null;
+
+      if (isHeader) {
+        const headerClass = headerLevel === 1 ? 'text-[13px] font-extrabold text-white mt-3 mb-1.5' :
+                            headerLevel === 2 ? 'text-xs font-black text-indigo-400 mt-2.5 mb-1' :
+                            'text-xs font-bold text-slate-200 mt-2 mb-0.5';
+        return (
+          <h5
+            key={idx}
+            className={`${headerClass} leading-snug text-left`}
+            dangerouslySetInnerHTML={{ __html: formatted }}
+          />
+        );
+      }
 
       return (
         <p
