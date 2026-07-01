@@ -1019,7 +1019,7 @@ export default function LandingPage({ showToast }) {
                     key={idx}
                     onMouseEnter={() => setHoveredIndex(idx)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none relative group cursor-pointer ${
+                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none relative group cursor-pointer card-pulse-left ${
                       hoveredIndex === idx
                         ? 'border-indigo-500/50 bg-indigo-500/5 lg:translate-x-2'
                         : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20'
@@ -1077,7 +1077,7 @@ export default function LandingPage({ showToast }) {
                     key={idx}
                     onMouseEnter={() => setHoveredRightIndex(idx)}
                     onMouseLeave={() => setHoveredRightIndex(null)}
-                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none group cursor-pointer ${
+                    className={`glass-panel p-4 rounded-2xl border transition-all duration-300 text-left select-none group cursor-pointer card-pulse-right ${
                       hoveredRightIndex === idx
                         ? 'border-cyan-500/50 bg-cyan-500/5 lg:-translate-x-2'
                         : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20'
