@@ -2,17 +2,17 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, FacebookAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// CodeVerse Firebase configuration keys
+// CodeVerse Firebase configuration keys loaded from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyDPAoTyMZbZCCQzlA48vxaKMLJeJGTf0Tg",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
     ? "codeverse-79496.firebaseapp.com"
     : "code-verse-online.vercel.app",
-  projectId: "codeverse-79496",
-  storageBucket: "codeverse-79496.firebasestorage.app",
-  messagingSenderId: "184408179665",
-  appId: "1:184408179665:web:6e30a8ee568471c60196f0",
-  measurementId: "G-LGY705LM2N"
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase App
