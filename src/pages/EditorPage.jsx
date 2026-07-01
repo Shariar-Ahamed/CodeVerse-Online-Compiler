@@ -913,77 +913,82 @@ Explain why this error occurred and how to fix it.`;
         </div>
 
         {/* Right Side: Action items wrapper */}
-        <div className="flex items-center gap-2 sm:gap-3 ml-auto relative z-20">
-          {/* Clear Button */}
-          <button
-            onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-eraser"></i>
-            <span className="hidden sm:inline">{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
-          </button>
+        <div className="flex items-center justify-between gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto relative z-20">
+          {/* Left-aligned secondary tools */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Clear Button */}
+            <button
+              onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i className="fas fa-eraser"></i>
+              <span className="hidden sm:inline">{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
+            </button>
 
-          {/* Copy Button */}
-          <button
-            onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-copy"></i>
-            <span className="hidden sm:inline">{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
-          </button>
+            {/* Copy Button */}
+            <button
+              onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i className="fas fa-copy"></i>
+              <span className="hidden sm:inline">{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
+            </button>
 
-          {/* Download Button */}
-          <button
-            onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-          >
-            <i className="fas fa-download"></i>
-            <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
-          </button>
+            {/* Download Button */}
+            <button
+              onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            >
+              <i className="fas fa-download"></i>
+              <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
+            </button>
 
+            {currentLanguage !== "text" && (
+              <>
+                {/* Settings Modal Button */}
+                <button
+                  onClick={openSettingsModal}
+                  className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                  title="API Credentials Configuration"
+                >
+                  <i className="fas fa-sliders text-sm"></i>
+                </button>
+
+                {/* AI Code Assistant Toggle Button */}
+                <button
+                  onClick={() => setShowAIPanel(prev => !prev)}
+                  className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                    showAIPanel
+                      ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
+                      : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+                  }`}
+                  title="AI Code Assistant"
+                >
+                  <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Right-aligned Run Button */}
           {currentLanguage !== "text" && (
-            <>
-              {/* Settings Modal Button */}
-              <button
-                onClick={openSettingsModal}
-                className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
-                title="API Credentials Configuration"
-              >
-                <i className="fas fa-sliders text-sm"></i>
-              </button>
-
-              {/* AI Code Assistant Toggle Button */}
-              <button
-                onClick={() => setShowAIPanel(prev => !prev)}
-                className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
-                  showAIPanel
-                    ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
-                    : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
-                }`}
-                title="AI Code Assistant"
-              >
-                <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
-              </button>
-
-              {/* Execute / Run Code Trigger Button */}
-              <button
-                onClick={runCode}
-                disabled={isExecuting}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-              >
-                {isExecuting ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>Compiling...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-play text-xs"></i>
-                    <span>Run<span className="hidden sm:inline"> Code</span></span>
-                  </>
-                )}
-              </button>
-            </>
+            <button
+              onClick={runCode}
+              disabled={isExecuting}
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+            >
+              {isExecuting ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Compiling...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-play text-xs"></i>
+                  <span>Run<span className="hidden sm:inline"> Code</span></span>
+                </>
+              )}
+            </button>
           )}
         </div>
       </div>
