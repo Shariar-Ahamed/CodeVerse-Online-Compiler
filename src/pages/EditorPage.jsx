@@ -883,37 +883,40 @@ Explain why this error occurred and how to fix it.`;
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       {/* ==================== COMPILER CONTROLS PANEL ==================== */}
-      <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-wrap items-center gap-2.5 sm:gap-3 transition-all duration-300 relative z-10">
-        {/* Left Side: Back button */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
-        >
-          <i className="fas fa-arrow-left text-xs"></i>
-          <span>Back</span>
-        </Link>
+      <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-all duration-300 relative z-10">
+        {/* Row 1: Back Button & Language Selector */}
+        <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 w-full sm:w-auto relative z-20">
+          {/* Left Side: Back button */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
+          >
+            <i className="fas fa-arrow-left text-xs"></i>
+            <span>Back</span>
+          </Link>
 
-        {/* Selection of Language Trigger Button */}
-        <div className="flex items-center gap-2.5 sm:gap-3 z-20">
-          <button
-            onClick={() => setShowLanguageModal(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
-          >
-            <i className="fas fa-cubes text-xs text-indigo-400"></i>
-            <span className="text-[var(--text-secondary)]">Language:</span>
-            <span className="text-indigo-400 font-extrabold">{LANGUAGES[currentLanguage]?.name}</span>
-            <i className="fas fa-chevron-down text-[10px] text-[var(--text-secondary)] ml-1"></i>
-          </button>
-          <span
-            id="lang-badge"
-            className={`hidden sm:inline-block px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
-          >
-            {LANGUAGES[currentLanguage]?.name}
-          </span>
+          {/* Selection of Language Trigger Button */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              onClick={() => setShowLanguageModal(true)}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
+            >
+              <i className="fas fa-cubes text-xs text-indigo-400"></i>
+              <span className="text-[var(--text-secondary)] text-xs xs:text-sm">Language:</span>
+              <span className="text-indigo-400 font-extrabold text-xs xs:text-sm">{LANGUAGES[currentLanguage]?.name}</span>
+              <i className="fas fa-chevron-down text-[10px] text-[var(--text-secondary)] ml-1"></i>
+            </button>
+            <span
+              id="lang-badge"
+              className={`hidden sm:inline-block px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
+            >
+              {LANGUAGES[currentLanguage]?.name}
+            </span>
+          </div>
         </div>
 
-        {/* Right Side: Action items wrapper */}
-        <div className="flex items-center justify-between gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto relative z-20">
+        {/* Row 2: Action items wrapper */}
+        <div className="flex items-center justify-between gap-2.5 sm:gap-3 w-full sm:w-auto relative z-20">
           {/* Left-aligned secondary tools */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Clear Button */}
