@@ -128,4 +128,4 @@ If you require instant executions, you can configure your own self-hosted Docker
 
 ## 📄 License
 
-This project is licensed under the terms of the [MIT License](file:///e:/Git%20All%20Repo/CodeVerse-Online-Compiler/LICENSE).
+This project is licensed under the terms of the [MIT License](https://github.com/Shariar-Ahamed/CodeVerse-Online-Compiler/blob/main/LICENSE).
