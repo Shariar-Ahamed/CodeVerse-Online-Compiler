@@ -110,23 +110,50 @@ export default function LandingPage({ showToast }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [hoveredRightIndex, setHoveredRightIndex] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState('next'); // 'next' or 'prev'
+  const [animationType, setAnimationType] = useState('flip'); // 'flip', 'zoom', 'slide'
 
   const handlePrevMilestone = () => {
     if (isTransitioning) return;
+    const animations = ['flip', 'zoom', 'slide'];
+    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    setAnimationType(randomAnim);
+    setSlideDirection('prev');
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentMilestoneIndex(prev => (prev === 0 ? MILESTONES.length - 1 : prev - 1));
+    }, 200);
+    setTimeout(() => {
       setIsTransitioning(false);
-    }, 250);
+    }, 400);
   };
 
   const handleNextMilestone = () => {
     if (isTransitioning) return;
+    const animations = ['flip', 'zoom', 'slide'];
+    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    setAnimationType(randomAnim);
+    setSlideDirection('next');
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentMilestoneIndex(prev => (prev === MILESTONES.length - 1 ? 0 : prev + 1));
+    }, 200);
+    setTimeout(() => {
       setIsTransitioning(false);
-    }, 250);
+    }, 400);
+  };
+
+  const getAnimationClass = () => {
+    if (animationType === 'flip') {
+      return `flip-card-container ${isTransitioning ? 'flip-card-flipped' : 'opacity-100 scale-100'}`;
+    }
+    if (animationType === 'zoom') {
+      return `zoom-warp-container ${isTransitioning ? 'zoom-warp-active' : 'opacity-100 scale-100'}`;
+    }
+    if (animationType === 'slide') {
+      return isTransitioning ? (slideDirection === 'next' ? 'slide-next-animation' : 'slide-prev-animation') : 'opacity-100 scale-100';
+    }
+    return '';
   };
 
   // --- Auto-Typing States ---
@@ -951,10 +978,10 @@ export default function LandingPage({ showToast }) {
           </div>
 
           {/* Symmetrical Interactive Container */}
-          <div className="relative w-full max-w-5xl mx-auto min-h-[480px]">
+          <div className="relative w-full max-w-5xl mx-auto min-h-[480px] perspective-container">
             
             {/* Symmetrical SVG paths overlay (Hidden on mobile) */}
-            <svg className={`absolute inset-0 w-full h-full pointer-events-none lg:block hidden z-[-1] transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`} viewBox="0 0 1000 500" preserveAspectRatio="none">
+            <svg className={`absolute inset-0 w-full h-full pointer-events-none lg:block hidden z-[-1] ${getAnimationClass()}`} viewBox="0 0 1000 500" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="left-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.05" />
@@ -980,7 +1007,7 @@ export default function LandingPage({ showToast }) {
             </svg>
 
             {/* Columns Grid */}
-            <div className={`grid grid-cols-1 lg:grid-cols-5 gap-8 items-center relative z-10 min-h-[420px] transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-5 gap-8 items-center relative z-10 min-h-[420px] ${getAnimationClass()}`}>
               
               {/* Left Column: Topics */}
               <div className="lg:col-span-2 flex flex-col gap-4 justify-between h-full py-2">
