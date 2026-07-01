@@ -906,39 +906,39 @@ Explain why this error occurred and how to fix it.`;
           </button>
           <span
             id="lang-badge"
-            className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
+            className={`hidden sm:inline-block px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
           >
             {LANGUAGES[currentLanguage]?.name}
           </span>
         </div>
 
         {/* Right Side: Action items wrapper */}
-        <div className="flex items-center gap-2.5 sm:gap-3 ml-auto relative z-20">
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto relative z-20">
           {/* Clear Button */}
           <button
             onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <i className="fas fa-eraser"></i>
-            <span>{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
+            <span className="hidden sm:inline">{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
           </button>
 
           {/* Copy Button */}
           <button
             onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <i className="fas fa-copy"></i>
-            <span>{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
+            <span className="hidden sm:inline">{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
           </button>
 
           {/* Download Button */}
           <button
             onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
           >
             <i className="fas fa-download"></i>
-            <span>{currentLanguage === "text" ? "Download Note" : "Download"}</span>
+            <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
           </button>
 
           {currentLanguage !== "text" && (
@@ -969,7 +969,7 @@ Explain why this error occurred and how to fix it.`;
               <button
                 onClick={runCode}
                 disabled={isExecuting}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
               >
                 {isExecuting ? (
                   <>
@@ -979,7 +979,7 @@ Explain why this error occurred and how to fix it.`;
                 ) : (
                   <>
                     <i className="fas fa-play text-xs"></i>
-                    <span>Run Code</span>
+                    <span>Run<span className="hidden sm:inline"> Code</span></span>
                   </>
                 )}
               </button>
