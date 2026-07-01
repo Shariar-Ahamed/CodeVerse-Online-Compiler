@@ -982,28 +982,31 @@ export default function LandingPage({ showToast }) {
             
             {/* Symmetrical SVG paths overlay (Hidden on mobile) */}
             <svg className={`absolute inset-0 w-full h-full pointer-events-none lg:block hidden z-[-1] ${getAnimationClass()}`} viewBox="0 0 1000 500" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="left-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.05" />
-                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.6" />
-                </linearGradient>
-                <linearGradient id="right-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.05" />
-                </linearGradient>
-              </defs>
+              {/* Left lines (Topics -> Center) - Base Wire + Glowing Laser Pulse */}
+              <path d="M 460 250 C 420 250, 360 60, 280 60" fill="none" className="base-wire" />
+              <path d="M 460 250 C 420 250, 360 60, 280 60" stroke="#818cf8" fill="none" className={`laser-wire-left ${hoveredIndex === 0 ? 'laser-hover-active' : ''}`} />
               
-              {/* Left lines (Topics -> Center) */}
-              <path d="M 280 60 C 360 60, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 0 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
-              <path d="M 280 160 C 360 160, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 1 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
-              <path d="M 280 260 C 360 260, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 2 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
-              <path d="M 280 360 C 360 360, 420 250, 460 250" stroke="url(#left-line-grad)" strokeWidth="1.5" fill="none" className={hoveredIndex === 3 ? "flowing-path-left stroke-indigo-400 stroke-2" : ""} />
+              <path d="M 460 250 C 420 250, 360 160, 280 160" fill="none" className="base-wire" />
+              <path d="M 460 250 C 420 250, 360 160, 280 160" stroke="#818cf8" fill="none" className={`laser-wire-left ${hoveredIndex === 1 ? 'laser-hover-active' : ''}`} />
+              
+              <path d="M 460 250 C 420 250, 360 260, 280 260" fill="none" className="base-wire" />
+              <path d="M 460 250 C 420 250, 360 260, 280 260" stroke="#818cf8" fill="none" className={`laser-wire-left ${hoveredIndex === 2 ? 'laser-hover-active' : ''}`} />
+              
+              <path d="M 460 250 C 420 250, 360 360, 280 360" fill="none" className="base-wire" />
+              <path d="M 460 250 C 420 250, 360 360, 280 360" stroke="#818cf8" fill="none" className={`laser-wire-left ${hoveredIndex === 3 ? 'laser-hover-active' : ''}`} />
 
-              {/* Right lines (Center -> Outcomes) */}
-              <path d="M 540 250 C 580 250, 640 60, 720 60" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 0 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
-              <path d="M 540 250 C 580 250, 640 160, 720 160" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 1 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
-              <path d="M 540 250 C 580 250, 640 260, 720 260" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 2 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
-              <path d="M 540 250 C 580 250, 640 415, 720 415" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 3 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+              {/* Right lines (Center -> Outcomes) - Base Wire + Glowing Laser Pulse */}
+              <path d="M 540 250 C 580 250, 640 60, 720 60" fill="none" className="base-wire" />
+              <path d="M 540 250 C 580 250, 640 60, 720 60" stroke="#22d3ee" fill="none" className={`laser-wire-right ${hoveredRightIndex === 0 ? 'laser-hover-active-right' : ''}`} />
+              
+              <path d="M 540 250 C 580 250, 640 160, 720 160" fill="none" className="base-wire" />
+              <path d="M 540 250 C 580 250, 640 160, 720 160" stroke="#22d3ee" fill="none" className={`laser-wire-right ${hoveredRightIndex === 1 ? 'laser-hover-active-right' : ''}`} />
+              
+              <path d="M 540 250 C 580 250, 640 260, 720 260" fill="none" className="base-wire" />
+              <path d="M 540 250 C 580 250, 640 260, 720 260" stroke="#22d3ee" fill="none" className={`laser-wire-right ${hoveredRightIndex === 2 ? 'laser-hover-active-right' : ''}`} />
+              
+              <path d="M 540 250 C 580 250, 640 415, 720 415" fill="none" className="base-wire" />
+              <path d="M 540 250 C 580 250, 640 415, 720 415" stroke="#22d3ee" fill="none" className={`laser-wire-right ${hoveredRightIndex === 3 ? 'laser-hover-active-right' : ''}`} />
             </svg>
 
             {/* Columns Grid */}

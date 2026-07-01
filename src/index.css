@@ -853,26 +853,59 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(0.5px) !important;
 }
 
-/* --- Flowing SVG lines animations --- */
-@keyframes flow-left {
-  to {
-    stroke-dashoffset: 24;
-  }
-}
-@keyframes flow-right {
-  to {
-    stroke-dashoffset: -24;
-  }
+/* --- Glowing Laser Pulse animations --- */
+.base-wire {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1.5;
+  transition: stroke 0.3s ease;
 }
 
-.flowing-path-left {
-  stroke-dasharray: 8, 4;
-  animation: flow-left 1.2s linear infinite;
+.light .base-wire {
+  stroke: rgba(0, 0, 0, 0.08);
 }
 
-.flowing-path-right {
-  stroke-dasharray: 8, 4;
-  animation: flow-right 1.2s linear infinite;
+.laser-wire-left,
+.laser-wire-right {
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 80, 300;
+  opacity: 0.65;
+  transition: opacity 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease;
+  animation: laser-flow-anim 5.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.laser-wire-left {
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.7));
+}
+
+.laser-wire-right {
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.7));
+}
+
+.laser-hover-active {
+  stroke-width: 2.2px;
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(99, 102, 241, 1));
+  animation-duration: 2.6s !important;
+}
+
+.laser-hover-active-right {
+  stroke-width: 2.2px;
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(34, 211, 238, 1));
+  animation-duration: 2.6s !important;
+}
+
+@keyframes laser-flow-anim {
+  0% {
+    stroke-dashoffset: 80;
+  }
+  61.5% {
+    stroke-dashoffset: -300;
+  }
+  100% {
+    stroke-dashoffset: -300;
+  }
 }
 
 /* ==========================================================================
