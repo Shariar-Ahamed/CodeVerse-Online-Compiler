@@ -1003,7 +1003,7 @@ export default function LandingPage({ showToast }) {
               <path d="M 540 250 C 580 250, 640 60, 720 60" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 0 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
               <path d="M 540 250 C 580 250, 640 160, 720 160" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 1 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
               <path d="M 540 250 C 580 250, 640 260, 720 260" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 2 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
-              <path d="M 540 250 C 580 250, 640 360, 720 360" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 3 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
+              <path d="M 540 250 C 580 250, 640 415, 720 415" stroke="url(#right-line-grad)" strokeWidth="1.5" fill="none" className={hoveredRightIndex === 3 ? "flowing-path-right stroke-cyan-400 stroke-2" : ""} />
             </svg>
 
             {/* Columns Grid */}
