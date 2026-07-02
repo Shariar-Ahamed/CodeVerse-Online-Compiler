@@ -912,6 +912,9 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
       setDoc(userRef, {
         activityLogs: {
           [dateKey]: increment(1)
+        },
+        languageStats: {
+          [currentLanguage]: increment(1)
         }
       }, { merge: true }).catch(err => {
         console.error("Error logging activity: ", err);

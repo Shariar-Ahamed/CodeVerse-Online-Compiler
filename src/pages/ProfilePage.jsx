@@ -48,7 +48,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     website: '',
     isVerified: false,
     lastSeen: '',
-    activityLogs: {}
+    activityLogs: {},
+    languageStats: {}
   });
 
   const [inputs, setInputs] = useState({
@@ -139,7 +140,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               website: data.socials?.website || '',
               isVerified: !!data.isVerified,
               lastSeen: data.lastSeen || '',
-              activityLogs: data.activityLogs || {}
+              activityLogs: data.activityLogs || {},
+              languageStats: data.languageStats || {}
             });
           } else {
             // Document doesn't exist, set from auth state
@@ -220,7 +222,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 website: data.socials?.website || '',
                 isVerified: !!data.isVerified,
                 lastSeen: data.lastSeen || '',
-                activityLogs: data.activityLogs || {}
+                activityLogs: data.activityLogs || {},
+                languageStats: data.languageStats || {}
               });
             }
           } else {
@@ -264,7 +267,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   website: data.socials?.website || '',
                   isVerified: !!data.isVerified,
                   lastSeen: data.lastSeen || '',
-                  activityLogs: data.activityLogs || {}
+                  activityLogs: data.activityLogs || {},
+                  languageStats: data.languageStats || {}
                 });
               }
             } else {
@@ -518,6 +522,44 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     return labels;
   };
   const monthLabels = getMonthLabels();
+
+  // Calculate language execution statistics from database
+  const getLanguageStats = () => {
+    const stats = profileData.languageStats || {};
+    
+    // Grouping counts
+    let jsTsCount = (stats['javascript'] || 0) + (stats['typescript'] || 0) + (stats['html'] || 0);
+    let cppCount = (stats['cpp'] || 0) + (stats['c'] || 0);
+    let pythonCount = (stats['python'] || 0);
+    
+    // Others
+    let othersCount = 0;
+    const groupedKeys = ['javascript', 'typescript', 'html', 'cpp', 'c', 'python'];
+    Object.keys(stats).forEach(key => {
+      if (!groupedKeys.includes(key)) {
+        othersCount += (stats[key] || 0);
+      }
+    });
+
+    const total = jsTsCount + cppCount + pythonCount + othersCount;
+
+    if (total === 0) {
+      // Return 0% if no execution data has been recorded yet for this profile
+      return [
+        { name: 'JavaScript / TypeScript / HTML', percent: 0, colorFrom: 'from-yellow-500', colorTo: 'to-indigo-500' },
+        { name: 'C / C++', percent: 0, colorFrom: 'from-blue-500', colorTo: 'to-indigo-500' },
+        { name: 'Python', percent: 0, colorFrom: 'from-emerald-500', colorTo: 'to-indigo-500' },
+        { name: 'Others (Go, Rust, Java, C#)', percent: 0, colorFrom: 'from-cyan-500', colorTo: 'to-indigo-500' }
+      ];
+    }
+
+    return [
+      { name: 'JavaScript / TypeScript / HTML', percent: Math.round((jsTsCount / total) * 100), colorFrom: 'from-yellow-500', colorTo: 'to-indigo-500' },
+      { name: 'C / C++', percent: Math.round((cppCount / total) * 100), colorFrom: 'from-blue-500', colorTo: 'to-indigo-500' },
+      { name: 'Python', percent: Math.round((pythonCount / total) * 100), colorFrom: 'from-emerald-500', colorTo: 'to-indigo-500' },
+      { name: 'Others (Go, Rust, Java, C#)', percent: Math.round((othersCount / total) * 100), colorFrom: 'from-cyan-500', colorTo: 'to-indigo-500' }
+    ];
+  };
 
   return (
     <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
@@ -914,49 +956,17 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             </div>
 
             <div className="flex flex-col gap-4">
-              {/* Item 1 */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span className="text-[var(--text-primary)]">JavaScript / TypeScript</span>
-                  <span className="text-[var(--text-secondary)] font-mono">45%</span>
+              {getLanguageStats().map((item, idx) => (
+                <div key={idx} className="flex flex-col gap-1.5 animate-fade-in">
+                  <div className="flex justify-between items-center text-xs font-semibold">
+                    <span className="text-[var(--text-primary)]">{item.name}</span>
+                    <span className="text-[var(--text-secondary)] font-mono">{item.percent}%</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
+                    <div className={`h-full bg-gradient-to-r ${item.colorFrom} ${item.colorTo} rounded-full`} style={{ width: `${item.percent}%` }}></div>
+                  </div>
                 </div>
-                <div className="w-full h-2 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-yellow-500 to-indigo-500 rounded-full" style={{ width: '45%' }}></div>
-                </div>
-              </div>
-
-              {/* Item 2 */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span className="text-[var(--text-primary)]">C++</span>
-                  <span className="text-[var(--text-secondary)] font-mono">30%</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style={{ width: '30%' }}></div>
-                </div>
-              </div>
-
-              {/* Item 3 */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span className="text-[var(--text-primary)]">Python</span>
-                  <span className="text-[var(--text-secondary)] font-mono">15%</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 rounded-full" style={{ width: '15%' }}></div>
-                </div>
-              </div>
-
-              {/* Item 4 */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center text-xs font-semibold">
-                  <span className="text-[var(--text-primary)]">Others (Go, Rust, Erlang, C)</span>
-                  <span className="text-[var(--text-secondary)] font-mono">10%</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full" style={{ width: '10%' }}></div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
