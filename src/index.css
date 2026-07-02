@@ -304,11 +304,7 @@ body::before {
   }
 }
 
-/* Settings Modal Custom Shadow and Blur */
-.modal-overlay {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+
 
 /* Web Console Custom Logging Styles */
 #web-console-logs::-webkit-scrollbar {

@@ -1872,7 +1872,7 @@ Explain why this error occurred and how to fix it.`;
             )}
 
             {/* 3. Main Monaco Editor Container Wrapper */}
-            <div className="flex-grow relative h-full min-w-0">
+            <div className="flex-grow relative h-[450px] lg:h-full min-w-0">
               <div className="absolute inset-0 w-full h-full">
                 <Editor
                   language={
@@ -1932,9 +1932,11 @@ Explain why this error occurred and how to fix it.`;
         {!isMobile && (
           <div
             onMouseDown={startResizingPanels}
-            className="hidden lg:block w-3 bg-transparent hover:bg-indigo-500/20 cursor-col-resize flex-shrink-0 z-20 transition-all duration-150 relative self-stretch select-none -mx-1.5"
+            className="hidden lg:block w-3 bg-transparent cursor-col-resize flex-shrink-0 z-20 relative self-stretch select-none -mx-1.5 flex justify-center group"
             title="Drag to resize workspace split ratio"
-          />
+          >
+            <div className="w-[1px] h-full bg-transparent group-hover:bg-white/80 transition-colors duration-150" />
+          </div>
         )}
 
         {/* Input Stdin / Console Output Panel */}
@@ -2117,11 +2119,11 @@ Explain why this error occurred and how to fix it.`;
       {showSettings && (
         <div
           onClick={() => setShowSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
           >
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
@@ -2142,7 +2144,7 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Body Form */}
-            <div className="p-6 flex flex-col gap-5 max-h-[60vh] overflow-y-auto scrollbar-thin">
+            <div className="p-6 flex flex-col gap-5 overflow-y-auto flex-grow scrollbar-thin">
               {/* 1. Judge0 API Base URL */}
               <div className="flex flex-col gap-2 pb-3 border-b border-[var(--border-color)]/10 text-left">
                 <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Judge0 API Base URL</span>
@@ -2204,7 +2206,7 @@ Explain why this error occurred and how to fix it.`;
             setShowLanguageModal(false);
             setLangSearchQuery("");
           }}
-          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -2316,11 +2318,11 @@ Explain why this error occurred and how to fix it.`;
       {showEditorSettings && (
         <div
           onClick={() => setShowEditorSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
           >
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
@@ -2341,7 +2343,7 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 flex flex-col gap-5 max-h-[60vh] overflow-y-auto scrollbar-thin">
+            <div className="p-6 flex flex-col gap-5 overflow-y-auto flex-grow scrollbar-thin">
               {/* 1. Font Size Control */}
               <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
                 <div className="text-left">
