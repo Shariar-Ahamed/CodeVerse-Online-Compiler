@@ -1062,6 +1062,19 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
 
     if (user && !user.isGuest) {
       saveCodeToFirestore("html", { htmlCode: htmlVal, cssCode: cssVal, jsCode: jsVal });
+      const d = new Date();
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const userRef = doc(db, "users", user.uid);
+      setDoc(userRef, {
+        activityLogs: {
+          [dateKey]: increment(1)
+        },
+        languageStats: {
+          html: increment(1)
+        }
+      }, { merge: true }).catch(err => {
+        console.error("Error logging web activity: ", err);
+      });
     }
 
     // Inject log interceptor code in iframe preview
