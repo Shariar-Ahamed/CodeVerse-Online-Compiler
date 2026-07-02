@@ -793,7 +793,7 @@ export default function LandingPage({ showToast }) {
           </div>
 
           {/* Category Filter Selector Pills */}
-          <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none select-none">
+          <div className="flex items-center justify-start md:justify-center gap-2 mb-10 overflow-x-auto pb-2 px-4 md:px-0 scrollbar-none select-none w-full">
             {['all', 'popular', 'programming', 'web', 'databases'].map((cat) => (
               <button
                 key={cat}
