@@ -8,7 +8,7 @@ import AIPanel from '../components/AIPanel';
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
 
-export default function EditorPage({ user, theme, showToast }) {
+export default function EditorPage({ user, theme, toggleTheme, showToast }) {
   // --- States ---
   const [searchParams] = useSearchParams();
   const queryLang = searchParams.get('lang');
@@ -54,6 +54,102 @@ export default function EditorPage({ user, theme, showToast }) {
   const [aiPromptContext, setAiPromptContext] = useState("");
   const [apiEndpoint, setApiEndpoint] = useState(() => localStorage.getItem("codeverse_api_url") || DEFAULT_API_URL);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("codeverse_api_key") || "");
+  
+  // --- Sidebar & Editor Settings States ---
+  const [activeSidebarTab, setActiveSidebarTab] = useState(null);
+  const [drafts, setDrafts] = useState(() => {
+    try {
+      const saved = localStorage.getItem("codeverse_drafts");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  });
+
+  const [showEditorSettings, setShowEditorSettings] = useState(false);
+  const [settingsFontSize, setSettingsFontSize] = useState(() => {
+    const val = localStorage.getItem("codeverse_settings_font_size");
+    return val ? parseInt(val, 10) : 14;
+  });
+  const [settingsWordWrap, setSettingsWordWrap] = useState(() => {
+    return localStorage.getItem("codeverse_settings_word_wrap") === "true";
+  });
+  const [settingsDisableAutocomplete, setSettingsDisableAutocomplete] = useState(() => {
+    return localStorage.getItem("codeverse_settings_disable_autocomplete") === "true";
+  });
+  const [settingsColorTheme, setSettingsColorTheme] = useState(() => {
+    return localStorage.getItem("codeverse_settings_color_theme") || "Dracula";
+  });
+  const [settingsPreserveErrorLog, setSettingsPreserveErrorLog] = useState(() => {
+    return localStorage.getItem("codeverse_settings_preserve_error_log") === "true";
+  });
+  const [settingsAvoidAutoScrolling, setSettingsAvoidAutoScrolling] = useState(() => {
+    return localStorage.getItem("codeverse_settings_avoid_auto_scrolling") === "true";
+  });
+  const [settingsEditorEngine, setSettingsEditorEngine] = useState(() => {
+    return localStorage.getItem("codeverse_settings_editor_engine") || "Monaco";
+  });
+  
+  // Panel resizing states
+  const [drawerWidth, setDrawerWidth] = useState(() => {
+    const val = localStorage.getItem("codeverse_settings_drawer_width");
+    return val ? parseInt(val, 10) : 160;
+  });
+  const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
+    const val = localStorage.getItem("codeverse_settings_left_panel_width");
+    return val ? parseFloat(val) : 65;
+  });
+  
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Explorer Workspace Files & Creation States
+  const [workspaceFiles, setWorkspaceFiles] = useState([]);
+  const [activeFileName, setActiveFileName] = useState("");
+  const [isCreatingFile, setIsCreatingFile] = useState(false);
+  const [newFileName, setNewFileName] = useState("");
+
+  // Sync workspace files when language changes
+  useEffect(() => {
+    const savedFiles = localStorage.getItem(`codeverse_files_${currentLanguage}`);
+    if (savedFiles) {
+      try {
+        const parsed = JSON.parse(savedFiles);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setWorkspaceFiles(parsed);
+          setActiveFileName(parsed[0].name);
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    let defaultFiles = [];
+    if (currentLanguage === "html") {
+      defaultFiles = [
+        { name: "index.html", content: localStorage.getItem("codeverse_code_html") || LANGUAGES.html.defaultCode, language: "html" },
+        { name: "style.css", content: localStorage.getItem("codeverse_web_css") || DEFAULT_WEB_CSS, language: "css" },
+        { name: "script.js", content: localStorage.getItem("codeverse_web_js") || DEFAULT_WEB_JS, language: "javascript" }
+      ];
+    } else {
+      const ext = currentLanguage === 'python' ? 'py' : currentLanguage === 'c' ? 'c' : currentLanguage === 'cpp' ? 'cpp' : currentLanguage === 'java' ? 'java' : 'txt';
+      const defaultName = `main.${ext}`;
+      const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage]?.defaultCode || "";
+      defaultFiles = [
+        { name: defaultName, content: savedCode, language: currentLanguage }
+      ];
+    }
+    setWorkspaceFiles(defaultFiles);
+    setActiveFileName(defaultFiles[0].name);
+  }, [currentLanguage]);
   
   // Web Lab Logs state
   const [webLogs, setWebLogs] = useState([]);
@@ -343,6 +439,232 @@ export default function EditorPage({ user, theme, showToast }) {
     });
   };
 
+  // --- Drafts Operations ---
+  const saveDraft = () => {
+    const draftId = `draft-${Math.random().toString(36).substring(2, 6)}`;
+    let draftCode = "";
+    let htmlData = null;
+    
+    if (currentLanguage === "html") {
+      htmlData = {
+        htmlCode: htmlCode,
+        cssCode: cssCode,
+        jsCode: jsCode
+      };
+    } else if (currentLanguage !== "text") {
+      draftCode = editorRef.current ? editorRef.current.getValue() : code;
+    } else {
+      showToast("Cannot save a text note as a draft. Try downloading as txt instead!", "warning");
+      return;
+    }
+
+    const newDraft = {
+      id: draftId,
+      name: draftId,
+      language: currentLanguage,
+      code: draftCode,
+      htmlData: htmlData,
+      timestamp: new Date().toISOString()
+    };
+
+    const updatedDrafts = [newDraft, ...drafts];
+    setDrafts(updatedDrafts);
+    localStorage.setItem("codeverse_drafts", JSON.stringify(updatedDrafts));
+    showToast(`Draft ${draftId} created successfully!`, "success");
+  };
+
+  const loadDraft = (draft) => {
+    if (draft.language === "html") {
+      setCurrentLanguage("html");
+      if (draft.htmlData) {
+        setHtmlCode(draft.htmlData.htmlCode || "");
+        setCssCode(draft.htmlData.cssCode || "");
+        setJsCode(draft.htmlData.jsCode || "");
+        
+        localStorage.setItem("codeverse_code_html", draft.htmlData.htmlCode || "");
+        localStorage.setItem("codeverse_web_css", draft.htmlData.cssCode || "");
+        localStorage.setItem("codeverse_web_js", draft.htmlData.jsCode || "");
+      }
+    } else if (draft.language !== "text") {
+      setCurrentLanguage(draft.language);
+      setCode(draft.code || "");
+      localStorage.setItem(`codeverse_code_${draft.language}`, draft.code || "");
+    }
+    showToast(`Loaded draft: ${draft.name}`, "info");
+  };
+
+  const deleteDraft = (draftId) => {
+    const updatedDrafts = drafts.filter(d => d.id !== draftId);
+    setDrafts(updatedDrafts);
+    localStorage.setItem("codeverse_drafts", JSON.stringify(updatedDrafts));
+    showToast("Draft deleted", "info");
+  };
+
+  // --- Workspace Drag Resize Helpers ---
+  const startResizingDrawer = (mouseDownEvent) => {
+    mouseDownEvent.preventDefault();
+    const startX = mouseDownEvent.clientX;
+    const startWidth = drawerWidth;
+
+    const handleMouseMove = (mouseMoveEvent) => {
+      if (mouseMoveEvent.buttons === 0) {
+        handleMouseUp();
+        return;
+      }
+      const deltaX = mouseMoveEvent.clientX - startX;
+      const newWidth = Math.max(140, Math.min(450, startWidth + deltaX));
+      setDrawerWidth(newWidth);
+      localStorage.setItem("codeverse_settings_drawer_width", newWidth);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.classList.remove('select-none', 'cursor-col-resize');
+      
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach(iframe => iframe.style.pointerEvents = 'auto');
+    };
+
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach(iframe => iframe.style.pointerEvents = 'none');
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.classList.add('select-none', 'cursor-col-resize');
+  };
+
+  const startResizingPanels = (mouseDownEvent) => {
+    mouseDownEvent.preventDefault();
+    const startX = mouseDownEvent.clientX;
+    const startWidthPercent = leftPanelWidth;
+    const container = mouseDownEvent.currentTarget.parentElement;
+    const containerWidth = container ? container.clientWidth : window.innerWidth;
+
+    const handleMouseMove = (mouseMoveEvent) => {
+      if (mouseMoveEvent.buttons === 0) {
+        handleMouseUp();
+        return;
+      }
+      const deltaX = mouseMoveEvent.clientX - startX;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      const newPercent = Math.max(30, Math.min(85, startWidthPercent + deltaPercent));
+      setLeftPanelWidth(newPercent);
+      localStorage.setItem("codeverse_settings_left_panel_width", newPercent);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.classList.remove('select-none', 'cursor-col-resize');
+      
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach(iframe => iframe.style.pointerEvents = 'auto');
+    };
+
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach(iframe => iframe.style.pointerEvents = 'none');
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.classList.add('select-none', 'cursor-col-resize');
+  };
+
+  // --- Workspace File Helpers ---
+  const detectLanguageByExtension = (filename) => {
+    const ext = filename.split('.').pop().toLowerCase();
+    switch(ext) {
+      case 'html': case 'htm': return 'html';
+      case 'css': return 'css';
+      case 'js': return 'javascript';
+      case 'ts': return 'typescript';
+      case 'jsx': return 'javascript';
+      case 'cpp': case 'cc': case 'cxx': case 'h': case 'hpp': return 'cpp';
+      case 'c': return 'c';
+      case 'py': return 'python';
+      case 'java': return 'java';
+      case 'cs': return 'csharp';
+      case 'go': return 'go';
+      case 'rs': return 'rust';
+      case 'rb': return 'ruby';
+      case 'php': return 'php';
+      case 'sh': return 'shell';
+      case 'json': return 'json';
+      case 'md': return 'markdown';
+      default: return 'text';
+    }
+  };
+
+  const handleCreateFile = () => {
+    if (!newFileName.trim()) {
+      setIsCreatingFile(false);
+      return;
+    }
+
+    const name = newFileName.trim();
+    if (workspaceFiles.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+      showToast("A file with this name already exists!", "error");
+      return;
+    }
+
+    const detectedLang = detectLanguageByExtension(name);
+    const newFile = {
+      name: name,
+      content: "",
+      language: detectedLang
+    };
+
+    const updated = [...workspaceFiles, newFile];
+    setWorkspaceFiles(updated);
+    localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
+    setActiveFileName(name);
+    setIsCreatingFile(false);
+    setNewFileName("");
+    showToast(`Created file: ${name}`, "success");
+  };
+
+  const handleDeleteFile = (fileNameToDelete) => {
+    const updated = workspaceFiles.filter(f => f.name !== fileNameToDelete);
+    setWorkspaceFiles(updated);
+    localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
+    
+    if (activeFileName === fileNameToDelete) {
+      setActiveFileName(updated[0].name);
+    }
+    showToast(`Deleted file: ${fileNameToDelete}`, "info");
+  };
+
+  const handleWorkspaceCodeChange = (val) => {
+    setWorkspaceFiles(prev => {
+      const updated = prev.map(f => {
+        if (f.name === activeFileName) {
+          return { ...f, content: val || "" };
+        }
+        return f;
+      });
+      localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
+      return updated;
+    });
+
+    if (currentLanguage === "html") {
+      if (activeFileName === "index.html") {
+        setHtmlCode(val || "");
+        localStorage.setItem("codeverse_code_html", val || "");
+      } else if (activeFileName === "style.css") {
+        setCssCode(val || "");
+        localStorage.setItem("codeverse_web_css", val || "");
+      } else if (activeFileName === "script.js") {
+        setJsCode(val || "");
+        localStorage.setItem("codeverse_web_js", val || "");
+      }
+    } else {
+      if (activeFileName.startsWith("main.")) {
+        setCode(val || "");
+        localStorage.setItem(`codeverse_code_${currentLanguage}`, val || "");
+      }
+    }
+  };
+
   // Refs
   const editorRef = useRef(null);
   const previewFrameRef = useRef(null);
@@ -354,13 +676,39 @@ export default function EditorPage({ user, theme, showToast }) {
 
   // Effect to sync options when global theme changes
   useEffect(() => {
-    if (editorRef.current) {
-      const monaco = window.monaco;
-      if (monaco) {
-        monaco.editor.setTheme(theme === 'light' ? 'vs' : 'dracula');
+    if (editorRef.current && window.monaco) {
+      const targetTheme = theme === 'light' ? 'Light (Default)' : 'Dracula';
+      setSettingsColorTheme(targetTheme);
+      localStorage.setItem("codeverse_settings_color_theme", targetTheme);
+      
+      const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
+      let baseTheme = 'vs-dark';
+      if (lightThemes.includes(targetTheme)) {
+        baseTheme = 'vs';
+      }
+      if (targetTheme === 'Dracula') {
+        window.monaco.editor.setTheme('dracula');
+      } else {
+        window.monaco.editor.setTheme(baseTheme);
       }
     }
   }, [theme]);
+
+  // Effect to apply Monaco theme when settingsColorTheme changes
+  useEffect(() => {
+    if (editorRef.current && window.monaco) {
+      const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
+      let baseTheme = 'vs-dark';
+      if (lightThemes.includes(settingsColorTheme)) {
+        baseTheme = 'vs';
+      }
+      if (settingsColorTheme === 'Dracula') {
+        window.monaco.editor.setTheme('dracula');
+      } else {
+        window.monaco.editor.setTheme(baseTheme);
+      }
+    }
+  }, [settingsColorTheme]);
 
   // Listen to messages from Web Lab Preview Iframe
   useEffect(() => {
@@ -399,6 +747,7 @@ export default function EditorPage({ user, theme, showToast }) {
   // Define Dracula theme and cache editor reference
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    window.monaco = monaco;
 
     monaco.editor.defineTheme('dracula', {
       base: 'vs-dark',
@@ -431,7 +780,16 @@ export default function EditorPage({ user, theme, showToast }) {
       }
     });
 
-    monaco.editor.setTheme(theme === 'light' ? 'vs' : 'dracula');
+    const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
+    let baseTheme = 'vs-dark';
+    if (lightThemes.includes(settingsColorTheme)) {
+      baseTheme = 'vs';
+    }
+    if (settingsColorTheme === 'Dracula') {
+      monaco.editor.setTheme('dracula');
+    } else {
+      monaco.editor.setTheme(baseTheme);
+    }
 
     // Add listener for Ctrl+Enter hotkey to run code
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
@@ -491,6 +849,9 @@ export default function EditorPage({ user, theme, showToast }) {
   const switchWebTab = (tab) => {
     setActiveWebTab(tab);
     localStorage.setItem("codeverse_web_active_tab", tab);
+    if (tab === "html") setActiveFileName("index.html");
+    else if (tab === "css") setActiveFileName("style.css");
+    else if (tab === "js") setActiveFileName("script.js");
   };
 
   // Safe UTF-8 Base64 Encoding and Decoding Helpers
@@ -883,32 +1244,32 @@ Explain why this error occurred and how to fix it.`;
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       {/* ==================== COMPILER CONTROLS PANEL ==================== */}
-      <div className="glass-panel p-4 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-all duration-300 relative z-10">
+      <div className="glass-panel py-2 px-4 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-all duration-300 relative z-10">
         {/* Row 1: Back Button & Language Selector */}
-        <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 w-full sm:w-auto relative z-20">
+        <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-2.5 w-full sm:w-auto relative z-20">
           {/* Left Side: Back button */}
           <Link
             to="/"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
           >
-            <i className="fas fa-arrow-left text-xs"></i>
+            <i className="fas fa-arrow-left text-[10px] sm:text-xs"></i>
             <span>Back</span>
           </Link>
 
           {/* Selection of Language Trigger Button */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLanguageModal(true)}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
             >
-              <i className="fas fa-cubes text-xs text-indigo-400"></i>
-              <span className="text-[var(--text-secondary)] text-xs xs:text-sm">Language:</span>
-              <span className="text-indigo-400 font-extrabold text-xs xs:text-sm">{LANGUAGES[currentLanguage]?.name}</span>
-              <i className="fas fa-chevron-down text-[10px] text-[var(--text-secondary)] ml-1"></i>
+              <i className="fas fa-cubes text-[10px] sm:text-xs text-indigo-400"></i>
+              <span className="text-[var(--text-secondary)] text-[10px] sm:text-xs">Language:</span>
+              <span className="text-indigo-400 font-extrabold text-[10px] sm:text-xs">{LANGUAGES[currentLanguage]?.name}</span>
+              <i className="fas fa-chevron-down text-[8px] sm:text-[10px] text-[var(--text-secondary)] ml-0.5"></i>
             </button>
             <span
               id="lang-badge"
-              className={`hidden sm:inline-block px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
+              className={`hidden sm:inline-block px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold whitespace-nowrap flex-shrink-0 ${LANGUAGES[currentLanguage]?.badgeClass}`}
             >
               {LANGUAGES[currentLanguage]?.name}
             </span>
@@ -916,33 +1277,33 @@ Explain why this error occurred and how to fix it.`;
         </div>
 
         {/* Row 2: Action items wrapper */}
-        <div className="flex items-center justify-between gap-2.5 sm:gap-3 w-full sm:w-auto relative z-20">
+        <div className="flex items-center justify-between gap-2 sm:gap-2.5 w-full sm:w-auto relative z-20">
           {/* Left-aligned secondary tools */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
             {/* Clear Button */}
             <button
               onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
             >
-              <i className="fas fa-eraser"></i>
+              <i className="fas fa-eraser text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
             </button>
 
             {/* Copy Button */}
             <button
               onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
             >
-              <i className="fas fa-copy"></i>
+              <i className="fas fa-copy text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
             </button>
 
             {/* Download Button */}
             <button
               onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
             >
-              <i className="fas fa-download"></i>
+              <i className="fas fa-download text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
             </button>
 
@@ -951,23 +1312,23 @@ Explain why this error occurred and how to fix it.`;
                 {/* Settings Modal Button */}
                 <button
                   onClick={openSettingsModal}
-                  className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                  className="p-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
                   title="API Credentials Configuration"
                 >
-                  <i className="fas fa-sliders text-sm"></i>
+                  <i className="fas fa-sliders text-xs"></i>
                 </button>
 
                 {/* AI Code Assistant Toggle Button */}
                 <button
                   onClick={() => setShowAIPanel(prev => !prev)}
-                  className={`p-2 rounded-lg border text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                  className={`p-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
                     showAIPanel
                       ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
                       : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
                   }`}
                   title="AI Code Assistant"
                 >
-                  <i className="fas fa-brain text-sm text-emerald-400 animate-pulse"></i>
+                  <i className="fas fa-brain text-xs text-emerald-400 animate-pulse"></i>
                 </button>
               </>
             )}
@@ -978,7 +1339,7 @@ Explain why this error occurred and how to fix it.`;
             <button
               onClick={runCode}
               disabled={isExecuting}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
             >
               {isExecuting ? (
                 <>
@@ -987,7 +1348,7 @@ Explain why this error occurred and how to fix it.`;
                 </>
               ) : (
                 <>
-                  <i className="fas fa-play text-xs"></i>
+                  <i className="fas fa-play text-[10px] sm:text-xs"></i>
                   <span>Run<span className="hidden sm:inline"> Code</span></span>
                 </>
               )}
@@ -1152,9 +1513,12 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-grow relative z-10">
-        {/* Monaco Code Editor Area (Occupies 2 columns on large displays) */}
-        <div className="lg:col-span-2 flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch flex-grow w-full relative z-10 min-h-[500px]">
+        {/* Monaco Code Editor Area */}
+        <div 
+          className="flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border flex-shrink-0"
+          style={{ width: isMobile ? '100%' : `${leftPanelWidth}%` }}
+        >
           {/* Tab Bar Header */}
           <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
             <div className="flex items-center gap-4">
@@ -1199,61 +1563,361 @@ Explain why this error occurred and how to fix it.`;
             </div>
           </div>
 
-          {/* Monaco Editor Wrapper */}
-          <div className="flex-grow min-h-[450px] relative">
-            <div className="absolute inset-0 w-full h-full">
-              <Editor
-                language={
-                  currentLanguage === "html"
-                    ? (activeWebTab === "js" ? "javascript" : activeWebTab)
-                    : LANGUAGES[currentLanguage]?.monacoId || "text"
-                }
-                value={
-                  currentLanguage === "html"
-                    ? (activeWebTab === "html" ? htmlCode : activeWebTab === "css" ? cssCode : jsCode)
-                    : code
-                }
-                onChange={(val) => {
-                  if (currentLanguage === "html") {
-                    if (activeWebTab === "html") {
-                      setHtmlCode(val || "");
-                      localStorage.setItem("codeverse_code_html", val || "");
-                    } else if (activeWebTab === "css") {
-                      setCssCode(val || "");
-                      localStorage.setItem("codeverse_web_css", val || "");
-                    } else {
-                      setJsCode(val || "");
-                      localStorage.setItem("codeverse_web_js", val || "");
-                    }
-                  } else {
-                    setCode(val || "");
-                    localStorage.setItem(`codeverse_code_${currentLanguage}`, val || "");
-                  }
-                }}
-                onMount={handleEditorDidMount}
-                loading={
-                  <div className="w-full h-full flex items-center justify-center text-slate-400 font-mono text-xs">
-                    <div className="spinner mr-2"></div> Loading Monaco IDE Workspace...
+          {/* Editor Workspace with Sidebar Navigation & Side Drawer */}
+          <div className="flex-grow flex flex-row min-h-[450px] relative overflow-hidden">
+            {/* 1. Left Vertical Icon Sidebar Bar */}
+            <div className="w-12 bg-[var(--bg-tertiary)]/10 border-r border-[var(--border-color)]/30 flex flex-col justify-between items-center py-4 flex-shrink-0 z-20">
+              {/* Top Icons */}
+              <div className="flex flex-col gap-5 w-full items-center">
+                {/* Explorer/Files icon */}
+                <button
+                  onClick={() => setActiveSidebarTab(prev => prev === 'explorer' ? null : 'explorer')}
+                  className={`w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center text-base hover:text-white ${
+                    activeSidebarTab === 'explorer' 
+                      ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/20' 
+                      : 'text-slate-400 border border-transparent hover:bg-slate-800/20'
+                  }`}
+                  title="Files Explorer"
+                >
+                  <i className="far fa-folder-open"></i>
+                </button>
+                
+                {/* Search icon */}
+                <button
+                  onClick={() => setActiveSidebarTab(prev => prev === 'search' ? null : 'search')}
+                  className={`w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center text-base hover:text-white ${
+                    activeSidebarTab === 'search' 
+                      ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/20' 
+                      : 'text-slate-400 border border-transparent hover:bg-slate-800/20'
+                  }`}
+                  title="Search Workspace"
+                >
+                  <i className="fas fa-search"></i>
+                </button>
+              </div>
+
+              {/* Bottom Icons */}
+              <div className="flex flex-col gap-4 w-full items-center">
+                {/* History / Drafts Icon */}
+                <button
+                  onClick={() => setActiveSidebarTab(prev => prev === 'history' ? null : 'history')}
+                  className={`w-8 h-8 rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center text-base hover:text-white ${
+                    activeSidebarTab === 'history' 
+                      ? 'text-indigo-400 bg-indigo-500/10 border border-indigo-500/20' 
+                      : 'text-slate-400 border border-transparent hover:bg-slate-800/20'
+                  }`}
+                  title="Local Drafts & Snapshots"
+                >
+                  <i className="fas fa-clock-rotate-left"></i>
+                </button>
+                
+                {/* Editor Settings Gear Icon */}
+                <button
+                  onClick={() => setShowEditorSettings(true)}
+                  className="w-8 h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/30 transition-all duration-200 cursor-pointer flex items-center justify-center text-base"
+                  title="Editor Settings"
+                >
+                  <i className="fas fa-cog"></i>
+                </button>
+              </div>
+            </div>
+
+            {/* 2. Slide Drawer Panel */}
+            {activeSidebarTab && (
+              <div 
+                className="border-r border-[var(--border-color)]/30 bg-[var(--bg-tertiary)]/5 flex flex-col flex-shrink-0 z-10 animate-fade-in relative"
+                style={{ width: `${drawerWidth}px` }}
+              >
+                {/* Explorer Tab Panel */}
+                {activeSidebarTab === 'explorer' && (
+                  <div className="flex flex-col h-full">
+                    {/* Explorer Header */}
+                    <div className="p-3 border-b border-[var(--border-color)]/30 bg-[var(--bg-tertiary)]/10 flex justify-between items-center shrink-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">Explorer</span>
+                      
+                      {/* Icons to Add File/Folder */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => {
+                            setIsCreatingFile(true);
+                            setNewFileName("");
+                          }}
+                          className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
+                          title="New File..."
+                        >
+                          <i className="fas fa-file-circle-plus text-xs"></i>
+                        </button>
+                        <button
+                          onClick={() => {
+                            showToast("Folder creation is a Premium feature!", "info");
+                          }}
+                          className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
+                          title="New Folder..."
+                        >
+                          <i className="fas fa-folder-plus text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Files List Wrapper */}
+                    <div className="p-3 flex flex-col gap-1.5 flex-grow overflow-y-auto scrollbar-thin">
+                      {/* Inline Input Field for New File Name */}
+                      {isCreatingFile && (
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/80 border border-indigo-500/50 shrink-0">
+                          <i className="far fa-file text-slate-400 text-xs"></i>
+                          <input
+                            autoFocus
+                            type="text"
+                            placeholder="filename.ext"
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleCreateFile();
+                              } else if (e.key === 'Escape') {
+                                setIsCreatingFile(false);
+                                setNewFileName("");
+                              }
+                            }}
+                            onBlur={() => {
+                              setTimeout(() => {
+                                setIsCreatingFile(false);
+                                setNewFileName("");
+                              }, 200);
+                            }}
+                            className="w-full bg-transparent text-xs text-white focus:outline-none focus:ring-0 p-0 font-mono"
+                          />
+                        </div>
+                      )}
+
+                      {/* Display Workspace Files */}
+                      {workspaceFiles.map(f => {
+                        const isActive = f.name === activeFileName;
+                        
+                        let fileIcon = "far fa-file-code text-indigo-400";
+                        const ext = f.name.split('.').pop().toLowerCase();
+                        if (ext === 'html') fileIcon = "fab fa-html5 text-orange-500";
+                        else if (ext === 'css') fileIcon = "fab fa-css3-alt text-blue-500";
+                        else if (ext === 'js') fileIcon = "fab fa-js text-yellow-500";
+                        else if (ext === 'py') fileIcon = "fab fa-python text-sky-400";
+                        else if (ext === 'c') fileIcon = "fas fa-copyright text-blue-400";
+                        else if (ext === 'cpp' || ext === 'cc') fileIcon = "fas fa-c text-blue-500";
+                        
+                        const isDefaultFile = ['index.html', 'style.css', 'script.js'].includes(f.name) || f.name.startsWith('main.');
+                        
+                        return (
+                          <div
+                            key={f.name}
+                            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all duration-200 group select-none ${
+                              isActive 
+                                ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20" 
+                                : "text-slate-400 hover:text-white hover:bg-slate-800/30 border border-transparent"
+                            }`}
+                          >
+                            <button
+                              onClick={() => {
+                                if (editorRef.current) {
+                                  const currentVal = editorRef.current.getValue();
+                                  handleWorkspaceCodeChange(currentVal);
+                                }
+                                
+                                setActiveFileName(f.name);
+                                
+                                if (currentLanguage === "html") {
+                                  if (f.name === "index.html") switchWebTab("html");
+                                  else if (f.name === "style.css") switchWebTab("css");
+                                  else if (f.name === "script.js") switchWebTab("js");
+                                }
+                              }}
+                              className="flex items-center gap-2 flex-grow text-left cursor-pointer"
+                            >
+                              <i className={fileIcon}></i>
+                              <span className="truncate">{f.name}</span>
+                            </button>
+
+                            {/* Delete button */}
+                            {!isDefaultFile && (
+                              <button
+                                onClick={() => handleDeleteFile(f.name)}
+                                className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
+                                title="Delete file"
+                              >
+                                <i className="far fa-trash-can text-[10px]"></i>
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                }
-                options={{
-                  fontSize: 14,
-                  fontFamily: 'Fira Code, JetBrains Mono, monospace',
-                  fontLigatures: true,
-                  automaticLayout: true,
-                  minimap: { enabled: true },
-                  scrollbar: {
-                    vertical: 'visible',
-                    horizontal: 'visible',
-                    useShadows: false,
-                    verticalScrollbarSize: 8,
-                    horizontalScrollbarSize: 8
-                  },
-                  cursorBlinking: 'smooth',
-                  cursorSmoothCaretAnimation: true,
-                  padding: { top: 12, bottom: 12 }
-                }}
-              />
+                )}
+
+                {/* Search Tab Panel */}
+                {activeSidebarTab === 'search' && (
+                  <div className="flex flex-col h-full">
+                    <div className="p-3 border-b border-[var(--border-color)]/30 bg-[var(--bg-tertiary)]/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">Search</span>
+                    </div>
+                    <div className="p-4 flex flex-col gap-3">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Search in file..."
+                          className="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-[var(--bg-primary)] border border-[var(--border-color)]/40 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-indigo-500/50 transition-all duration-200"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && editorRef.current) {
+                              const searchString = e.target.value;
+                              if (searchString) {
+                                editorRef.current.trigger('actions', 'actions.find');
+                              }
+                            }
+                          }}
+                        />
+                        <i className="fas fa-search absolute left-3 top-2.5 text-[var(--text-muted)] text-[10px]"></i>
+                      </div>
+                      <p className="text-[10px] text-[var(--text-muted)] leading-relaxed italic">
+                        Type search query and press <strong>Enter</strong> to open built-in Monaco editor find overlay.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* History / Drafts Tab Panel */}
+                {activeSidebarTab === 'history' && (
+                  <div className="flex flex-col h-full max-h-[480px]">
+                    <div className="p-3 border-b border-[var(--border-color)]/30 bg-[var(--bg-tertiary)]/10 flex justify-between items-center flex-shrink-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">Drafts</span>
+                        <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                          {drafts.length}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {/* Save Current Workspace as Draft */}
+                        <button
+                          onClick={saveDraft}
+                          className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
+                          title="Save current workspace snapshot as draft"
+                        >
+                          <i className="fas fa-plus text-xs"></i>
+                        </button>
+                        {/* Reload Drafts List from LocalStorage */}
+                        <button
+                          onClick={() => {
+                            try {
+                              const saved = localStorage.getItem("codeverse_drafts");
+                              setDrafts(saved ? JSON.parse(saved) : []);
+                              showToast("Drafts list reloaded", "info");
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
+                          title="Reload drafts list"
+                        >
+                          <i className="fas fa-sync text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex-grow overflow-y-auto divide-y divide-[var(--border-color)]/10 scrollbar-thin">
+                      {drafts.length === 0 ? (
+                        <div className="p-6 text-center text-xs text-[var(--text-muted)] italic leading-relaxed">
+                          No drafts saved yet.<br/>Click the "+" button to save a snapshot.
+                        </div>
+                      ) : (
+                        drafts.map(d => {
+                          const dateObj = new Date(d.timestamp);
+                          const dateStr = isNaN(dateObj.getTime()) ? 'yesterday' : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                          return (
+                            <div
+                              key={d.id}
+                              className="p-3 flex items-center justify-between hover:bg-[var(--bg-tertiary)]/20 transition-all duration-200 select-none group"
+                            >
+                              <div
+                                onClick={() => loadDraft(d)}
+                                className="flex-grow min-w-0 pr-2 cursor-pointer"
+                              >
+                                <h4 className="text-xs font-bold text-slate-200 truncate group-hover:text-indigo-400 transition-colors duration-150">
+                                  {d.name}
+                                </h4>
+                                <div className="flex items-center gap-1.5 mt-0.5 text-[9px] text-[var(--text-muted)] font-mono">
+                                  <span className="uppercase font-extrabold text-indigo-400/80">{d.language}</span>
+                                  <span>•</span>
+                                  <span>{dateStr}</span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => deleteDraft(d.id)}
+                                className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
+                                title="Delete draft"
+                              >
+                                <i className="far fa-trash-can text-[10px]"></i>
+                              </button>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Drag Resize Handle */}
+                <div
+                  onMouseDown={startResizingDrawer}
+                  className="absolute right-0 top-0 bottom-0 w-1.5 hover:w-2 bg-transparent hover:bg-indigo-500/40 cursor-col-resize z-30 transition-all duration-150 select-none"
+                  style={{ right: '-3px' }}
+                />
+              </div>
+            )}
+
+            {/* 3. Main Monaco Editor Container Wrapper */}
+            <div className="flex-grow relative h-full min-w-0">
+              <div className="absolute inset-0 w-full h-full">
+                <Editor
+                  language={
+                    workspaceFiles.find(f => f.name === activeFileName)?.language || 
+                    (currentLanguage === "html"
+                      ? (activeWebTab === "js" ? "javascript" : activeWebTab)
+                      : LANGUAGES[currentLanguage]?.monacoId || "text")
+                  }
+                  value={
+                    workspaceFiles.find(f => f.name === activeFileName)?.content || ""
+                  }
+                  onChange={handleWorkspaceCodeChange}
+                  onMount={handleEditorDidMount}
+                  theme={
+                    settingsColorTheme === 'Dracula' 
+                      ? 'dracula' 
+                      : (['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'].includes(settingsColorTheme) ? 'vs' : 'vs-dark')
+                  }
+                  loading={
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 font-mono text-xs">
+                      <div className="spinner mr-2"></div> Loading Monaco IDE Workspace...
+                    </div>
+                  }
+                  options={{
+                    fontSize: settingsFontSize,
+                    fontFamily: 'Fira Code, JetBrains Mono, monospace',
+                    fontLigatures: true,
+                    automaticLayout: true,
+                    minimap: { enabled: true },
+                    scrollbar: {
+                      vertical: 'visible',
+                      horizontal: 'visible',
+                      useShadows: false,
+                      verticalScrollbarSize: 8,
+                      horizontalScrollbarSize: 8
+                    },
+                    cursorBlinking: 'smooth',
+                    cursorSmoothCaretAnimation: true,
+                    padding: { top: 12, bottom: 12 },
+                    wordWrap: settingsWordWrap ? 'on' : 'off',
+                    quickSuggestions: !settingsDisableAutocomplete,
+                    suggestOnTriggerCharacters: !settingsDisableAutocomplete
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -1264,8 +1928,17 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
 
-        {/* Input Stdin / Console Output Panel (Occupies 1 column) */}
-        <div className="flex flex-col gap-6">
+        {/* Panel resizing divider handle */}
+        {!isMobile && (
+          <div
+            onMouseDown={startResizingPanels}
+            className="hidden lg:block w-3 bg-transparent hover:bg-indigo-500/20 cursor-col-resize flex-shrink-0 z-20 transition-all duration-150 relative self-stretch select-none -mx-1.5"
+            title="Drag to resize workspace split ratio"
+          />
+        )}
+
+        {/* Input Stdin / Console Output Panel */}
+        <div className="flex flex-col gap-6 flex-grow min-w-0">
           {currentLanguage !== "html" ? (
             <>
               {/* Standard Input (Stdin) Area */}
@@ -1321,7 +1994,7 @@ Explain why this error occurred and how to fix it.`;
                 </div>
 
                 {/* Console Output box */}
-                <div id="console-output-container" className="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] max-h-[350px] relative">
+                <div id="console-output-container" className="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] relative">
                   <pre id="output-console" className="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
                     {consoleOutput}
                     <span className="terminal-cursor"></span>
@@ -1442,66 +2115,82 @@ Explain why this error occurred and how to fix it.`;
 
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
-        <div className="modal-overlay fixed inset-0 z-50 bg-[#0f1524]/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
-          <div className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl animate-fade-in-up">
+        <div
+          onClick={() => setShowSettings(false)}
+          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+          >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/40 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <i className="fas fa-sliders text-indigo-400"></i>
-                <h3 className="font-bold text-[var(--text-primary)]">Compiler Settings</h3>
+            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <i className="fas fa-sliders text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-[var(--text-primary)]">Compiler Settings</h3>
+                </div>
               </div>
               <button
                 onClick={() => setShowSettings(false)}
-                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 cursor-pointer"
               >
                 <i className="fas fa-times"></i>
               </button>
             </div>
 
             {/* Modal Body Form */}
-            <div className="p-6 flex flex-col gap-4">
-              <div>
-                <label htmlFor="api-url-input" className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  Judge0 API Base URL
-                </label>
+            <div className="p-6 flex flex-col gap-5 max-h-[60vh] overflow-y-auto scrollbar-thin">
+              {/* 1. Judge0 API Base URL */}
+              <div className="flex flex-col gap-2 pb-3 border-b border-[var(--border-color)]/10 text-left">
+                <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Judge0 API Base URL</span>
                 <input
                   type="text"
-                  id="api-url-input"
                   value={settingsUrlInput}
                   onChange={(e) => setSettingsUrlInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 font-mono transition-all duration-200"
                   placeholder="https://ce.judge0.com"
                 />
-                <p className="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+                <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">
                   By default we use the Judge0 Community Edition testing instance. You can replace this with your self-hosted Docker URL or RapidAPI proxy.
-                </p>
+                </span>
               </div>
 
-              <div>
-                <label htmlFor="api-key-input" className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                  RapidAPI Host Key (x-rapidapi-key)
-                </label>
+              {/* 2. RapidAPI Host Key */}
+              <div className="flex flex-col gap-2 text-left">
+                <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">RapidAPI Host Key (x-rapidapi-key)</span>
                 <input
                   type="password"
-                  id="api-key-input"
                   value={settingsKeyInput}
                   onChange={(e) => setSettingsKeyInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 font-mono transition-all duration-200"
                   placeholder="••••••••••••••••••••••••••••••••"
                 />
-                <p className="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+                <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">
                   Only required if pointing to RapidAPI endpoint (e.g. <code>https://judge0-ce.p.rapidapi.com</code>). Leave empty for self-hosted instances.
-                </p>
+                </span>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/40 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420]/75 flex justify-between items-center shrink-0">
+              <button
+                onClick={() => {
+                  setSettingsUrlInput(DEFAULT_API_URL);
+                  setSettingsKeyInput("");
+                  showToast("Compiler settings reset to defaults", "info");
+                }}
+                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer bg-transparent border-none"
+              >
+                Reset to defaults
+              </button>
               <button
                 onClick={saveSettings}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200"
+                className="px-6 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow"
               >
-                Save Configuration
+                Done
               </button>
             </div>
           </div>
@@ -1515,7 +2204,7 @@ Explain why this error occurred and how to fix it.`;
             setShowLanguageModal(false);
             setLangSearchQuery("");
           }}
-          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/85 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -1617,6 +2306,326 @@ Explain why this error occurred and how to fix it.`;
                 className="px-3.5 py-1.5 rounded-lg border border-[#232f48] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[#1c263e] active:scale-95 transition-all duration-200"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== EDITOR CONFIGURATION SETTINGS MODAL ==================== */}
+      {showEditorSettings && (
+        <div
+          onClick={() => setShowEditorSettings(false)}
+          className="modal-overlay fixed inset-0 z-50 bg-[#060913]/60 flex items-center justify-center p-4 transition-all duration-300"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <i className="fas fa-sliders text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-[var(--text-primary)]">Editor Settings</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowEditorSettings(false)}
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 cursor-pointer"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 flex flex-col gap-5 max-h-[60vh] overflow-y-auto scrollbar-thin">
+              {/* 1. Font Size Control */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Font size</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">8–32px</span>
+                </div>
+                <div className="flex items-center gap-3 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                  <button
+                    onClick={() => {
+                      const next = Math.max(8, settingsFontSize - 1);
+                      setSettingsFontSize(next);
+                      localStorage.setItem("codeverse_settings_font_size", next);
+                    }}
+                    className="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-xs transition-colors cursor-pointer"
+                  >
+                    <i className="fas fa-minus"></i>
+                  </button>
+                  <span className="text-xs font-mono font-bold text-white w-8 text-center">{settingsFontSize}px</span>
+                  <button
+                    onClick={() => {
+                      const next = Math.min(32, settingsFontSize + 1);
+                      setSettingsFontSize(next);
+                      localStorage.setItem("codeverse_settings_font_size", next);
+                    }}
+                    className="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-xs transition-colors cursor-pointer"
+                  >
+                    <i className="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. Theme Control */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Theme</span>
+                </div>
+                <div className="flex items-center gap-1 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                  <button
+                    onClick={() => {
+                      if (theme !== 'light' && toggleTheme) toggleTheme();
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+                      theme === 'light' 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <i className="far fa-sun text-[10px]"></i>
+                    <span>Light</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (theme !== 'dark' && toggleTheme) toggleTheme();
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+                      theme === 'dark' 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <i className="far fa-moon text-[10px]"></i>
+                    <span>Dark</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 3. Editor Engine */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Editor</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">On mobile, Ace is always used.</span>
+                </div>
+                <div className="flex items-center gap-1 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                  <button
+                    onClick={() => {
+                      setSettingsEditorEngine("Monaco");
+                      localStorage.setItem("codeverse_settings_editor_engine", "Monaco");
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
+                      settingsEditorEngine === "Monaco" 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Monaco
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSettingsEditorEngine("Ace");
+                      localStorage.setItem("codeverse_settings_editor_engine", "Ace");
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
+                      settingsEditorEngine === "Ace" 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Ace
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. Color Theme Dropdown */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Color theme</span>
+                </div>
+                <select
+                  value={settingsColorTheme}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    setSettingsColorTheme(selected);
+                    localStorage.setItem("codeverse_settings_color_theme", selected);
+                    
+                    if (editorRef.current && window.monaco) {
+                      const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
+                      let baseTheme = 'vs-dark';
+                      if (lightThemes.includes(selected)) {
+                        baseTheme = 'vs';
+                      }
+                      if (selected === 'Dracula') {
+                        window.monaco.editor.setTheme('dracula');
+                      } else {
+                        window.monaco.editor.setTheme(baseTheme);
+                      }
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer max-w-[150px]"
+                >
+                  <optgroup label="Dark themes" className="bg-[#121824] text-slate-300">
+                    <option value="Dark (Default)">Dark (Default)</option>
+                    <option value="One Dark Pro">One Dark Pro</option>
+                    <option value="Dracula">Dracula</option>
+                    <option value="Monokai">Monokai</option>
+                    <option value="Night Owl">Night Owl</option>
+                    <option value="GitHub Dark">GitHub Dark</option>
+                    <option value="Tokyo Night">Tokyo Night</option>
+                    <option value="Catppuccin Mocha">Catppuccin Mocha</option>
+                    <option value="Nord">Nord</option>
+                    <option value="Solarized Dark">Solarized Dark</option>
+                    <option value="High Contrast Dark">High Contrast Dark</option>
+                  </optgroup>
+                  <optgroup label="Light themes" className="bg-[#121824] text-slate-300">
+                    <option value="Light (Default)">Light (Default)</option>
+                    <option value="One Light">One Light</option>
+                    <option value="GitHub Light">GitHub Light</option>
+                    <option value="Solarized Light">Solarized Light</option>
+                    <option value="Night Owl Light">Night Owl Light</option>
+                    <option value="Catppuccin Latte">Catppuccin Latte</option>
+                    <option value="Min Light">Min Light</option>
+                    <option value="Vitesse Light">Vitesse Light</option>
+                    <option value="High Contrast Light">High Contrast Light</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              {/* 5. Word Wrap Toggle */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left pr-4">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Word wrap</span>
+                  <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">Wrap long lines to fit the editor width.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !settingsWordWrap;
+                    setSettingsWordWrap(next);
+                    localStorage.setItem("codeverse_settings_word_wrap", next);
+                  }}
+                  className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
+                    settingsWordWrap ? 'bg-indigo-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
+                    settingsWordWrap ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
+              </div>
+
+              {/* 6. Autocomplete Disable Toggle */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left pr-4">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Disable auto-complete</span>
+                  <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">Stop suggesting completions as you type.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !settingsDisableAutocomplete;
+                    setSettingsDisableAutocomplete(next);
+                    localStorage.setItem("codeverse_settings_disable_autocomplete", next);
+                  }}
+                  className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
+                    settingsDisableAutocomplete ? 'bg-indigo-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
+                    settingsDisableAutocomplete ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
+              </div>
+
+              {/* 7. Preserve Console Error Toggle */}
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]/10">
+                <div className="text-left pr-4">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Web Console: Preserve error log</span>
+                  <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">Keep errors in the console instead of clearing them.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !settingsPreserveErrorLog;
+                    setSettingsPreserveErrorLog(next);
+                    localStorage.setItem("codeverse_settings_preserve_error_log", next);
+                  }}
+                  className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
+                    settingsPreserveErrorLog ? 'bg-indigo-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
+                    settingsPreserveErrorLog ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
+              </div>
+
+              {/* 8. Avoid Console Auto-scroll Toggle */}
+              <div className="flex items-center justify-between pb-3">
+                <div className="text-left pr-4">
+                  <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Web Console: Avoid auto scrolling</span>
+                  <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">Don't auto-scroll the console to the newest line.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !settingsAvoidAutoScrolling;
+                    setSettingsAvoidAutoScrolling(next);
+                    localStorage.setItem("codeverse_settings_avoid_auto_scrolling", next);
+                  }}
+                  className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
+                    settingsAvoidAutoScrolling ? 'bg-indigo-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
+                    settingsAvoidAutoScrolling ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420]/75 flex justify-between items-center shrink-0">
+              <button
+                onClick={() => {
+                  setSettingsFontSize(14);
+                  setSettingsWordWrap(false);
+                  setSettingsDisableAutocomplete(false);
+                  setSettingsColorTheme("Dracula");
+                  setSettingsPreserveErrorLog(false);
+                  setSettingsAvoidAutoScrolling(false);
+                  setSettingsEditorEngine("Monaco");
+
+                  localStorage.setItem("codeverse_settings_font_size", 14);
+                  localStorage.setItem("codeverse_settings_word_wrap", false);
+                  localStorage.setItem("codeverse_settings_disable_autocomplete", false);
+                  localStorage.setItem("codeverse_settings_color_theme", "Dracula");
+                  localStorage.setItem("codeverse_settings_preserve_error_log", false);
+                  localStorage.setItem("codeverse_settings_avoid_auto_scrolling", false);
+                  localStorage.setItem("codeverse_settings_editor_engine", "Monaco");
+                  
+                  if (editorRef.current && window.monaco) {
+                    window.monaco.editor.setTheme('dracula');
+                  }
+                  showToast("Settings reset to defaults", "info");
+                }}
+                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+              >
+                Reset to defaults
+              </button>
+              
+              <button
+                onClick={() => setShowEditorSettings(false)}
+                className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/10 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Done
               </button>
             </div>
           </div>

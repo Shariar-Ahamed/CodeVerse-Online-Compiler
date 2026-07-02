@@ -150,19 +150,7 @@ body::before {
   min-height: 400px;
 }
 
-/* Make sure Monaco matches theme transition and uses official background colors */
-.monaco-editor, 
-.monaco-editor .margin, 
-.monaco-editor-background {
-  transition: background-color 0.3s ease !important;
-  background-color: #282a36 !important;
-}
 
-.light .monaco-editor, 
-.light .monaco-editor .margin, 
-.light .monaco-editor-background {
-  background-color: #ffffff !important;
-}
 
 /* Terminal Console Styling */
 .terminal-console {

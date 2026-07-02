@@ -289,7 +289,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<LandingPage showToast={showToast} />} />
           <Route path="/login" element={<AuthPage user={user} onLogin={handleLogin} showToast={showToast} />} />
-          <Route path="/editor" element={<EditorPage user={user} theme={theme} showToast={showToast} />} />
+          <Route path="/editor" element={<EditorPage user={user} theme={theme} toggleTheme={toggleTheme} showToast={showToast} />} />
           <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} onUserUpdate={handleLogin} showToast={showToast} />} />
           <Route path="/profile/:username" element={<ProfilePage user={user} onLogout={handleLogout} onUserUpdate={handleLogin} showToast={showToast} />} />
           <Route path="/challenges" element={<ChallengesPage user={user} showToast={showToast} />} />
