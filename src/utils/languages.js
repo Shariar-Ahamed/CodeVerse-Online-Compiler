@@ -20,21 +20,22 @@ export const LANGUAGES = {
     badgeClass: "bg-orange-500/10 border-orange-500/20 text-orange-500",
     icon: "fab fa-html5",
     categories: ["popular", "web"],
-    defaultCode: `<!-- HTML Structure -->
-<!DOCTYPE html>
+    defaultCode: `<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeVerse Live Preview</title>
-</head>
-<body>
-    <div class="card">
-        <h1>Welcome to CodeVerse!</h1>
-        <p>This is a live frontend development playground.</p>
-        <button id="btn">Click Me!</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello, World!</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="clock-container">
+      <h1 class="title">Hello World!</h1>
+      <p id="currentTime"></p>
+      <div id="timezoneLabel" class="timezone-badge">Detecting...</div>
     </div>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>`
   },
   c: {
@@ -506,50 +507,85 @@ End Module`
 
 export const DEFAULT_WEB_CSS = `/* CSS Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e1e38 0%, #0d0d1a 100%);
-    color: #ffffff;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  color: #ffffff;
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 25px;
 }
 
-.card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
+.clock-container {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 40px;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-width: 450px;
+  width: 100%;
 }
 
-h1 {
-    color: #6366f1;
-    margin-top: 0;
+.title {
+  color: #818cf8;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-top: 0;
+  margin-bottom: 8px;
+  background: linear-gradient(to right, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-button {
-    background: #6366f1;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
+#currentTime {
+  font-size: 2.75rem;
+  font-weight: 700;
+  font-family: monospace;
+  margin: 20px 0 10px 0;
+  color: #38bdf8;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
 }
 
-button:hover {
-    background: #4f46e5;
-    transform: translateY(-2px);
+.timezone-badge {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }`;
 
 export const DEFAULT_WEB_JS = `// Client side scripts
-document.getElementById('btn').addEventListener('click', () => {
-    alert('CodeVerse sandbox interactive action successfully invoked!');
-    console.log('Button clicked inside iframe environment');
-});`;
+const userLocale = navigator.language || 'en-US';
+const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const timezoneLabel = document.getElementById('timezoneLabel');
+if (timezoneLabel) {
+  timezoneLabel.textContent = userTimezone.replace('_', ' ');
+}
+
+function showTime() {
+  const timeElement = document.getElementById('currentTime');
+  if (timeElement) {
+    const now = new Date();
+    const timeOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    };
+    timeElement.textContent = now.toLocaleTimeString(userLocale, timeOptions);
+  }
+}
+
+showTime();
+setInterval(showTime, 1000);`;

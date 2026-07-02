@@ -5,6 +5,116 @@ import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import AIPanel from '../components/AIPanel';
+const draculaTheme = {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [
+    { token: '', foreground: 'f8f8f2' },
+    { token: 'invalid', foreground: 'ff5555' },
+    { token: 'emphasis', fontStyle: 'italic' },
+    { token: 'strong', fontStyle: 'bold' },
+    
+    // Comments
+    { token: 'comment', foreground: '6272a4', fontStyle: 'italic' },
+    { token: 'comment.doc', foreground: '6272a4', fontStyle: 'italic' },
+    
+    // Keywords and Storage
+    { token: 'keyword', foreground: 'ff79c6' },
+    { token: 'keyword.control', foreground: 'ff79c6' },
+    { token: 'keyword.operator', foreground: 'ff79c6' },
+    { token: 'keyword.directive', foreground: 'ff79c6' },
+    { token: 'keyword.other', foreground: 'ff79c6' },
+    { token: 'storage', foreground: 'ff79c6' },
+    { token: 'storage.type', foreground: '8be9fd', fontStyle: 'italic' },
+    
+    // Preprocessors (C/C++ directives like #include)
+    { token: 'meta.preprocessor', foreground: 'ff79c6' },
+    { token: 'meta.preprocessor.string', foreground: 'f1fa8c' },
+    { token: 'meta.preprocessor.numeric', foreground: 'bd93f9' },
+    
+    // Numbers
+    { token: 'number', foreground: 'bd93f9' },
+    { token: 'number.hex', foreground: 'bd93f9' },
+    { token: 'number.octal', foreground: 'bd93f9' },
+    { token: 'number.binary', foreground: 'bd93f9' },
+    { token: 'number.float', foreground: 'bd93f9' },
+    { token: 'constant.numeric', foreground: 'bd93f9' },
+    
+    { token: 'regexp', foreground: 'ffb86c' },
+    
+    // Types, Classes, Functions
+    { token: 'type', foreground: '8be9fd', fontStyle: 'italic' },
+    { token: 'type.identifier', foreground: '8be9fd', fontStyle: 'italic' },
+    { token: 'class', foreground: '50fa7b' },
+    { token: 'class.identifier', foreground: '50fa7b' },
+    { token: 'function', foreground: '50fa7b' },
+    { token: 'function.identifier', foreground: '50fa7b' },
+    { token: 'member', foreground: '50fa7b' },
+    
+    // Strings
+    { token: 'string', foreground: 'f1fa8c' },
+    { token: 'string.escape', foreground: 'ff79c6' },
+    
+    // Identifiers and Variables
+    { token: 'identifier', foreground: 'f8f8f2' },
+    { token: 'variable', foreground: 'f8f8f2' },
+    { token: 'variable.predefined', foreground: '8be9fd' },
+    { token: 'variable.parameter', foreground: 'ffb86c', fontStyle: 'italic' },
+    { token: 'constant', foreground: 'bd93f9' },
+    { token: 'constant.language', foreground: 'bd93f9' },
+    
+    // Tags and Markup
+    { token: 'tag', foreground: 'ff79c6' },
+    { token: 'tag.id', foreground: '8be9fd' },
+    { token: 'tag.class', foreground: '50fa7b' },
+    { token: 'tag.html', foreground: 'ff79c6' },
+    { token: 'tag.xml', foreground: 'ff79c6' },
+    
+    // Attributes
+    { token: 'attribute.name', foreground: '50fa7b' },
+    { token: 'attribute.name.html', foreground: '50fa7b' },
+    { token: 'attribute.name.xml', foreground: '50fa7b' },
+    { token: 'attribute.name.css', foreground: '50fa7b' },
+    { token: 'attribute.value', foreground: 'f1fa8c' },
+    { token: 'attribute.value.html', foreground: 'f1fa8c' },
+    { token: 'attribute.value.xml', foreground: 'f1fa8c' },
+    { token: 'attribute.value.number', foreground: 'bd93f9' },
+    { token: 'attribute.value.unit', foreground: 'bd93f9' },
+    { token: 'string.html', foreground: 'f1fa8c' },
+    { token: 'string.xml', foreground: 'f1fa8c' },
+    { token: 'string.yaml', foreground: 'f1fa8c' },
+    
+    // CSS specific rules
+    { token: 'tag.css', foreground: 'ff79c6' },
+    { token: 'keyword.css', foreground: 'ff79c6' },
+    { token: 'string.css', foreground: 'f1fa8c' },
+    { token: 'number.css', foreground: 'bd93f9' },
+    { token: 'tag.class.css', foreground: '50fa7b' },
+    { token: 'tag.id.css', foreground: '8be9fd' },
+    { token: 'attribute.value.css', foreground: 'f1fa8c' },
+    
+    // JSON and Yaml
+    { token: 'keyword.json', foreground: 'ff79c6' },
+    { token: 'string.key.json', foreground: 'ff79c6' },
+    { token: 'string.value.json', foreground: 'f1fa8c' },
+    
+    // Delimiters, Operators, Annotations
+    { token: 'delimiter', foreground: 'f8f8f2' },
+    { token: 'delimiter.html', foreground: 'f8f8f2' },
+    { token: 'delimiter.xml', foreground: 'f8f8f2' },
+    { token: 'operator', foreground: 'ff79c6' },
+    { token: 'annotation', foreground: 'ffb86c' }
+  ],
+  colors: {
+    'editor.background': '#282a36',
+    'editor.foreground': '#f8f8f2',
+    'editor.lineHighlightBackground': '#44475a',
+    'editorCursor.foreground': '#08CB00',
+    'editor.selectionBackground': '#44475a',
+    'editor.inactiveSelectionBackground': '#44475a44',
+    'editor.lineHighlightBorder': '#282a36'
+  }
+};
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
 
@@ -67,6 +177,19 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     }
   });
 
+  const autoRunTimerRef = useRef(null);
+  const webPreviewSessionRef = useRef(0);
+  const [isAutoRunEnabled, setIsAutoRunEnabled] = useState(() => {
+    const saved = localStorage.getItem("codeverse_autorun_web");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("codeverse_autorun_web", isAutoRunEnabled);
+  }, [isAutoRunEnabled]);
+
+  const [isWebConsoleOpen, setIsWebConsoleOpen] = useState(false);
+
   const [showEditorSettings, setShowEditorSettings] = useState(false);
   const [settingsFontSize, setSettingsFontSize] = useState(() => {
     const val = localStorage.getItem("codeverse_settings_font_size");
@@ -118,18 +241,59 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
 
   // Sync workspace files when language changes
   useEffect(() => {
-    const savedFiles = localStorage.getItem(`codeverse_files_${currentLanguage}`);
+    let savedFiles = localStorage.getItem(`codeverse_files_${currentLanguage}`);
+    let parsed = null;
     if (savedFiles) {
       try {
-        const parsed = JSON.parse(savedFiles);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setWorkspaceFiles(parsed);
-          setActiveFileName(parsed[0].name);
-          return;
-        }
+        parsed = JSON.parse(savedFiles);
       } catch (e) {
         console.error(e);
       }
+    }
+
+    // Auto-repair logic for old/stuck workspaces in localStorage
+    if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+      let needsRepair = false;
+      const repaired = parsed.map(file => {
+        // If it's a default single file named main.txt but the active language is NOT text/html
+        if (
+          currentLanguage !== "text" && 
+          currentLanguage !== "html" && 
+          file.name === "main.txt" && 
+          (file.language === "text" || !file.language)
+        ) {
+          needsRepair = true;
+          const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
+          return {
+            ...file,
+            name: `main.${ext}`,
+            language: currentLanguage
+          };
+        }
+        
+        // General repair: if file language doesn't match extension resolution
+        const detected = detectLanguageByExtension(file.name);
+        if (file.language !== detected) {
+          needsRepair = true;
+          return {
+            ...file,
+            language: detected
+          };
+        }
+        
+        return file;
+      });
+
+      if (needsRepair) {
+        setWorkspaceFiles(repaired);
+        setActiveFileName(repaired[0].name);
+        localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(repaired));
+        return;
+      }
+
+      setWorkspaceFiles(parsed);
+      setActiveFileName(parsed[0].name);
+      return;
     }
     
     let defaultFiles = [];
@@ -140,7 +304,7 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
         { name: "script.js", content: localStorage.getItem("codeverse_web_js") || DEFAULT_WEB_JS, language: "javascript" }
       ];
     } else {
-      const ext = currentLanguage === 'python' ? 'py' : currentLanguage === 'c' ? 'c' : currentLanguage === 'cpp' ? 'cpp' : currentLanguage === 'java' ? 'java' : 'txt';
+      const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
       const defaultName = `main.${ext}`;
       const savedCode = localStorage.getItem(`codeverse_code_${currentLanguage}`) || LANGUAGES[currentLanguage]?.defaultCode || "";
       defaultFiles = [
@@ -571,14 +735,21 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
   };
 
   // --- Workspace File Helpers ---
-  const detectLanguageByExtension = (filename) => {
+  function detectLanguageByExtension(filename) {
     const ext = filename.split('.').pop().toLowerCase();
+    
+    // Search in LANGUAGES list for a matching extension
+    const foundKey = Object.keys(LANGUAGES).find(key => LANGUAGES[key].extension === ext);
+    if (foundKey) {
+      return foundKey;
+    }
+    
+    // Fallback cases
     switch(ext) {
       case 'html': case 'htm': return 'html';
       case 'css': return 'css';
-      case 'js': return 'javascript';
+      case 'js': case 'jsx': return 'javascript';
       case 'ts': return 'typescript';
-      case 'jsx': return 'javascript';
       case 'cpp': case 'cc': case 'cxx': case 'h': case 'hpp': return 'cpp';
       case 'c': return 'c';
       case 'py': return 'python';
@@ -588,12 +759,12 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
       case 'rs': return 'rust';
       case 'rb': return 'ruby';
       case 'php': return 'php';
-      case 'sh': return 'shell';
+      case 'sh': return 'bash';
       case 'json': return 'json';
       case 'md': return 'markdown';
       default: return 'text';
     }
-  };
+  }
 
   const handleCreateFile = () => {
     if (!newFileName.trim()) {
@@ -714,7 +885,9 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
   useEffect(() => {
     const handleIframeMessage = (e) => {
       if (e.data && e.data.source === "codeverse-preview") {
-        setWebLogs((prev) => [...prev, { type: e.data.type, args: e.data.args }]);
+        if (e.data.sessionId === webPreviewSessionRef.current) {
+          setWebLogs((prev) => [...prev, { type: e.data.type, args: e.data.args }]);
+        }
       }
     };
     window.addEventListener("message", handleIframeMessage);
@@ -744,41 +917,17 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     }
   }, [showLanguageModal]);
 
+  // Define Dracula theme before the editor mounts to prevent initial render fallback
+  const handleEditorBeforeMount = (monaco) => {
+    monaco.editor.defineTheme('dracula', draculaTheme);
+  };
+
   // Define Dracula theme and cache editor reference
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     window.monaco = monaco;
 
-    monaco.editor.defineTheme('dracula', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [
-        { token: '', foreground: 'f8f8f2' },
-        { token: 'comment', foreground: '6272a4', fontStyle: 'italic' },
-        { token: 'keyword', foreground: 'ff79c6' },
-        { token: 'identifier', foreground: 'f8f8f2' },
-        { token: 'string', foreground: 'f1fa8c' },
-        { token: 'number', foreground: 'bd93f9' },
-        { token: 'operator', foreground: 'ff79c6' },
-        { token: 'type', foreground: '8be9fd', fontStyle: 'italic' },
-        { token: 'class', foreground: '50fa7b' },
-        { token: 'function', foreground: '50fa7b' },
-        { token: 'variable', foreground: 'f8f8f2' },
-        { token: 'variable.predefined', foreground: '8be9fd' },
-        { token: 'constant', foreground: 'bd93f9' },
-        { token: 'regexp', foreground: 'ffb86c' },
-        { token: 'annotation', foreground: 'ffb86c' }
-      ],
-      colors: {
-        'editor.background': '#282a36',
-        'editor.foreground': '#f8f8f2',
-        'editor.lineHighlightBackground': '#44475a',
-        'editorCursor.foreground': '#08CB00',
-        'editor.selectionBackground': '#44475a',
-        'editor.inactiveSelectionBackground': '#44475a44',
-        'editor.lineHighlightBorder': '#282a36'
-      }
-    });
+    monaco.editor.defineTheme('dracula', draculaTheme);
 
     const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
     let baseTheme = 'vs-dark';
@@ -1055,12 +1204,15 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     }
   };
 
-  const renderWebLabPreview = () => {
+  const renderWebLabPreview = (skipSaveToDb = false) => {
+    webPreviewSessionRef.current += 1;
+    const currentSessionId = webPreviewSessionRef.current;
+
     const htmlVal = htmlCode;
     const cssVal = cssCode;
     const jsVal = jsCode;
 
-    if (user && !user.isGuest) {
+    if (user && !user.isGuest && !skipSaveToDb) {
       saveCodeToFirestore("html", { htmlCode: htmlVal, cssCode: cssVal, jsCode: jsVal });
       const d = new Date();
       const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1081,6 +1233,7 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     const iframeLoggerScript = `
       <script>
         (function() {
+          const sessionId = ${currentSessionId};
           const _log = console.log;
           const _error = console.error;
           const _warn = console.warn;
@@ -1088,6 +1241,7 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
           function sendLog(type, args) {
             window.parent.postMessage({
               source: 'codeverse-preview',
+              sessionId: sessionId,
               type: type,
               args: Array.from(args)
             }, '*');
@@ -1109,6 +1263,7 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
           window.onerror = function(message, source, lineno, colno, error) {
             window.parent.postMessage({
               source: 'codeverse-preview',
+              sessionId: sessionId,
               type: 'error',
               args: [message + ' (Line ' + lineno + ')']
             }, '*');
@@ -1134,15 +1289,48 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
 
     const iframe = previewFrameRef.current;
     if (iframe) {
-      const frameDoc = iframe.contentDocument || iframe.contentWindow.document;
-      frameDoc.open();
-      frameDoc.write(fullDocument);
-      frameDoc.close();
+      // Navigate to about:blank to destroy any running scripts/intervals of the previous document
+      iframe.contentWindow.location.replace("about:blank");
+      
+      // Delay slightly to allow the load of about:blank to complete, then write the new document
+      setTimeout(() => {
+        try {
+          const frameDoc = iframe.contentDocument || iframe.contentWindow.document;
+          if (frameDoc) {
+            frameDoc.open();
+            frameDoc.write(fullDocument);
+            frameDoc.close();
+          }
+        } catch (err) {
+          console.error("Failed to write to iframe: ", err);
+        }
+      }, 50);
     }
 
     setWebLogs([]);
-    showToast("Web Sandbox preview updated", "success");
+    if (!skipSaveToDb) {
+      showToast("Web Sandbox preview updated", "success");
+    }
   };
+
+  // Live server style auto preview with 1000ms debounce (skips Firestore writes during typing)
+  useEffect(() => {
+    if (currentLanguage === "html" && isAutoRunEnabled) {
+      if (autoRunTimerRef.current) {
+        clearTimeout(autoRunTimerRef.current);
+      }
+      
+      autoRunTimerRef.current = setTimeout(() => {
+        renderWebLabPreview(true); // pass true to skip database updates
+      }, 1000);
+    }
+    
+    return () => {
+      if (autoRunTimerRef.current) {
+        clearTimeout(autoRunTimerRef.current);
+      }
+    };
+  }, [htmlCode, cssCode, jsCode, currentLanguage, isAutoRunEnabled]);
 
   // --- Toolbar Handlers ---
   const clearConsole = () => {
@@ -1350,25 +1538,41 @@ Explain why this error occurred and how to fix it.`;
             )}
           </div>
 
-          {/* Right-aligned Run Button */}
+          {/* Right-aligned Actions (Auto Preview & Run Button) */}
           {currentLanguage !== "text" && (
-            <button
-              onClick={runCode}
-              disabled={isExecuting}
-              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-            >
-              {isExecuting ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>Compiling...</span>
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-play text-[10px] sm:text-xs"></i>
-                  <span>Run<span className="hidden sm:inline"> Code</span></span>
-                </>
+            <div className="flex items-center gap-3">
+              {currentLanguage === "html" && (
+                <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-1">
+                  <input
+                    type="checkbox"
+                    checked={isAutoRunEnabled}
+                    onChange={(e) => setIsAutoRunEnabled(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="flex items-center gap-1">
+                    <i className={`fas fa-bolt text-[9px] sm:text-[10px] ${isAutoRunEnabled ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'}`}></i>
+                    <span>Auto Preview</span>
+                  </span>
+                </label>
               )}
-            </button>
+              <button
+                onClick={runCode}
+                disabled={isExecuting}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+              >
+                {isExecuting ? (
+                  <>
+                    <div className="spinner"></div>
+                    <span>Compiling...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-play text-[10px] sm:text-xs"></i>
+                    <span>Run<span className="hidden sm:inline"> Code</span></span>
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -1892,15 +2096,21 @@ Explain why this error occurred and how to fix it.`;
               <div className="absolute inset-0 w-full h-full">
                 <Editor
                   language={
-                    workspaceFiles.find(f => f.name === activeFileName)?.language || 
-                    (currentLanguage === "html"
-                      ? (activeWebTab === "js" ? "javascript" : activeWebTab)
-                      : LANGUAGES[currentLanguage]?.monacoId || "text")
+                    (() => {
+                      const fileLang = workspaceFiles.find(f => f.name === activeFileName)?.language;
+                      if (fileLang) {
+                        return LANGUAGES[fileLang]?.monacoId || fileLang;
+                      }
+                      return currentLanguage === "html"
+                        ? (activeWebTab === "js" ? "javascript" : activeWebTab)
+                        : LANGUAGES[currentLanguage]?.monacoId || "text";
+                    })()
                   }
                   value={
                     workspaceFiles.find(f => f.name === activeFileName)?.content || ""
                   }
                   onChange={handleWorkspaceCodeChange}
+                  beforeMount={handleEditorBeforeMount}
                   onMount={handleEditorDidMount}
                   theme={
                     settingsColorTheme === 'Dracula' 
@@ -2059,54 +2269,73 @@ Explain why this error occurred and how to fix it.`;
                 ></iframe>
                 
                 {/* Web Dev Console Logs Panel */}
-                <div id="web-console" className="h-44 border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden">
-                  <div className="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
+                <div id="web-console" className={`border-t border-[var(--border-color)] bg-[var(--console-bg)] flex flex-col overflow-hidden transition-all duration-300 ${isWebConsoleOpen ? 'h-44' : 'h-7'}`}>
+                  <div 
+                    onClick={() => setIsWebConsoleOpen(prev => !prev)}
+                    className="h-7 border-b border-[var(--border-color)] px-3 bg-[var(--bg-tertiary)]/20 flex items-center justify-between text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider cursor-pointer select-none hover:bg-[var(--bg-tertiary)]/30 transition-colors"
+                  >
                     <div className="flex items-center gap-1.5">
                       <i className="fas fa-bug text-rose-500/80"></i>
                       <span>Console Logs</span>
+                      {webLogs.length > 0 && (
+                        <span className="px-1.5 py-0.2 rounded-full text-[8px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold ml-1 font-sans">
+                          {webLogs.length}
+                        </span>
+                      )}
                     </div>
-                    <button
-                      onClick={() => setWebLogs([])}
-                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200"
-                      title="Clear Console"
-                    >
-                      <i className="fas fa-trash-can"></i>
-                    </button>
+                    <div className="flex items-center gap-3.5" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => setWebLogs([])}
+                        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200 cursor-pointer"
+                        title="Clear Console"
+                      >
+                        <i className="fas fa-trash-can"></i>
+                      </button>
+                      <button
+                        onClick={() => setIsWebConsoleOpen(prev => !prev)}
+                        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all duration-200 cursor-pointer"
+                        title={isWebConsoleOpen ? "Collapse Console" : "Expand Console"}
+                      >
+                        <i className={`fas ${isWebConsoleOpen ? 'fa-chevron-down' : 'fa-chevron-up'}`}></i>
+                      </button>
+                    </div>
                   </div>
-                  <div id="web-console-logs" className="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1.5 select-text scrollbar-thin">
-                    {webLogs.length === 0 ? (
-                      <div className="text-[var(--text-muted)] italic text-[10px] font-mono">
-                        No console logs yet. Press Run Code to execute and load preview.
-                      </div>
-                    ) : (
-                      webLogs.map((log, index) => {
-                        let headerIcon = "fa-info-circle text-indigo-400";
-                        if (log.type === "error") headerIcon = "fa-exclamation-triangle text-rose-400";
-                        if (log.type === "warn") headerIcon = "fa-exclamation-circle text-amber-400";
+                  {isWebConsoleOpen && (
+                    <div id="web-console-logs" className="flex-grow p-2 overflow-y-auto font-mono text-[10px] space-y-1.5 select-text scrollbar-thin">
+                      {webLogs.length === 0 ? (
+                        <div className="text-[var(--text-muted)] italic text-[10px] font-mono">
+                          No console logs yet. Press Run Code to execute and load preview.
+                        </div>
+                      ) : (
+                        webLogs.map((log, index) => {
+                          let headerIcon = "fa-info-circle text-indigo-400";
+                          if (log.type === "error") headerIcon = "fa-exclamation-triangle text-rose-400";
+                          if (log.type === "warn") headerIcon = "fa-exclamation-circle text-amber-400";
 
-                        const formattedArgs = log.args.map(arg => {
-                          if (typeof arg === "object") {
-                            try {
-                              return JSON.stringify(arg);
-                            } catch(e) {
-                              return String(arg);
+                          const formattedArgs = log.args.map(arg => {
+                            if (typeof arg === "object") {
+                              try {
+                                return JSON.stringify(arg);
+                              } catch(e) {
+                                return String(arg);
+                              }
                             }
-                          }
-                          return String(arg);
-                        }).join(" ");
+                            return String(arg);
+                          }).join(" ");
 
-                        return (
-                          <div key={index} className={`console-log-item console-log-${log.type} font-mono text-[11px] pb-1 border-b border-slate-800/40 last:border-b-0`}>
-                            <div className="flex items-center gap-1.5 opacity-60">
-                              <i className={`fas ${headerIcon} text-[9px]`}></i>
-                              <span className="text-[8px] font-bold font-mono uppercase">{log.type}</span>
+                          return (
+                            <div key={index} className={`console-log-item console-log-${log.type} font-mono text-[11px] pb-1 border-b border-slate-800/40 last:border-b-0`}>
+                              <div className="flex items-center gap-1.5 opacity-60">
+                                <i className={`fas ${headerIcon} text-[9px]`}></i>
+                                <span className="text-[8px] font-bold font-mono uppercase">{log.type}</span>
+                              </div>
+                              <div className="console-log-body pl-3.5 text-slate-300 font-mono text-xs whitespace-pre-wrap">{formattedArgs}</div>
                             </div>
-                            <div className="console-log-body pl-3.5 text-slate-300 font-mono text-xs whitespace-pre-wrap">{formattedArgs}</div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
