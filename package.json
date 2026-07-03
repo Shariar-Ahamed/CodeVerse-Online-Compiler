@@ -12,8 +12,10 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@monaco-editor/react": "^4.7.0",
+    "ace-builds": "^1.44.0",
     "firebase": "^12.15.0",
     "react": "^19.2.7",
+    "react-ace": "^14.0.1",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.0"
   },

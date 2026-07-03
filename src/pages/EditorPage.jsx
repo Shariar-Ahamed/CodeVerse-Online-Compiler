@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
+import AceEditor from 'react-ace';
+import ace from 'ace-builds';
+ace.config.set('basePath', 'https://cdn.jsdelivr.net/npm/ace-builds@1.37.0/src-noconflict/');
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -117,6 +120,58 @@ const draculaTheme = {
 };
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
+
+// Map project language keys/extensions to Ace Editor mode names
+const getAceMode = (langKey, filename, activeWebTab) => {
+  let targetExt = "";
+  if (filename) {
+    targetExt = filename.split('.').pop().toLowerCase();
+  }
+
+  if (langKey === "html" || targetExt === "html" || targetExt === "htm") {
+    if (activeWebTab === "js") return "javascript";
+    if (activeWebTab === "css") return "css";
+    return "html";
+  }
+
+  const mapping = {
+    'text': 'text',
+    'c': 'c_cpp',
+    'cpp': 'c_cpp',
+    'python': 'python',
+    'javascript': 'javascript',
+    'typescript': 'typescript',
+    'java': 'java',
+    'csharp': 'csharp',
+    'go': 'golang',
+    'rust': 'rust',
+    'php': 'php',
+    'ruby': 'ruby',
+    'bash': 'sh',
+    'sql': 'sql',
+    'json': 'json',
+    'markdown': 'markdown',
+    'css': 'css',
+    'html': 'html'
+  };
+
+  return mapping[langKey] || mapping[targetExt] || "text";
+};
+
+// Map settingsColorTheme names to Ace Editor theme names
+const getAceTheme = (themeName) => {
+  const lightThemes = ['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'];
+  if (lightThemes.includes(themeName)) {
+    return "chrome";
+  }
+  if (themeName === "Dracula") {
+    return "dracula";
+  }
+  if (themeName === "Monokai") {
+    return "monokai";
+  }
+  return "tomorrow_night_eighties";
+};
 
 export default function EditorPage({ user, theme, toggleTheme, showToast }) {
   // --- States ---
@@ -2094,55 +2149,82 @@ Explain why this error occurred and how to fix it.`;
             {/* 3. Main Monaco Editor Container Wrapper */}
             <div className="flex-grow relative h-[450px] lg:h-full min-w-0">
               <div className="absolute inset-0 w-full h-full">
-                <Editor
-                  language={
-                    (() => {
-                      const fileLang = workspaceFiles.find(f => f.name === activeFileName)?.language;
-                      if (fileLang) {
-                        return LANGUAGES[fileLang]?.monacoId || fileLang;
-                      }
-                      return currentLanguage === "html"
-                        ? (activeWebTab === "js" ? "javascript" : activeWebTab)
-                        : LANGUAGES[currentLanguage]?.monacoId || "text";
-                    })()
-                  }
-                  value={
-                    workspaceFiles.find(f => f.name === activeFileName)?.content || ""
-                  }
-                  onChange={handleWorkspaceCodeChange}
-                  beforeMount={handleEditorBeforeMount}
-                  onMount={handleEditorDidMount}
-                  theme={
-                    settingsColorTheme === 'Dracula' 
-                      ? 'dracula' 
-                      : (['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'].includes(settingsColorTheme) ? 'vs' : 'vs-dark')
-                  }
-                  loading={
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 font-mono text-xs">
-                      <div className="spinner mr-2"></div> Loading Monaco IDE Workspace...
-                    </div>
-                  }
-                  options={{
-                    fontSize: settingsFontSize,
-                    fontFamily: 'Fira Code, JetBrains Mono, monospace',
-                    fontLigatures: true,
-                    automaticLayout: true,
-                    minimap: { enabled: true },
-                    scrollbar: {
-                      vertical: 'visible',
-                      horizontal: 'visible',
-                      useShadows: false,
-                      verticalScrollbarSize: 8,
-                      horizontalScrollbarSize: 8
-                    },
-                    cursorBlinking: 'smooth',
-                    cursorSmoothCaretAnimation: true,
-                    padding: { top: 12, bottom: 12 },
-                    wordWrap: settingsWordWrap ? 'on' : 'off',
-                    quickSuggestions: !settingsDisableAutocomplete,
-                    suggestOnTriggerCharacters: !settingsDisableAutocomplete
-                  }}
-                />
+                {settingsEditorEngine === "Ace" || isMobile ? (
+                  <AceEditor
+                    mode={getAceMode(currentLanguage, activeFileName, activeWebTab)}
+                    theme={getAceTheme(settingsColorTheme)}
+                    value={workspaceFiles.find(f => f.name === activeFileName)?.content || ""}
+                    onChange={handleWorkspaceCodeChange}
+                    name="codeverse_ace_editor"
+                    fontSize={settingsFontSize}
+                    width="100%"
+                    height="100%"
+                    editorProps={{ $blockScrolling: true }}
+                    setOptions={{
+                      enableBasicAutocompletion: !settingsDisableAutocomplete,
+                      enableLiveAutocompletion: !settingsDisableAutocomplete,
+                      showLineNumbers: true,
+                      tabSize: 4,
+                      useWorker: false, // Turn off syntax validator workers to avoid external worker path issues in Vite
+                      wrap: settingsWordWrap,
+                      fontFamily: "Fira Code, JetBrains Mono, monospace"
+                    }}
+                    style={{
+                      borderRadius: '0px',
+                      background: settingsColorTheme === 'Dracula' ? '#282a36' : (['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'].includes(settingsColorTheme) ? '#f5f5f5' : '#1e1e1e')
+                    }}
+                  />
+                ) : (
+                  <Editor
+                    language={
+                      (() => {
+                        const fileLang = workspaceFiles.find(f => f.name === activeFileName)?.language;
+                        if (fileLang) {
+                          return LANGUAGES[fileLang]?.monacoId || fileLang;
+                        }
+                        return currentLanguage === "html"
+                          ? (activeWebTab === "js" ? "javascript" : activeWebTab)
+                          : LANGUAGES[currentLanguage]?.monacoId || "text";
+                      })()
+                    }
+                    value={
+                      workspaceFiles.find(f => f.name === activeFileName)?.content || ""
+                    }
+                    onChange={handleWorkspaceCodeChange}
+                    beforeMount={handleEditorBeforeMount}
+                    onMount={handleEditorDidMount}
+                    theme={
+                      settingsColorTheme === 'Dracula' 
+                        ? 'dracula' 
+                        : (['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'].includes(settingsColorTheme) ? 'vs' : 'vs-dark')
+                    }
+                    loading={
+                      <div className="w-full h-full flex items-center justify-center text-slate-400 font-mono text-xs">
+                        <div className="spinner mr-2"></div> Loading Monaco IDE Workspace...
+                      </div>
+                    }
+                    options={{
+                      fontSize: settingsFontSize,
+                      fontFamily: 'Fira Code, JetBrains Mono, monospace',
+                      fontLigatures: true,
+                      automaticLayout: true,
+                      minimap: { enabled: true },
+                      scrollbar: {
+                        vertical: 'visible',
+                        horizontal: 'visible',
+                        useShadows: false,
+                        verticalScrollbarSize: 8,
+                        horizontalScrollbarSize: 8
+                      },
+                      cursorBlinking: 'smooth',
+                      cursorSmoothCaretAnimation: true,
+                      padding: { top: 12, bottom: 12 },
+                      wordWrap: settingsWordWrap ? 'on' : 'off',
+                      quickSuggestions: !settingsDisableAutocomplete,
+                      suggestOnTriggerCharacters: !settingsDisableAutocomplete
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>
