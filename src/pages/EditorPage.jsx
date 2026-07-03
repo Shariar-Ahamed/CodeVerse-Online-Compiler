@@ -1590,7 +1590,7 @@ Explain why this error occurred and how to fix it.`;
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       {/* ==================== COMPILER CONTROLS PANEL ==================== */}
-      <div className="glass-panel py-2 px-4 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-all duration-300 relative z-10">
+      <div className="glass-panel py-2 px-4 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-all duration-300 relative z-30">
         {/* Row 1: Back Button & Language Selector */}
         <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-2.5 w-full sm:w-auto relative z-20">
           {/* Left Side: Back button */}
@@ -1624,7 +1624,7 @@ Explain why this error occurred and how to fix it.`;
 
         {/* Row 2: Action items wrapper */}
         <div className="flex items-center justify-between gap-2 sm:gap-2.5 w-full sm:w-auto relative z-20">
-          {/* Left-aligned secondary tools */}
+          {/* Group 1: Content Utility Actions */}
           <div className="flex items-center gap-2">
             {/* Clear Button */}
             <button
@@ -1652,9 +1652,15 @@ Explain why this error occurred and how to fix it.`;
               <i className="fas fa-download text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
             </button>
+          </div>
 
-            {currentLanguage !== "text" && (
-              <>
+          {currentLanguage !== "text" && (
+            <>
+              {/* Separator 1 */}
+              <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-color)] mx-1" />
+
+              {/* Group 2: Configurations & AI Tools */}
+              <div className="flex items-center gap-2">
                 {/* Settings Modal Button */}
                 <button
                   onClick={openSettingsModal}
@@ -1676,45 +1682,46 @@ Explain why this error occurred and how to fix it.`;
                 >
                   <i className="fas fa-brain text-xs text-emerald-400 animate-pulse"></i>
                 </button>
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Right-aligned Actions (Auto Preview & Run Button) */}
-          {currentLanguage !== "text" && (
-            <div className="flex items-center gap-3">
-              {currentLanguage === "html" && (
-                <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-1">
-                  <input
-                    type="checkbox"
-                    checked={isAutoRunEnabled}
-                    onChange={(e) => setIsAutoRunEnabled(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer accent-indigo-600"
-                  />
-                  <span className="flex items-center gap-1">
-                    <i className={`fas fa-bolt text-[9px] sm:text-[10px] ${isAutoRunEnabled ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'}`}></i>
-                    <span>Auto Preview</span>
-                  </span>
-                </label>
-              )}
-              <button
-                onClick={runCode}
-                disabled={isExecuting}
-                className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-              >
-                {isExecuting ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>Compiling...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-play text-[10px] sm:text-xs"></i>
-                    <span>Run<span className="hidden sm:inline"> Code</span></span>
-                  </>
+              {/* Separator 2 */}
+              <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-color)] mx-1" />
+
+              {/* Group 3: Execution Controls */}
+              <div className="flex items-center gap-3">
+                {currentLanguage === "html" && (
+                  <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-1">
+                    <input
+                      type="checkbox"
+                      checked={isAutoRunEnabled}
+                      onChange={(e) => setIsAutoRunEnabled(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer accent-indigo-600"
+                    />
+                    <span className="flex items-center gap-1">
+                      <i className={`fas fa-bolt text-[9px] sm:text-[10px] ${isAutoRunEnabled ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'}`}></i>
+                      <span>Auto Preview</span>
+                    </span>
+                  </label>
                 )}
-              </button>
-            </div>
+                <button
+                  onClick={runCode}
+                  disabled={isExecuting}
+                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+                >
+                  {isExecuting ? (
+                    <>
+                      <div className="spinner"></div>
+                      <span>Compiling...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-play text-[10px] sm:text-xs"></i>
+                      <span>Run<span className="hidden sm:inline"> Code</span></span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
           )}
 
           {/* User Profile Dropdown */}
