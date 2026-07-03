@@ -1522,7 +1522,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
           {/* OTP Verification Modal Overlay */}
           {showOtpModal && (
-            <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-md z-30 p-6 sm:p-10 flex items-center justify-center animate-fade-in-up">
+            <div className="absolute inset-0 bg-black/15 z-30 p-6 sm:p-10 flex items-center justify-center animate-fade-in-up">
               <div className="glass-panel border border-[var(--border-color)] p-6 sm:p-8 rounded-2xl w-full max-w-sm flex flex-col gap-4 text-center shadow-2xl relative animate-scale-up">
                 
                 {/* Cancel Button */}

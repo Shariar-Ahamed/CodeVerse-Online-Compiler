@@ -735,7 +735,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
   };
 
   return (
-    <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
+    <>
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 animate-fade-in-up">
       {/* Background Blur Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
@@ -1266,87 +1267,88 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         </div>
 
       </div>
-
-      {/* Followers / Following List Modal Overlay */}
-      {showFollowModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
-          <div className="glass-panel border border-[var(--border-color)] bg-slate-900/90 rounded-2xl w-full max-w-md flex flex-col max-h-[80vh] shadow-2xl relative overflow-hidden animate-scale-up">
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] p-4 sm:p-5 select-none bg-slate-950/30">
-              <h3 className="font-black text-sm uppercase tracking-wider text-white flex items-center gap-2">
-                <i className={followModalType === 'followers' ? "fas fa-users text-indigo-400" : "fas fa-user-plus text-indigo-400"}></i>
-                <span>{followModalType === 'followers' ? 'Followers' : 'Following'} ({followUsersList.length})</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowFollowModal(false);
-                  setFollowUsersList([]);
-                }}
-                className="text-slate-400 hover:text-white transition-colors duration-200 focus:outline-none p-1.5 bg-slate-950/40 rounded-lg border border-slate-800"
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-
-            {/* Modal Body / Users List */}
-            <div className="flex-grow overflow-y-auto p-4 sm:p-5 flex flex-col gap-3 min-h-[150px] scrollbar-custom">
-              {modalLoading ? (
-                <div className="flex-grow flex flex-col items-center justify-center gap-2 py-10">
-                  <i className="fas fa-circle-notch animate-spin text-indigo-400 text-lg"></i>
-                  <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</span>
-                </div>
-              ) : followUsersList.length === 0 ? (
-                <div className="flex-grow flex flex-col items-center justify-center text-center py-10 gap-2">
-                  <div className="w-10 h-10 rounded-full bg-slate-800/40 border border-slate-800 flex items-center justify-center text-slate-500">
-                    <i className="fas fa-user-group text-sm"></i>
-                  </div>
-                  <span className="text-xs text-slate-500 italic font-medium">
-                    {followModalType === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
-                  </span>
-                </div>
-              ) : (
-                followUsersList.map((usr) => (
-                  <div 
-                    key={usr.uid} 
-                    className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/30 hover:bg-slate-950/60 border border-slate-950 hover:border-indigo-500/20 transition-all duration-200 animate-fade-in-up"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-9 h-9 rounded-full border border-indigo-500/20 flex items-center justify-center bg-slate-800 shrink-0 overflow-hidden select-none">
-                        {usr.photoURL ? (
-                          <img src={usr.photoURL} alt={usr.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white uppercase">
-                            {(usr.name || 'U').charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-left overflow-hidden">
-                        <p className="font-bold text-xs text-white truncate leading-snug">{usr.name || 'Developer'}</p>
-                        <p className="text-[10px] text-indigo-400 font-mono font-semibold truncate leading-normal">@{usr.username}</p>
-                      </div>
-                    </div>
-                    
-                    {/* View Profile Action */}
-                    <button
-                      onClick={() => {
-                        setShowFollowModal(false);
-                        setFollowUsersList([]);
-                        navigate(`/profile/${usr.username}`);
-                      }}
-                      className="shrink-0 px-3 py-1.5 bg-slate-900/50 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 rounded-lg text-[9px] font-bold text-slate-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      View Profile
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
     </main>
-  );
+
+    {/* Followers / Following List Modal Overlay */}
+    {showFollowModal && (
+      <div className="fixed inset-0 bg-black/15 z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div className="glass-panel border border-[var(--border-color)] bg-[#0d1321]/95 rounded-2xl w-full max-w-md flex flex-col max-h-[80vh] shadow-2xl relative overflow-hidden animate-scale-up">
+          
+          {/* Modal Header */}
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] p-4 sm:p-5 select-none bg-slate-950/10">
+            <h3 className="font-black text-sm uppercase tracking-wider text-white flex items-center gap-2">
+              <i className={followModalType === 'followers' ? "fas fa-users text-indigo-400" : "fas fa-user-plus text-indigo-400"}></i>
+              <span>{followModalType === 'followers' ? 'Followers' : 'Following'} ({followUsersList.length})</span>
+            </h3>
+            <button
+              type="button"
+              onClick={() => {
+                setShowFollowModal(false);
+                setFollowUsersList([]);
+              }}
+              className="w-8 h-8 rounded-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200 focus:outline-none cursor-pointer"
+            >
+              <i className="fas fa-times text-xs"></i>
+            </button>
+          </div>
+
+          {/* Modal Body / Users List */}
+          <div className="flex-grow overflow-y-auto p-4 sm:p-5 flex flex-col gap-3 min-h-[150px] scrollbar-custom">
+            {modalLoading ? (
+              <div className="flex-grow flex flex-col items-center justify-center gap-2 py-10">
+                <i className="fas fa-circle-notch animate-spin text-indigo-400 text-lg"></i>
+                <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</span>
+              </div>
+            ) : followUsersList.length === 0 ? (
+              <div className="flex-grow flex flex-col items-center justify-center text-center py-10 gap-2">
+                <div className="w-10 h-10 rounded-full bg-slate-800/40 border border-slate-800 flex items-center justify-center text-slate-500">
+                  <i className="fas fa-user-group text-sm"></i>
+                </div>
+                <span className="text-xs text-slate-500 italic font-medium">
+                  {followModalType === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+                </span>
+              </div>
+            ) : (
+              followUsersList.map((usr) => (
+                <div 
+                  key={usr.uid} 
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--bg-tertiary)]/50 border border-[var(--border-color)] hover:border-indigo-500/20 transition-all duration-200 animate-fade-in-up"
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="w-9 h-9 rounded-full border border-[var(--border-color)] flex items-center justify-center bg-slate-800 shrink-0 overflow-hidden select-none">
+                      {usr.photoURL ? (
+                        <img src={usr.photoURL} alt={usr.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white uppercase">
+                          {(usr.name || 'U').charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-left overflow-hidden">
+                      <p className="font-bold text-xs text-white truncate leading-snug">{usr.name || 'Developer'}</p>
+                      <p className="text-[10px] text-indigo-400 font-mono font-semibold truncate leading-normal">@{usr.username}</p>
+                    </div>
+                  </div>
+                  
+                  {/* View Profile Action */}
+                  <button
+                    onClick={() => {
+                      setShowFollowModal(false);
+                      setFollowUsersList([]);
+                      navigate(`/profile/${usr.username}`);
+                    }}
+                    className="shrink-0 px-3.5 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:bg-indigo-600 hover:border-indigo-500 rounded-xl text-[10px] font-bold text-slate-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95"
+                  >
+                    View Profile
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+        </div>
+      </div>
+    )}
+  </>
+);
 }

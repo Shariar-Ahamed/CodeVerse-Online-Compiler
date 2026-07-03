@@ -435,7 +435,7 @@ export default function ContactPage({ showToast }) {
 
       {/* Premium Glassmorphic Success Confirmation Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in select-none">
+        <div className="fixed inset-0 z-50 bg-black/15 flex items-center justify-center p-4 animate-fade-in select-none">
           <div className="w-full max-w-md rounded-3xl border border-emerald-500/20 bg-[#0d1321]/90 shadow-2xl shadow-emerald-500/5 p-6 md:p-8 animate-scale-up text-center relative overflow-hidden glass-panel">
             {/* Ambient Background Glow Orbs */}
             <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none"></div>
