@@ -72,6 +72,18 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     return () => clearInterval(interval);
   }, []);
 
+  const [profileUid, setProfileUid] = useState(null);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
+  // States for followers/following list modal
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [followModalType, setFollowModalType] = useState('followers'); // 'followers' or 'following'
+  const [followUsersList, setFollowUsersList] = useState([]);
+  const [modalLoading, setModalLoading] = useState(false);
+
   const [recentRuns, setRecentRuns] = useState([]);
 
   const formatRunTime = (timestamp) => {
@@ -143,6 +155,28 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
       }
     };
 
+    const fetchFollowStats = async (targetUid) => {
+      try {
+        const followersCol = collection(db, "users", targetUid, "followers");
+        const followersSnap = await getDocs(followersCol);
+        setFollowerCount(followersSnap.size);
+
+        const followingCol = collection(db, "users", targetUid, "following");
+        const followingSnap = await getDocs(followingCol);
+        setFollowingCount(followingSnap.size);
+
+        if (user && user.uid && user.uid !== targetUid) {
+          const followRef = doc(db, "users", targetUid, "followers", user.uid);
+          const followSnap = await getDoc(followRef);
+          setIsFollowing(followSnap.exists());
+        } else {
+          setIsFollowing(false);
+        }
+      } catch (err) {
+        console.error("Error fetching follow stats:", err);
+      }
+    };
+
     const fetchProfile = async () => {
       try {
         setLoading(true);
@@ -190,6 +224,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               languageStats: data.languageStats || {}
             });
             fetchRecentRuns(user.uid, !!user.isGuest);
+            setProfileUid(user.uid);
+            fetchFollowStats(user.uid);
           } else {
             // Document doesn't exist, set from auth state
             const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -224,6 +260,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               activityLogs: {}
             });
             fetchRecentRuns(user.uid, !!user.isGuest);
+            setProfileUid(user.uid);
+            fetchFollowStats(user.uid);
           }
         } else {
           // Fetch by querying username (case-insensitive conversion to lowercase)
@@ -275,6 +313,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 languageStats: data.languageStats || {}
               });
               fetchRecentRuns(docSnap.id, false);
+              setProfileUid(docSnap.id);
+              fetchFollowStats(docSnap.id);
             }
           } else {
             // Try fallback fetch by doc ID (in case it is a UID instead of a username)
@@ -322,6 +362,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   languageStats: data.languageStats || {}
                 });
                 fetchRecentRuns(fallbackSnap.id, false);
+                setProfileUid(fallbackSnap.id);
+                fetchFollowStats(fallbackSnap.id);
               }
             } else {
               // Profile not found
@@ -353,6 +395,84 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
 
     fetchProfile();
   }, [username, isOwnProfile, user]);
+
+  const handleFollowToggle = async () => {
+    if (!user) {
+      showToast("Please sign in to follow other developers!", "warning");
+      navigate('/login');
+      return;
+    }
+    if (!profileUid || profileUid === user.uid) return;
+
+    setFollowLoading(true);
+    try {
+      const followersRef = doc(db, "users", profileUid, "followers", user.uid);
+      const followingRef = doc(db, "users", user.uid, "following", profileUid);
+
+      if (isFollowing) {
+        // Unfollow
+        await deleteDoc(followersRef);
+        await deleteDoc(followingRef);
+        setIsFollowing(false);
+        setFollowerCount(prev => Math.max(0, prev - 1));
+        showToast("Unfollowed developer", "info");
+      } else {
+        // Follow
+        const currentUserRef = doc(db, "users", user.uid);
+        const currentUserSnap = await getDoc(currentUserRef);
+        const currentUserData = currentUserSnap.exists() ? currentUserSnap.data() : {};
+        
+        const followerPayload = {
+          uid: user.uid,
+          name: currentUserData.name || user.name || "Developer",
+          username: currentUserData.username || user.username || user.uid,
+          photoURL: currentUserData.photoURL || user.photoURL || "",
+          timestamp: new Date().toISOString()
+        };
+
+        const targetUserPayload = {
+          uid: profileUid,
+          name: profileData.name,
+          username: profileData.username,
+          photoURL: profileData.photoURL || "",
+          timestamp: new Date().toISOString()
+        };
+
+        await setDoc(followersRef, followerPayload);
+        await setDoc(followingRef, targetUserPayload);
+        setIsFollowing(true);
+        setFollowerCount(prev => prev + 1);
+        showToast(`Following ${profileData.name}`, "success");
+      }
+    } catch (err) {
+      console.error("Error toggling follow status:", err);
+      showToast("Operation failed. Please try again.", "error");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  const fetchFollowUsersList = async (type) => {
+    if (!profileUid) return;
+    setModalLoading(true);
+    setFollowModalType(type);
+    setShowFollowModal(true);
+    try {
+      const followCol = collection(db, "users", profileUid, type);
+      const followSnap = await getDocs(followCol);
+      const list = [];
+      followSnap.forEach(docSnap => {
+        list.push(docSnap.data());
+      });
+      list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      setFollowUsersList(list);
+    } catch (err) {
+      console.error(`Error fetching ${type} list:`, err);
+      showToast(`Failed to load ${type} list.`, "error");
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   // Handle local image upload selection and canvas compression
   const handleImageChange = (e) => {
@@ -620,39 +740,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
-      {/* Header Info Block */}
-      <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 relative z-10">
-        <div>
-          <h2 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-            {isOwnProfile ? "Developer Dashboard" : `${profileData.name}'s Profile`}
-          </h2>
-          <p className="text-xs text-[var(--text-secondary)] mt-1">
-            {isOwnProfile 
-              ? "Monitor compilation metrics, account details, and workspace activities."
-              : `View compilation stats and profile information of ${profileData.name}.`}
-          </p>
-        </div>
-        {isOwnProfile && (
-          <div className="flex flex-wrap items-center gap-3">
-            {user && user.role === 'admin' && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 shadow-md active:scale-95 transition-all duration-200 cursor-pointer relative z-20"
-              >
-                <i className="fas fa-crown text-amber-400"></i>
-                <span>Admin Panel</span>
-              </button>
-            )}
-            <button
-              onClick={() => navigate('/editor')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all duration-200 shadow-md shadow-indigo-600/15 cursor-pointer relative z-20"
-            >
-              <i className="fas fa-terminal"></i>
-              <span>Launch Code Editor</span>
-            </button>
-          </div>
-        )}
-      </div>
+
 
       {/* Dashboard Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start relative z-10">
@@ -941,6 +1029,28 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 </div>
               </div>
 
+              {/* Followers / Following Row */}
+              <div className="grid grid-cols-2 divide-x divide-[var(--border-color)] border-b border-[var(--border-color)]/60 w-full pb-3 text-center select-none">
+                <div 
+                  onClick={() => fetchFollowUsersList('followers')} 
+                  className="cursor-pointer group hover:bg-indigo-500/5 py-1 rounded-l-xl transition-all duration-200"
+                >
+                  <span className="block text-lg font-black text-indigo-400 font-mono group-hover:scale-105 transition-transform">
+                    {followerCount}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-secondary)] group-hover:text-indigo-300 transition-colors uppercase font-semibold">Followers</span>
+                </div>
+                <div 
+                  onClick={() => fetchFollowUsersList('following')} 
+                  className="cursor-pointer group hover:bg-indigo-500/5 py-1 rounded-r-xl transition-all duration-200"
+                >
+                  <span className="block text-lg font-black text-indigo-400 font-mono group-hover:scale-105 transition-transform">
+                    {followingCount}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-secondary)] group-hover:text-indigo-300 transition-colors uppercase font-semibold">Following</span>
+                </div>
+              </div>
+
               {/* Action buttons */}
               {isOwnProfile ? (
                 <div className="flex flex-col gap-2 w-full">
@@ -953,9 +1063,25 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   </button>
                 </div>
               ) : (
-                <div className="w-full text-slate-500 text-[10px] uppercase font-bold tracking-wider py-2 border-t border-[var(--border-color)]/30 mt-1">
-                  <i className="fas fa-globe mr-1.5 text-indigo-400 animate-pulse"></i>
-                  <span>Public Profile View</span>
+                <div className="flex flex-col gap-2 w-full mt-1">
+                  <button
+                    onClick={handleFollowToggle}
+                    disabled={followLoading}
+                    className={`w-full py-2.5 rounded-xl text-xs font-black transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border ${
+                      isFollowing 
+                        ? 'bg-transparent border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-300' 
+                        : 'bg-indigo-600 border-indigo-500/30 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/15'
+                    }`}
+                  >
+                    {followLoading ? (
+                      <i className="fas fa-circle-notch animate-spin text-[10px]"></i>
+                    ) : isFollowing ? (
+                      <i className="fas fa-user-minus"></i>
+                    ) : (
+                      <i className="fas fa-user-plus"></i>
+                    )}
+                    <span>{followLoading ? 'Syncing...' : (isFollowing ? 'Following' : 'Follow')}</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -1140,6 +1266,87 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         </div>
 
       </div>
+
+      {/* Followers / Following List Modal Overlay */}
+      {showFollowModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass-panel border border-[var(--border-color)] bg-slate-900/90 rounded-2xl w-full max-w-md flex flex-col max-h-[80vh] shadow-2xl relative overflow-hidden animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-color)] p-4 sm:p-5 select-none bg-slate-950/30">
+              <h3 className="font-black text-sm uppercase tracking-wider text-white flex items-center gap-2">
+                <i className={followModalType === 'followers' ? "fas fa-users text-indigo-400" : "fas fa-user-plus text-indigo-400"}></i>
+                <span>{followModalType === 'followers' ? 'Followers' : 'Following'} ({followUsersList.length})</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFollowModal(false);
+                  setFollowUsersList([]);
+                }}
+                className="text-slate-400 hover:text-white transition-colors duration-200 focus:outline-none p-1.5 bg-slate-950/40 rounded-lg border border-slate-800"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Modal Body / Users List */}
+            <div className="flex-grow overflow-y-auto p-4 sm:p-5 flex flex-col gap-3 min-h-[150px] scrollbar-custom">
+              {modalLoading ? (
+                <div className="flex-grow flex flex-col items-center justify-center gap-2 py-10">
+                  <i className="fas fa-circle-notch animate-spin text-indigo-400 text-lg"></i>
+                  <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest animate-pulse">Syncing User Directory...</span>
+                </div>
+              ) : followUsersList.length === 0 ? (
+                <div className="flex-grow flex flex-col items-center justify-center text-center py-10 gap-2">
+                  <div className="w-10 h-10 rounded-full bg-slate-800/40 border border-slate-800 flex items-center justify-center text-slate-500">
+                    <i className="fas fa-user-group text-sm"></i>
+                  </div>
+                  <span className="text-xs text-slate-500 italic font-medium">
+                    {followModalType === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+                  </span>
+                </div>
+              ) : (
+                followUsersList.map((usr) => (
+                  <div 
+                    key={usr.uid} 
+                    className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/30 hover:bg-slate-950/60 border border-slate-950 hover:border-indigo-500/20 transition-all duration-200 animate-fade-in-up"
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="w-9 h-9 rounded-full border border-indigo-500/20 flex items-center justify-center bg-slate-800 shrink-0 overflow-hidden select-none">
+                        {usr.photoURL ? (
+                          <img src={usr.photoURL} alt={usr.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white uppercase">
+                            {(usr.name || 'U').charAt(0)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-left overflow-hidden">
+                        <p className="font-bold text-xs text-white truncate leading-snug">{usr.name || 'Developer'}</p>
+                        <p className="text-[10px] text-indigo-400 font-mono font-semibold truncate leading-normal">@{usr.username}</p>
+                      </div>
+                    </div>
+                    
+                    {/* View Profile Action */}
+                    <button
+                      onClick={() => {
+                        setShowFollowModal(false);
+                        setFollowUsersList([]);
+                        navigate(`/profile/${usr.username}`);
+                      }}
+                      className="shrink-0 px-3 py-1.5 bg-slate-900/50 hover:bg-indigo-600 border border-slate-800 hover:border-indigo-500 rounded-lg text-[9px] font-bold text-slate-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95"
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
     </main>
   );
 }

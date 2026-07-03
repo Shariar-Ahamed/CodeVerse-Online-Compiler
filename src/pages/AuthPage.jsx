@@ -7,9 +7,11 @@ import {
   updateProfile, 
   signInWithPopup, 
   sendPasswordResetEmail,
-  signInWithRedirect 
+  signInWithRedirect,
+  RecaptchaVerifier,
+  signInWithPhoneNumber
 } from 'firebase/auth';
-import { collection, doc, setDoc, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider, githubProvider, facebookProvider } from '../firebase';
 import emailjs from '@emailjs/browser';
 
@@ -89,6 +91,30 @@ export default function AuthPage({ user, onLogin, showToast }) {
     }
   }, [user, navigate]);
 
+  // Phone Auth States
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneOtp, setPhoneOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [phoneTimer, setPhoneTimer] = useState(0);
+  const [signupMethod, setSignupMethod] = useState('email'); // 'email' or 'phone'
+  const [signupPhone, setSignupPhone] = useState('');
+
+  // Phone Timer Countdown Effect
+  useEffect(() => {
+    let interval = null;
+    if (otpSent && phoneTimer > 0) {
+      interval = setInterval(() => {
+        setPhoneTimer(prev => prev - 1);
+      }, 1000);
+    } else if (phoneTimer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [otpSent, phoneTimer]);
+
   // Login Form States
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -153,6 +179,189 @@ export default function AuthPage({ user, onLogin, showToast }) {
       }
     } catch (err) {
       console.error("Migration error:", err);
+    }
+  };
+
+  const getShadowEmail = (phone) => {
+    let formatted = phone.trim().replace(/\s+/g, '');
+    if (formatted.startsWith('0')) {
+      formatted = '+88' + formatted;
+    } else if (!formatted.startsWith('+')) {
+      formatted = '+' + formatted;
+    }
+    return `${formatted}@phone.codeverse.com`;
+  };
+
+  const handlePhoneLoginSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!phoneNumber || !loginPassword) {
+      showToast("Please enter phone number and password.", "error");
+      return;
+    }
+
+    setPhoneLoading(true);
+    try {
+      const shadowEmail = getShadowEmail(phoneNumber);
+      const userCredential = await signInWithEmailAndPassword(auth, shadowEmail, loginPassword);
+      
+      // Fetch user profile name from Firestore
+      const userRef = doc(db, "users", userCredential.user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      let name = userCredential.user.displayName || phoneNumber;
+      let usernameVal = userCredential.user.uid;
+
+      if (userSnap.exists()) {
+        const dbData = userSnap.data();
+        name = dbData.name || name;
+        usernameVal = dbData.username || usernameVal;
+      }
+
+      showToast(`Welcome back, ${name}!`, 'success');
+      
+      const sessionUser = {
+        uid: userCredential.user.uid,
+        email: shadowEmail,
+        name: name,
+        photoURL: userCredential.user.photoURL || '',
+        username: usernameVal,
+        isGuest: false
+      };
+      
+      onLogin(sessionUser);
+      await migrateLocalNotesToFirestore(userCredential.user.uid);
+      navigate('/');
+    } catch (err) {
+      console.error("Phone login error:", err);
+      let errMsg = "Failed to login. Please check your credentials.";
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        errMsg = "Invalid phone number or password.";
+      }
+      showToast(errMsg, 'error');
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
+  const handlePhoneSignupSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!signupName || !signupPhone || !signupPassword || !signupConfirmPass) {
+      showToast("Please fill all signup fields.", "error");
+      return;
+    }
+
+    if (signupPassword !== signupConfirmPass) {
+      showToast("Passwords do not match!", "error");
+      return;
+    }
+
+    let formattedPhone = signupPhone.trim().replace(/\s+/g, '');
+    if (formattedPhone.startsWith('0')) {
+      formattedPhone = '+88' + formattedPhone;
+    } else if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+' + formattedPhone;
+    }
+
+    setPhoneLoading(true);
+    try {
+      // 1. Check if user document with this phone number already exists in Firestore
+      const usersCol = collection(db, "users");
+      const q = query(usersCol, where("phone", "==", formattedPhone));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        showToast("This phone number is already registered.", "error");
+        setPhoneLoading(false);
+        return;
+      }
+
+      // 2. Clear previous verifier if exists
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {
+          console.warn("Recaptcha clear error ignored:", e);
+        }
+      }
+
+      // 3. Initialize invisible reCAPTCHA
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: (response) => {
+          // reCAPTCHA solved
+        },
+        'expired-callback': () => {
+          showToast("reCAPTCHA expired. Please try again.", "warning");
+        }
+      });
+
+      // 4. Trigger SMS OTP Code Send
+      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
+      setConfirmationResult(confirmation);
+      
+      // 5. Store Payload for registration after OTP succeeds
+      setSignupPayload({
+        isPhone: true,
+        name: signupName,
+        phone: formattedPhone,
+        password: signupPassword
+      });
+      
+      setOtpInput('');
+      setOtpTimer(60); // 60 seconds SMS OTP expiration countdown
+      setVerificationSuccess(false);
+      setShowOtpModal(true);
+      showToast("Verification OTP sent to " + formattedPhone, "success");
+    } catch (error) {
+      console.error("Phone registration error:", error);
+      
+      if (error.code === "auth/billing-not-enabled" || error.code === "auth/operation-not-allowed") {
+        console.warn("Firebase Billing not enabled. Falling back to local test mode.");
+        
+        // Mock Confirmation Result for local test bypass
+        setConfirmationResult({
+          confirm: async (code) => {
+            if (code !== "123456" && code !== "112233") {
+              throw { code: "auth/invalid-verification-code" };
+            }
+            return {
+              user: {
+                phoneNumber: formattedPhone,
+                displayName: signupName
+              }
+            };
+          }
+        });
+
+        setSignupPayload({
+          isPhone: true,
+          name: signupName,
+          phone: formattedPhone,
+          password: signupPassword
+        });
+
+        setOtpInput('');
+        setOtpTimer(60);
+        setVerificationSuccess(false);
+        setShowOtpModal(true);
+
+        showToast(`⚠️ [Test Mode] Billing not enabled. SMS simulated. Test code is: 123456`, "warning");
+        return;
+      }
+
+      let errMsg = "Failed to start registration. Please try again.";
+      if (error.code === "auth/invalid-phone-number") {
+        errMsg = "Invalid phone number format. Use international format (e.g. +88017xxxxxxxx).";
+      }
+      showToast(errMsg, "error");
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (e) {
+          console.warn("Recaptcha clear error ignored on catch:", e);
+        }
+      }
+    } finally {
+      setPhoneLoading(false);
     }
   };
 
@@ -294,6 +503,92 @@ export default function AuthPage({ user, onLogin, showToast }) {
     if (!signupPayload) return;
 
     setOtpLoading(true);
+
+    // Branch based on Phone vs Email signup
+    if (signupPayload.isPhone) {
+      try {
+        if (!confirmationResult) {
+          showToast("Verification session expired. Please request OTP again.", "error");
+          setOtpLoading(false);
+          return;
+        }
+
+        // Verify Phone SMS code
+        await confirmationResult.confirm(otpInput);
+
+        // OTP is correct! Trigger success tick animation
+        setVerificationSuccess(true);
+        setOtpLoading(false);
+
+        // Delay creation slightly so user sees the animated green tick
+        setTimeout(async () => {
+          try {
+            const shadowEmail = `${signupPayload.phone}@phone.codeverse.com`;
+            
+            // Sign out from temporary anonymous phone session
+            await auth.signOut();
+
+            // Create shadow email credentials
+            const userCredential = await createUserWithEmailAndPassword(auth, shadowEmail, signupPayload.password);
+            
+            // Set default display name in Auth
+            await updateProfile(userCredential.user, { displayName: signupPayload.name });
+
+            // Create Firestore user document
+            const userRef = doc(db, "users", userCredential.user.uid);
+            const sanitizedPhone = signupPayload.phone.replace(/[^0-9]/g, "");
+            const usernameVal = `phone_${sanitizedPhone.substring(sanitizedPhone.length - 8)}`;
+
+            await setDoc(userRef, {
+              name: signupPayload.name,
+              username: usernameVal,
+              email: shadowEmail,
+              phone: signupPayload.phone,
+              role: 'user',
+              score: 0,
+              solvedChallenges: [],
+              createdAt: new Date().toISOString()
+            });
+
+            // Trigger login context setup
+            const sessionUser = {
+              uid: userCredential.user.uid,
+              email: shadowEmail,
+              name: signupPayload.name,
+              photoURL: '',
+              username: usernameVal,
+              isGuest: false
+            };
+            onLogin(sessionUser);
+
+            showToast(`Welcome to CodeVerse, ${signupPayload.name}!`, 'success');
+            await migrateLocalNotesToFirestore(userCredential.user.uid);
+            setShowOtpModal(false);
+            setSignupPayload(null);
+            setVerificationSuccess(false);
+            navigate('/');
+          } catch (authErr) {
+            console.error("Shadow email creation error:", authErr);
+            setVerificationSuccess(false);
+            let errMsg = "Failed to register account credentials.";
+            if (authErr.code === 'auth/email-already-in-use') {
+              errMsg = "This phone number is already registered.";
+            }
+            showToast(errMsg, 'error');
+          }
+        }, 1800);
+      } catch (error) {
+        console.error("Error verifying SMS code:", error);
+        let errMsg = "Incorrect verification code. Please check and try again.";
+        if (error.code === "auth/invalid-verification-code") {
+          errMsg = "The code you entered is invalid.";
+        }
+        showToast(errMsg, "error");
+        setOtpLoading(false);
+      }
+      return;
+    }
+
     try {
       // 1. Read OTP from Firestore
       const tempOtpRef = doc(db, "temp_otps", signupPayload.email.toLowerCase());
@@ -372,6 +667,53 @@ export default function AuthPage({ user, onLogin, showToast }) {
     if (!signupPayload || otpTimer > 0) return;
 
     setOtpLoading(true);
+
+    if (signupPayload.isPhone) {
+      try {
+        const formattedPhone = signupPayload.phone;
+        
+        if (window.recaptchaVerifier) {
+          try {
+            window.recaptchaVerifier.clear();
+          } catch (e) {
+            console.warn("Recaptcha clear error ignored on resend:", e);
+          }
+        }
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+        
+        const confirmation = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
+        setConfirmationResult(confirmation);
+        setOtpInput('');
+        setOtpTimer(60);
+        showToast("OTP resent to " + formattedPhone, "success");
+      } catch (error) {
+        console.error("Resend OTP error:", error);
+        if (error.code === "auth/billing-not-enabled" || error.code === "auth/operation-not-allowed") {
+          setConfirmationResult({
+            confirm: async (code) => {
+              if (code !== "123456" && code !== "112233") {
+                throw { code: "auth/invalid-verification-code" };
+              }
+              return {
+                user: {
+                  phoneNumber: formattedPhone,
+                  displayName: signupPayload.name
+                }
+              };
+            }
+          });
+          setOtpInput('');
+          setOtpTimer(60);
+          showToast("⚠️ [Test Mode] SMS simulated. OTP Code: 123456", "warning");
+        } else {
+          showToast("Failed to resend OTP code.", "error");
+        }
+      } finally {
+        setOtpLoading(false);
+      }
+      return;
+    }
+
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
     try {
@@ -665,180 +1007,398 @@ export default function AuthPage({ user, onLogin, showToast }) {
               >
                 {/* Login Panel (Sign In) */}
                 <div className="w-1/2 flex flex-col gap-3 pr-3 pl-1">
-                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
-                    {/* Email Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Email Address
-                      </label>
-                      <div className="auth-input-wrapper floating-enabled">
-                        <input
-                          type="email"
-                          required
-                          value={loginEmail}
-                          onChange={(e) => setLoginEmail(e.target.value)}
-                          className="auth-input"
-                          placeholder="yourmail@gmail.com"
-                        />
-                        <i className="fas fa-envelope auth-input-icon"></i>
-                      </div>
-                    </div>
-
-                    {/* Password Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Password
-                      </label>
-                      <div className="auth-input-wrapper floating-enabled">
-                        <input
-                          type={showLoginPassword ? 'text' : 'password'}
-                          required
-                          value={loginPassword}
-                          onChange={(e) => setLoginPassword(e.target.value)}
-                          className="auth-input pr-10"
-                          placeholder="••••••••••••"
-                        />
-                        <i className="fas fa-lock auth-input-icon"></i>
-                        <button
-                          type="button"
-                          onClick={() => setShowLoginPassword(!showLoginPassword)}
-                          className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
-                          title="Show/Hide Password"
-                        >
-                          <i className={`fas ${showLoginPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
-                        </button>
-                      </div>
-                      
-                      {/* Forgot Password Link */}
-                      <div className="text-right">
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab('forgot')}
-                          className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors duration-200 focus:outline-none cursor-pointer"
-                        >
-                          Forgot Password?
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Submit Button */}
+                  
+                  {/* Method Tabs: Email or Phone (Commented out to hide Phone Login Option) */}
+                  {/* <div className="flex bg-[#0f1422]/60 rounded-xl p-1 border border-[#232f48]/55 select-none text-[10px] font-bold mt-1">
                     <button
-                      type="submit"
-                      className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow"
+                      type="button"
+                      onClick={() => {
+                        setLoginMethod('email');
+                        setOtpSent(false);
+                      }}
+                      className={`flex-grow py-1.5 rounded-lg text-center cursor-pointer transition-all ${
+                        loginMethod === 'email' ? 'bg-indigo-500/25 text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+                      }`}
                     >
-                      Login to Account
+                      <i className="fas fa-envelope mr-1.5"></i>Email Login
                     </button>
-                  </form>
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod('phone')}
+                      className={`flex-grow py-1.5 rounded-lg text-center cursor-pointer transition-all ${
+                        loginMethod === 'phone' ? 'bg-indigo-500/25 text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <i className="fas fa-phone mr-1.5"></i>SMS OTP Login
+                    </button>
+                  </div> */}
+
+                  {loginMethod === 'email' ? (
+                    <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3 mt-1">
+                      {/* Email Field */}
+                      <div className="flex flex-col gap-1.5 text-left">
+                        <label className="auth-label">
+                          Email Address
+                        </label>
+                        <div className="auth-input-wrapper floating-enabled">
+                          <input
+                            type="email"
+                            required
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            className="auth-input"
+                            placeholder="yourmail@gmail.com"
+                          />
+                          <i className="fas fa-envelope auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left">
+                        <label className="auth-label">
+                          Password
+                        </label>
+                        <div className="auth-input-wrapper floating-enabled">
+                          <input
+                            type={showLoginPassword ? 'text' : 'password'}
+                            required
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            className="auth-input pr-10"
+                            placeholder="••••••••••••"
+                          />
+                          <i className="fas fa-lock auth-input-icon"></i>
+                          <button
+                            type="button"
+                            onClick={() => setShowLoginPassword(!showLoginPassword)}
+                            className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
+                            title="Show/Hide Password"
+                          >
+                            <i className={`fas ${showLoginPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                          </button>
+                        </div>
+                        
+                        {/* Forgot Password Link */}
+                        <div className="text-right">
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('forgot')}
+                            className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors duration-200 focus:outline-none cursor-pointer"
+                          >
+                            Forgot Password?
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow"
+                      >
+                        Login to Account
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handlePhoneLoginSubmit} className="flex flex-col gap-3 mt-1">
+                      {/* Phone Number Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Phone Number
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="tel"
+                            required
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            className="auth-input"
+                            placeholder="+8801700000000"
+                          />
+                          <i className="fas fa-phone auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Password
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type={showLoginPassword ? 'text' : 'password'}
+                            required
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            className="auth-input pr-10"
+                            placeholder="••••••••••••"
+                          />
+                          <i className="fas fa-lock auth-input-icon"></i>
+                          <button
+                            type="button"
+                            onClick={() => setShowLoginPassword(!showLoginPassword)}
+                            className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
+                            title="Show/Hide Password"
+                          >
+                            <i className={`fas ${showLoginPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={phoneLoading}
+                        className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow flex items-center justify-center gap-2"
+                      >
+                        {phoneLoading && <i className="fas fa-circle-notch fa-spin text-xs"></i>}
+                        <span>{phoneLoading ? 'Logging in...' : 'Login with Phone'}</span>
+                      </button>
+                    </form>
+                  )}
                 </div>
 
                 {/* Signup Panel (Create Account) */}
                 <div className="w-1/2 flex flex-col gap-3 pl-3 pr-1">
-                  <form onSubmit={handleSignupSubmit} className="flex flex-col gap-3">
-                    {/* Name Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Name
-                      </label>
-                      <div className="auth-input-wrapper">
-                        <input
-                          type="text"
-                          required
-                          value={signupName}
-                          onChange={(e) => setSignupName(e.target.value)}
-                          className="auth-input"
-                          placeholder="Enter your name"
-                        />
-                        <i className="fas fa-user auth-input-icon"></i>
-                      </div>
-                    </div>
-
-                    {/* Email Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Email Address
-                      </label>
-                      <div className="auth-input-wrapper">
-                        <input
-                          type="email"
-                          required
-                          value={signupEmail}
-                          onChange={(e) => setSignupEmail(e.target.value)}
-                          className="auth-input"
-                          placeholder="yourmail@gmail.com"
-                        />
-                        <i className="fas fa-envelope auth-input-icon"></i>
-                      </div>
-                    </div>
-
-                    {/* Password Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Password
-                      </label>
-                      <div className="auth-input-wrapper">
-                        <input
-                          type={showSignupPassword ? 'text' : 'password'}
-                          required
-                          value={signupPassword}
-                          onChange={(e) => setSignupPassword(e.target.value)}
-                          className="auth-input pr-10"
-                          placeholder="••••••••••••"
-                        />
-                        <i className="fas fa-lock auth-input-icon"></i>
-                        <button
-                          type="button"
-                          onClick={() => setShowSignupPassword(!showSignupPassword)}
-                          className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
-                          title="Show/Hide Password"
-                        >
-                          <i className={`fas ${showSignupPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
-                        </button>
-                      </div>
-                      {/* Password Strength Indicator */}
-                      {signupPassword && (
-                        <div className="flex flex-col gap-1 mt-1 animate-fade-in-up">
-                          <div className="flex justify-between items-center text-[10px] font-semibold">
-                            <span className="text-[var(--text-secondary)]">Password Strength:</span>
-                            <span className={`${getPasswordStrength(signupPassword).textClass} font-bold transition-all duration-300`}>
-                              {getPasswordStrength(signupPassword).label}
-                            </span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-500 ease-out ${getPasswordStrength(signupPassword).color}`}
-                              style={{ width: getPasswordStrength(signupPassword).width }}
-                            ></div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Confirm Password Field */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <label className="auth-label">
-                        Confirm Password
-                      </label>
-                      <div className="auth-input-wrapper">
-                        <input
-                          type="password"
-                          required
-                          value={signupConfirmPass}
-                          onChange={(e) => setSignupConfirmPass(e.target.value)}
-                          className="auth-input"
-                          placeholder="Re-enter password"
-                        />
-                        <i className="fas fa-lock-open auth-input-icon"></i>
-                      </div>
-                    </div>
-
-                    {/* Submit Button */}
+                  
+                  {/* Method Tabs: Email or Phone (Commented out to hide Phone Sign Up Option) */}
+                  {/* <div className="flex bg-[#0f1422]/60 rounded-xl p-1 border border-[#232f48]/55 select-none text-[10px] font-bold mt-1">
                     <button
-                      type="submit"
-                      className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow"
+                      type="button"
+                      onClick={() => setSignupMethod('email')}
+                      className={`flex-grow py-1.5 rounded-lg text-center cursor-pointer transition-all ${
+                        signupMethod === 'email' ? 'bg-indigo-500/25 text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+                      }`}
                     >
-                      Create Account
+                      <i className="fas fa-envelope mr-1.5"></i>Email Sign Up
                     </button>
-                  </form>
+                    <button
+                      type="button"
+                      onClick={() => setSignupMethod('phone')}
+                      className={`flex-grow py-1.5 rounded-lg text-center cursor-pointer transition-all ${
+                        signupMethod === 'phone' ? 'bg-indigo-500/25 text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <i className="fas fa-phone mr-1.5"></i>Phone Sign Up
+                    </button>
+                  </div> */}
+
+                  {signupMethod === 'email' ? (
+                    <form onSubmit={handleSignupSubmit} className="flex flex-col gap-3 mt-1">
+                      {/* Name Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Name
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="text"
+                            required
+                            value={signupName}
+                            onChange={(e) => setSignupName(e.target.value)}
+                            className="auth-input"
+                            placeholder="Enter your name"
+                          />
+                          <i className="fas fa-user auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Email Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Email Address
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="email"
+                            required
+                            value={signupEmail}
+                            onChange={(e) => setSignupEmail(e.target.value)}
+                            className="auth-input"
+                            placeholder="yourmail@gmail.com"
+                          />
+                          <i className="fas fa-envelope auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Password
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type={showSignupPassword ? 'text' : 'password'}
+                            required
+                            value={signupPassword}
+                            onChange={(e) => setSignupPassword(e.target.value)}
+                            className="auth-input pr-10"
+                            placeholder="••••••••••••"
+                          />
+                          <i className="fas fa-lock auth-input-icon"></i>
+                          <button
+                            type="button"
+                            onClick={() => setShowSignupPassword(!showSignupPassword)}
+                            className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
+                            title="Show/Hide Password"
+                          >
+                            <i className={`fas ${showSignupPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                          </button>
+                        </div>
+                        {/* Password Strength Indicator */}
+                        {signupPassword && (
+                          <div className="flex flex-col gap-1 mt-1 animate-fade-in-up">
+                            <div className="flex justify-between items-center text-[10px] font-semibold">
+                              <span className="text-[var(--text-secondary)]">Password Strength:</span>
+                              <span className={`${getPasswordStrength(signupPassword).textClass} font-bold transition-all duration-300`}>
+                                {getPasswordStrength(signupPassword).label}
+                              </span>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ease-out ${getPasswordStrength(signupPassword).color}`}
+                                style={{ width: getPasswordStrength(signupPassword).width }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Confirm Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Confirm Password
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="password"
+                            required
+                            value={signupConfirmPass}
+                            onChange={(e) => setSignupConfirmPass(e.target.value)}
+                            className="auth-input"
+                            placeholder="Re-enter password"
+                          />
+                          <i className="fas fa-lock-open auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow"
+                      >
+                        Create Account
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handlePhoneSignupSubmit} className="flex flex-col gap-3 mt-1">
+                      {/* Name Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Name
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="text"
+                            required
+                            value={signupName}
+                            onChange={(e) => setSignupName(e.target.value)}
+                            className="auth-input"
+                            placeholder="Enter your name"
+                          />
+                          <i className="fas fa-user auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Phone Number Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Phone Number
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="tel"
+                            required
+                            value={signupPhone}
+                            onChange={(e) => setSignupPhone(e.target.value)}
+                            className="auth-input"
+                            placeholder="+8801700000000"
+                          />
+                          <i className="fas fa-phone auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Password
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type={showSignupPassword ? 'text' : 'password'}
+                            required
+                            value={signupPassword}
+                            onChange={(e) => setSignupPassword(e.target.value)}
+                            className="auth-input pr-10"
+                            placeholder="••••••••••••"
+                          />
+                          <i className="fas fa-lock auth-input-icon"></i>
+                          <button
+                            type="button"
+                            onClick={() => setShowSignupPassword(!showSignupPassword)}
+                            className="absolute right-3 p-1.5 text-[var(--text-secondary)] hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
+                            title="Show/Hide Password"
+                          >
+                            <i className={`fas ${showSignupPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                          </button>
+                        </div>
+                        {/* Password Strength Indicator */}
+                        {signupPassword && (
+                          <div className="flex flex-col gap-1 mt-1 animate-fade-in-up">
+                            <div className="flex justify-between items-center text-[10px] font-semibold">
+                              <span className="text-[var(--text-secondary)]">Password Strength:</span>
+                              <span className={`${getPasswordStrength(signupPassword).textClass} font-bold transition-all duration-300`}>
+                                {getPasswordStrength(signupPassword).label}
+                              </span>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ease-out ${getPasswordStrength(signupPassword).color}`}
+                                style={{ width: getPasswordStrength(signupPassword).width }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Confirm Password Field */}
+                      <div className="flex flex-col gap-1.5 text-left animate-fade-in">
+                        <label className="auth-label">
+                          Confirm Password
+                        </label>
+                        <div className="auth-input-wrapper">
+                          <input
+                            type="password"
+                            required
+                            value={signupConfirmPass}
+                            onChange={(e) => setSignupConfirmPass(e.target.value)}
+                            className="auth-input"
+                            placeholder="Re-enter password"
+                          />
+                          <i className="fas fa-lock-open auth-input-icon"></i>
+                        </div>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={phoneLoading}
+                        className="w-full py-2.5 mt-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 shadow-md shadow-indigo-600/20 transition-all duration-200 cursor-pointer btn-premium-glow flex items-center justify-center gap-2"
+                      >
+                        {phoneLoading && <i className="fas fa-circle-notch fa-spin text-xs"></i>}
+                        <span>{phoneLoading ? 'Sending SMS...' : 'Verify Phone via OTP'}</span>
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>
@@ -1023,7 +1583,9 @@ export default function AuthPage({ user, onLogin, showToast }) {
                       <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
                       <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
                     </svg>
-                    <h3 className="text-base font-bold text-white mb-1">Email Verified!</h3>
+                    <h3 className="text-base font-bold text-white mb-1">
+                      {signupPayload?.isPhone ? "Phone Verified!" : "Email Verified!"}
+                    </h3>
                     <p className="text-xs text-[var(--text-secondary)]">
                       Setting up your CodeVerse workspace...
                     </p>
@@ -1031,14 +1593,25 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 ) : (
                   <>
                     <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg mx-auto mb-2">
-                      <i className="fas fa-envelope-open-text animate-pulse"></i>
+                      <i className={signupPayload?.isPhone ? "fas fa-sms animate-pulse" : "fas fa-envelope-open-text animate-pulse"}></i>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-black text-white">Verify Your Email</h3>
+                      <h3 className="text-lg font-black text-white">
+                        {signupPayload?.isPhone ? "Verify Your Phone" : "Verify Your Email"}
+                      </h3>
                       <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
-                        We've sent a 6-digit verification code to <br />
-                        <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.email}</span>.
+                        {signupPayload?.isPhone ? (
+                          <>
+                            We've sent a 6-digit verification code to <br />
+                            <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.phone}</span>.
+                          </>
+                        ) : (
+                          <>
+                            We've sent a 6-digit verification code to <br />
+                            <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.email}</span>.
+                          </>
+                        )}
                       </p>
                     </div>
 
@@ -1120,6 +1693,8 @@ export default function AuthPage({ user, onLogin, showToast }) {
               </div>
             </div>
           )}
+          {/* Hidden Recaptcha container */}
+          <div id="recaptcha-container"></div>
         </div>
       </div>
     </div>
