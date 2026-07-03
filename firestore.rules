@@ -26,6 +26,18 @@ service cloud.firestore {
         allow write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // followers সাবকালেকশন পারমিশন (যেকোনো লগইন ইউজার দেখতে পারবে, কিন্তু কেবল নিজের আইডিতে ফলো/আনফলো রাইট করতে পারবে)
+      match /followers/{followerId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == followerId;
+      }
+
+      // following সাবকালেকশন পারমিশন (যেকোনো লগইন ইউজার দেখতে পারবে, কিন্তু কেবল নিজের আইডিতে ফলোয়িং লিস্ট রাইট করতে পারবে)
+      match /following/{followingId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // পূর্বের ইউজার নোটস ও workspaces সাবকালেকশন সুরক্ষিত রাখা
       match /{document=**} {
         allow read, write: if request.auth != null && (request.auth.uid == userId || 
