@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import ace from 'ace-builds';
 ace.config.set('basePath', 'https://cdn.jsdelivr.net/npm/ace-builds@1.37.0/src-noconflict/');
@@ -252,8 +252,10 @@ const VanillaAceEditor = ({ mode, theme, value, onChange, fontSize, wordWrap, di
   return <div ref={containerRef} style={{ width: '100%', height: '100%', ...style }} />;
 };
 
-export default function EditorPage({ user, theme, toggleTheme, showToast }) {
+export default function EditorPage({ user, onLogout, theme, toggleTheme, showToast }) {
   // --- States ---
+  const navigate = useNavigate();
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const queryLang = searchParams.get('lang');
   
@@ -451,7 +453,16 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     setWorkspaceFiles(defaultFiles);
     setActiveFileName(defaultFiles[0].name);
   }, [currentLanguage]);
-  
+
+  // Close user profile dropdown on click outside
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setUserDropdownOpen(false);
+    };
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, []);
+
   // Web Lab Logs state
   const [webLogs, setWebLogs] = useState([]);
 
@@ -1702,6 +1713,95 @@ Explain why this error occurred and how to fix it.`;
                     <span>Run<span className="hidden sm:inline"> Code</span></span>
                   </>
                 )}
+              </button>
+            </div>
+          )}
+
+          {/* User Profile Dropdown */}
+          {user ? (
+            <div className="relative flex items-center gap-2 border-l border-[var(--border-color)] pl-3 ml-1 select-none">
+              {/* User Name */}
+              <span className="hidden md:inline text-xs font-bold text-slate-300 max-w-[100px] truncate">
+                {user.name}
+              </span>
+              
+              {/* Avatar Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setUserDropdownOpen(prev => !prev);
+                }}
+                className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
+                title="View Profile Actions"
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm">
+                    {(user.name || 'U').charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown Menu */}
+              {userDropdownOpen && (
+                <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[#0f1420] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up">
+                  {/* Account Info summary */}
+                  <div className="px-2.5 py-1.5 border-b border-[var(--border-color)]/30 mb-1 flex flex-col text-left">
+                    <span className="text-[10px] font-bold text-slate-400 truncate">{user.name}</span>
+                    <span className="text-[8px] font-mono text-slate-500 truncate mt-0.5">{user.email}</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      navigate(`/profile/${user.username || ''}`);
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                  >
+                    <i className="far fa-user text-[10px] text-indigo-400 w-4 text-center"></i>
+                    <span>My account</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      if (user.role === 'admin') {
+                        navigate('/admin');
+                      } else {
+                        openSettingsModal();
+                      }
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                  >
+                    <i className="fas fa-sliders text-[10px] text-cyan-400 w-4 text-center"></i>
+                    <span>{user.role === 'admin' ? 'Admin Panel' : 'API Console'}</span>
+                  </button>
+
+                  <div className="h-[1px] bg-[var(--border-color)]/30 my-0.5" />
+
+                  <button
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      onLogout();
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                  >
+                    <i className="fas fa-sign-out-alt text-[10px] text-rose-400 w-4 text-center"></i>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Login button if user is not logged in
+            <div className="border-l border-[var(--border-color)] pl-3 ml-1">
+              <button
+                onClick={() => navigate('/login')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 active:scale-95 transition-all duration-200"
+              >
+                <i className="fas fa-sign-in-alt"></i>
+                <span>Login</span>
               </button>
             </div>
           )}

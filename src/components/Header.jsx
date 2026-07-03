@@ -41,7 +41,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
 
   return (
     <header className="fixed top-0 left-0 w-full border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/45 z-30 backdrop-blur-xl transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Logo & Name */}
         <div
@@ -95,6 +95,16 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
 
         {/* Quick Action Navigation Toolbar */}
         <div className="flex items-center gap-3">
+          {/* Theme Toggle Switch */}
+          <button
+            id="theme-toggle"
+            onClick={toggleTheme}
+            className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none"
+            title="Toggle Light/Dark Theme"
+          >
+            <i id="theme-icon" className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'} text-sm`}></i>
+          </button>
+
           {/* Authentication Container */}
           <div id="auth-nav-container" className="flex items-center gap-2">
             {!user ? (
@@ -107,50 +117,83 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                 <span>Login</span>
               </button>
             ) : (
-              <div id="nav-user-profile" className={`${mobileMenuOpen ? 'hidden md:flex' : 'flex'} items-center gap-2.5`}>
-                {/* User Avatar Button (Goes directly to Profile) */}
+              <div id="nav-user-profile" className={`${mobileMenuOpen ? 'hidden md:flex' : 'flex'} items-center gap-2 relative`}>
+                {/* User Name */}
+                <span className="hidden md:inline text-xs font-bold text-slate-300 max-w-[100px] truncate">
+                  {user.name}
+                </span>
+
+                {/* User Avatar Button (Toggles Dropdown) */}
                 <button
                   id="nav-user-avatar-btn"
-                  onClick={() => navigate(`/profile/${user.username || ''}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDropdownOpen(prev => !prev);
+                  }}
                   className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
-                  title="View Developer Profile"
+                  title="View Profile Actions"
                 >
                   {user.photoURL ? (
                     <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
+                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm">
                       {(user.name || 'U').charAt(0).toUpperCase()}
                     </span>
                   )}
                 </button>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[#0f1420] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up">
+                    {/* Account Info summary */}
+                    <div className="px-2.5 py-1.5 border-b border-[var(--border-color)]/30 mb-1 flex flex-col text-left">
+                      <span className="text-[10px] font-bold text-slate-400 truncate">{user.name}</span>
+                      <span className="text-[8px] font-mono text-slate-500 truncate mt-0.5">{user.email}</span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        navigate(`/profile/${user.username || ''}`);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                    >
+                      <i className="far fa-user text-[10px] text-indigo-400 w-4 text-center"></i>
+                      <span>My account</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        if (user.role === 'admin') {
+                          navigate('/admin');
+                        } else {
+                          navigate('/editor');
+                        }
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                    >
+                      <i className="fas fa-sliders text-[10px] text-cyan-400 w-4 text-center"></i>
+                      <span>{user.role === 'admin' ? 'Admin Panel' : 'API Console'}</span>
+                    </button>
+
+                    <div className="h-[1px] bg-[var(--border-color)]/30 my-0.5" />
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                    >
+                      <i className="fas fa-sign-out-alt text-[10px] text-rose-400 w-4 text-center"></i>
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-
-
-
-          {/* Theme Toggle Switch */}
-          <button
-            id="theme-toggle"
-            onClick={toggleTheme}
-            className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none"
-            title="Toggle Light/Dark Theme"
-          >
-            <i id="theme-icon" className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'} text-sm`}></i>
-          </button>
-
-          {/* Direct Sign Out Button (Shown on the right of Theme Toggle - Desktop only) */}
-          {user && (
-            <button
-              id="nav-signout-direct-btn"
-              onClick={onLogout}
-              className="hidden md:flex px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/20 active:scale-95 transition-all duration-200 cursor-pointer items-center gap-1.5"
-              title="Sign Out"
-            >
-              <i className="fas fa-sign-out-alt"></i>
-              <span>Sign Out</span>
-            </button>
-          )}
 
           {/* Mobile Menu Trigger */}
           <button
