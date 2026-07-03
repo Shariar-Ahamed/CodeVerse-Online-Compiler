@@ -127,7 +127,11 @@ const getAceMode = (langKey, filename, activeWebTab) => {
     targetExt = filename.split('.').pop().toLowerCase();
   }
 
-  if (langKey === "html" || targetExt === "html" || targetExt === "htm") {
+  if (targetExt === "js" || targetExt === "jsx") return "javascript";
+  if (targetExt === "css") return "css";
+  if (targetExt === "html" || targetExt === "htm") return "html";
+
+  if (langKey === "html") {
     if (activeWebTab === "js") return "javascript";
     if (activeWebTab === "css") return "css";
     return "html";
@@ -378,6 +382,26 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const [isCreatingFile, setIsCreatingFile] = useState(false);
   const [newFileName, setNewFileName] = useState("");
 
+  // Folders & Folder UI States
+  const [folders, setFolders] = useState(() => {
+    const saved = localStorage.getItem(`codeverse_folders_${currentLanguage}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [expandedFolders, setExpandedFolders] = useState({});
+  const [folderForNewFile, setFolderForNewFile] = useState("");
+
+  // Refs to always access latest workspaceFiles and folders in DB saves
+  const latestWorkspaceFilesRef = useRef([]);
+  const latestFoldersRef = useRef([]);
+  useEffect(() => {
+    latestWorkspaceFilesRef.current = workspaceFiles;
+  }, [workspaceFiles]);
+  useEffect(() => {
+    latestFoldersRef.current = folders;
+  }, [folders]);
+
   // Sync workspace files when language changes
   useEffect(() => {
     let savedFiles = localStorage.getItem(`codeverse_files_${currentLanguage}`);
@@ -388,6 +412,19 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       } catch (e) {
         console.error(e);
       }
+    }
+
+    // Sync folders for current language
+    let savedFolders = localStorage.getItem(`codeverse_folders_${currentLanguage}`);
+    if (savedFolders) {
+      try {
+        setFolders(JSON.parse(savedFolders));
+      } catch (e) {
+        console.error(e);
+        setFolders([]);
+      }
+    } else {
+      setFolders([]);
     }
 
     // Auto-repair logic for old/stuck workspaces in localStorage
@@ -566,30 +603,54 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
               setJsCode(data.jsCode);
               localStorage.setItem("codeverse_web_js", data.jsCode);
             }
+
+            if (data.folders) {
+              setFolders(data.folders);
+              localStorage.setItem("codeverse_folders_html", JSON.stringify(data.folders));
+            }
             
-            // Sync with workspaceFiles
-            setWorkspaceFiles(prev => {
-              const files = (prev && prev.length > 0) ? prev : [
-                { name: "index.html", content: data.htmlCode || LANGUAGES.html.defaultCode, language: "html" },
-                { name: "style.css", content: data.cssCode || DEFAULT_WEB_CSS, language: "css" },
-                { name: "script.js", content: data.jsCode || DEFAULT_WEB_JS, language: "javascript" }
-              ];
-              const updated = files.map(f => {
-                if (f.name === "index.html" && data.htmlCode) return { ...f, content: data.htmlCode };
-                if (f.name === "style.css" && data.cssCode) return { ...f, content: data.cssCode };
-                if (f.name === "script.js" && data.jsCode) return { ...f, content: data.jsCode };
-                return f;
+            // Sync with workspaceFiles (use cloud list if present, otherwise fall back to mapping local files)
+            if (data.workspaceFiles) {
+              setWorkspaceFiles(data.workspaceFiles);
+              localStorage.setItem("codeverse_files_html", JSON.stringify(data.workspaceFiles));
+            } else {
+              setWorkspaceFiles(prev => {
+                const files = (prev && prev.length > 0) ? prev : [
+                  { name: "index.html", content: data.htmlCode || LANGUAGES.html.defaultCode, language: "html" },
+                  { name: "style.css", content: data.cssCode || DEFAULT_WEB_CSS, language: "css" },
+                  { name: "script.js", content: data.jsCode || DEFAULT_WEB_JS, language: "javascript" }
+                ];
+                const updated = files.map(f => {
+                  if (f.name === "index.html" && data.htmlCode) return { ...f, content: data.htmlCode };
+                  if (f.name === "style.css" && data.cssCode) return { ...f, content: data.cssCode };
+                  if (f.name === "script.js" && data.jsCode) return { ...f, content: data.jsCode };
+                  return f;
+                });
+                localStorage.setItem("codeverse_files_html", JSON.stringify(updated));
+                return updated;
               });
-              localStorage.setItem("codeverse_files_html", JSON.stringify(updated));
-              return updated;
-            });
+            }
           } else {
             if (data.code) {
               localStorage.setItem(`codeverse_code_${langId}`, data.code);
               if (currentLanguage === langId) {
                 setCode(data.code);
               }
-              
+            }
+
+            if (data.folders) {
+              if (currentLanguage === langId) {
+                setFolders(data.folders);
+              }
+              localStorage.setItem(`codeverse_folders_${langId}`, JSON.stringify(data.folders));
+            }
+
+            if (data.workspaceFiles) {
+              if (currentLanguage === langId) {
+                setWorkspaceFiles(data.workspaceFiles);
+              }
+              localStorage.setItem(`codeverse_files_${langId}`, JSON.stringify(data.workspaceFiles));
+            } else if (data.code) {
               // Sync with workspaceFiles
               setWorkspaceFiles(prev => {
                 const ext = LANGUAGES[langId]?.extension || 'txt';
@@ -644,6 +705,8 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       const docRef = doc(db, "users", user.uid, "code_workspaces", lang);
       await setDoc(docRef, {
         ...data,
+        workspaceFiles: latestWorkspaceFilesRef.current,
+        folders: latestFoldersRef.current,
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (e) {
@@ -977,10 +1040,15 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const handleCreateFile = () => {
     if (!newFileName.trim()) {
       setIsCreatingFile(false);
+      setFolderForNewFile("");
       return;
     }
 
-    const name = newFileName.trim();
+    let name = newFileName.trim();
+    if (folderForNewFile) {
+      name = `${folderForNewFile}/${name}`;
+    }
+
     if (workspaceFiles.some(f => f.name.toLowerCase() === name.toLowerCase())) {
       showToast("A file with this name already exists!", "error");
       return;
@@ -996,10 +1064,22 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     const updated = [...workspaceFiles, newFile];
     setWorkspaceFiles(updated);
     localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
+    
+    if (folderForNewFile) {
+      setExpandedFolders(prev => ({
+        ...prev,
+        [folderForNewFile]: true
+      }));
+    }
+
     setActiveFileName(name);
     setIsCreatingFile(false);
     setNewFileName("");
+    setFolderForNewFile("");
     showToast(`Created file: ${name}`, "success");
+    
+    // Save to Firestore
+    saveCodeToFirestore(currentLanguage, {});
   };
 
   const handleDeleteFile = (fileNameToDelete) => {
@@ -1011,6 +1091,55 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       setActiveFileName(updated[0].name);
     }
     showToast(`Deleted file: ${fileNameToDelete}`, "info");
+
+    // Save to Firestore
+    saveCodeToFirestore(currentLanguage, {});
+  };
+
+  const handleCreateFolder = () => {
+    if (!newFolderName.trim()) {
+      setIsCreatingFolder(false);
+      return;
+    }
+
+    const name = newFolderName.trim();
+    if (folders.some(f => f.toLowerCase() === name.toLowerCase())) {
+      showToast("A folder with this name already exists!", "error");
+      return;
+    }
+
+    const updated = [...folders, name];
+    setFolders(updated);
+    localStorage.setItem(`codeverse_folders_${currentLanguage}`, JSON.stringify(updated));
+    setIsCreatingFolder(false);
+    setNewFolderName("");
+    showToast(`Created folder: ${name}`, "success");
+
+    // Save to Firestore
+    saveCodeToFirestore(currentLanguage, {});
+  };
+
+  const handleDeleteFolder = (folderName) => {
+    const updatedFolders = folders.filter(f => f !== folderName);
+    setFolders(updatedFolders);
+    localStorage.setItem(`codeverse_folders_${currentLanguage}`, JSON.stringify(updatedFolders));
+
+    const updatedFiles = workspaceFiles.filter(f => !f.name.startsWith(folderName + "/"));
+    setWorkspaceFiles(updatedFiles);
+    localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updatedFiles));
+
+    showToast(`Deleted folder: ${folderName}`, "info");
+
+    if (activeFileName.startsWith(folderName + "/")) {
+      if (updatedFiles.length > 0) {
+        setActiveFileName(updatedFiles[0].name);
+      } else {
+        setActiveFileName("");
+      }
+    }
+
+    // Save to Firestore
+    saveCodeToFirestore(currentLanguage, {});
   };
 
   const handleWorkspaceCodeChange = (val) => {
@@ -1416,9 +1545,32 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     webPreviewSessionRef.current += 1;
     const currentSessionId = webPreviewSessionRef.current;
 
-    const htmlVal = htmlCode;
-    const cssVal = cssCode;
-    const jsVal = jsCode;
+    // Detect the active folder of the current file
+    let activeFolder = "";
+    if (activeFileName && activeFileName.includes("/")) {
+      const parts = activeFileName.split("/");
+      parts.pop();
+      activeFolder = parts.join("/");
+    }
+
+    // Resolve HTML, CSS, JS values from the workspaceFiles list directly
+    let htmlVal = "";
+    let cssVal = "";
+    let jsVal = "";
+
+    if (activeFolder) {
+      const folderHtml = workspaceFiles.find(f => f.name === `${activeFolder}/index.html` || (f.name.startsWith(activeFolder + "/") && f.name.endsWith(".html")));
+      const folderCss = workspaceFiles.find(f => f.name === `${activeFolder}/style.css` || f.name === `${activeFolder}/styles.css` || (f.name.startsWith(activeFolder + "/") && f.name.endsWith(".css")));
+      const folderJs = workspaceFiles.find(f => f.name === `${activeFolder}/script.js` || (f.name.startsWith(activeFolder + "/") && f.name.endsWith(".js")));
+
+      htmlVal = folderHtml ? folderHtml.content : (workspaceFiles.find(f => f.name === "index.html")?.content || "");
+      cssVal = folderCss ? folderCss.content : (workspaceFiles.find(f => f.name === "style.css")?.content || "");
+      jsVal = folderJs ? folderJs.content : (workspaceFiles.find(f => f.name === "script.js")?.content || "");
+    } else {
+      htmlVal = workspaceFiles.find(f => f.name === "index.html")?.content || "";
+      cssVal = workspaceFiles.find(f => f.name === "style.css")?.content || "";
+      jsVal = workspaceFiles.find(f => f.name === "script.js")?.content || "";
+    }
 
     if (user && !user.isGuest && !skipSaveToDb) {
       saveCodeToFirestore("html", { htmlCode: htmlVal, cssCode: cssVal, jsCode: jsVal });
@@ -1532,7 +1684,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
         clearTimeout(autoRunTimerRef.current);
       }
     };
-  }, [htmlCode, cssCode, jsCode, currentLanguage, isAutoRunEnabled]);
+  }, [workspaceFiles, activeFileName, currentLanguage, isAutoRunEnabled]);
 
   // --- Toolbar Handlers ---
   const clearConsole = () => {
@@ -2159,6 +2311,7 @@ Explain why this error occurred and how to fix it.`;
                           onClick={() => {
                             setIsCreatingFile(true);
                             setNewFileName("");
+                            setFolderForNewFile("");
                           }}
                           className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
                           title="New File..."
@@ -2167,7 +2320,8 @@ Explain why this error occurred and how to fix it.`;
                         </button>
                         <button
                           onClick={() => {
-                            showToast("Folder creation is a Premium feature!", "info");
+                            setIsCreatingFolder(true);
+                            setNewFolderName("");
                           }}
                           className="w-6 h-6 rounded hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-150 cursor-pointer"
                           title="New Folder..."
@@ -2179,28 +2333,28 @@ Explain why this error occurred and how to fix it.`;
 
                     {/* Files List Wrapper */}
                     <div className="p-3 flex flex-col gap-1.5 flex-grow overflow-y-auto scrollbar-thin">
-                      {/* Inline Input Field for New File Name */}
-                      {isCreatingFile && (
-                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/80 border border-indigo-500/50 shrink-0">
-                          <i className="far fa-file text-slate-400 text-xs"></i>
+                      {/* Inline Input Field for New Folder Name */}
+                      {isCreatingFolder && (
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/80 border border-emerald-500/50 shrink-0">
+                          <i className="far fa-folder text-emerald-400 text-xs"></i>
                           <input
                             autoFocus
                             type="text"
-                            placeholder="filename.ext"
-                            value={newFileName}
-                            onChange={(e) => setNewFileName(e.target.value)}
+                            placeholder="folder_name"
+                            value={newFolderName}
+                            onChange={(e) => setNewFolderName(e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
-                                handleCreateFile();
+                                handleCreateFolder();
                               } else if (e.key === 'Escape') {
-                                setIsCreatingFile(false);
-                                setNewFileName("");
+                                setIsCreatingFolder(false);
+                                setNewFolderName("");
                               }
                             }}
                             onBlur={() => {
                               setTimeout(() => {
-                                setIsCreatingFile(false);
-                                setNewFileName("");
+                                setIsCreatingFolder(false);
+                                setNewFolderName("");
                               }, 200);
                             }}
                             className="w-full bg-transparent text-xs text-white focus:outline-none focus:ring-0 p-0 font-mono"
@@ -2208,8 +2362,155 @@ Explain why this error occurred and how to fix it.`;
                         </div>
                       )}
 
-                      {/* Display Workspace Files */}
-                      {workspaceFiles.map(f => {
+                      {/* Inline Input Field for New File Name */}
+                      {isCreatingFile && (
+                        <div className="flex flex-col gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/80 border border-indigo-500/50 shrink-0">
+                          {folderForNewFile && (
+                            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
+                              In {folderForNewFile}/
+                            </span>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <i className="far fa-file text-slate-400 text-xs"></i>
+                            <input
+                              autoFocus
+                              type="text"
+                              placeholder="filename.ext"
+                              value={newFileName}
+                              onChange={(e) => setNewFileName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleCreateFile();
+                                } else if (e.key === 'Escape') {
+                                  setIsCreatingFile(false);
+                                  setNewFileName("");
+                                  setFolderForNewFile("");
+                                }
+                              }}
+                              onBlur={() => {
+                                setTimeout(() => {
+                                  setIsCreatingFile(false);
+                                  setNewFileName("");
+                                  setFolderForNewFile("");
+                                }, 200);
+                              }}
+                              className="w-full bg-transparent text-xs text-white focus:outline-none focus:ring-0 p-0 font-mono"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Display Folders & Nested Files */}
+                      {folders.map(folder => {
+                        const isExpanded = expandedFolders[folder];
+                        const folderFiles = workspaceFiles.filter(f => f.name.startsWith(folder + "/"));
+                        return (
+                          <div key={folder} className="flex flex-col gap-1">
+                            {/* Folder Header Row */}
+                            <div className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between text-slate-400 hover:text-white hover:bg-slate-800/30 border border-transparent transition-all duration-200 group select-none">
+                              <button
+                                onClick={() => {
+                                  setExpandedFolders(prev => ({
+                                    ...prev,
+                                    [folder]: !prev[folder]
+                                  }));
+                                }}
+                                className="flex items-center gap-2 flex-grow text-left cursor-pointer"
+                              >
+                                <i className={`fas ${isExpanded ? 'fa-folder-open text-yellow-500' : 'fa-folder text-yellow-500'}`}></i>
+                                <span className="truncate">{folder}</span>
+                              </button>
+                              
+                              <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150">
+                                <button
+                                  onClick={() => {
+                                    setFolderForNewFile(folder);
+                                    setIsCreatingFile(true);
+                                    setNewFileName("");
+                                  }}
+                                  className="w-5 h-5 rounded hover:bg-emerald-500/20 text-slate-500 hover:text-emerald-400 flex items-center justify-center cursor-pointer"
+                                  title="New File in folder..."
+                                >
+                                  <i className="fas fa-file-circle-plus text-[10px]"></i>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteFolder(folder)}
+                                  className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center cursor-pointer"
+                                  title="Delete folder"
+                                >
+                                  <i className="far fa-trash-can text-[10px]"></i>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Nested Files inside Folder */}
+                            {isExpanded && (
+                              <div className="pl-6 flex flex-col gap-1 border-l border-slate-800/50 ml-4 py-0.5">
+                                {folderFiles.length === 0 ? (
+                                  <span className="text-[10px] text-slate-500 italic px-2 py-0.5 select-none">Empty folder</span>
+                                ) : (
+                                  folderFiles.map(f => {
+                                    const isActive = f.name === activeFileName;
+                                    const basename = f.name.substring(folder.length + 1);
+                                    
+                                    let fileIcon = "far fa-file-code text-indigo-400";
+                                    const ext = basename.split('.').pop().toLowerCase();
+                                    if (ext === 'html') fileIcon = "fab fa-html5 text-orange-500";
+                                    else if (ext === 'css') fileIcon = "fab fa-css3-alt text-blue-500";
+                                    else if (ext === 'js') fileIcon = "fab fa-js text-yellow-500";
+                                    else if (ext === 'py') fileIcon = "fab fa-python text-sky-400";
+                                    else if (ext === 'c') fileIcon = "fas fa-copyright text-blue-400";
+                                    else if (ext === 'cpp' || ext === 'cc') fileIcon = "fas fa-c text-blue-500";
+
+                                    return (
+                                      <div
+                                        key={f.name}
+                                        className={`w-full text-left px-2 py-1 rounded-md text-xs font-semibold flex items-center justify-between transition-all duration-200 group select-none ${
+                                          isActive 
+                                            ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20" 
+                                            : "text-slate-400 hover:text-white hover:bg-slate-800/30 border border-transparent"
+                                        }`}
+                                      >
+                                        <button
+                                          onClick={() => {
+                                            if (editorRef.current) {
+                                              const currentVal = editorRef.current.getValue();
+                                              handleWorkspaceCodeChange(currentVal);
+                                            }
+                                            
+                                            setActiveFileName(f.name);
+                                            
+                                            if (currentLanguage === "html") {
+                                              if (f.name === "index.html") switchWebTab("html");
+                                              else if (f.name === "style.css") switchWebTab("css");
+                                              else if (f.name === "script.js") switchWebTab("js");
+                                            }
+                                          }}
+                                          className="flex items-center gap-2 flex-grow text-left cursor-pointer"
+                                        >
+                                          <i className={fileIcon}></i>
+                                          <span className="truncate">{basename}</span>
+                                        </button>
+
+                                        <button
+                                          onClick={() => handleDeleteFile(f.name)}
+                                          className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
+                                          title="Delete file"
+                                        >
+                                          <i className="far fa-trash-can text-[10px]"></i>
+                                        </button>
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {/* Display Root Files */}
+                      {workspaceFiles.filter(f => !f.name.includes("/")).map(f => {
                         const isActive = f.name === activeFileName;
                         
                         let fileIcon = "far fa-file-code text-indigo-400";
@@ -2253,7 +2554,6 @@ Explain why this error occurred and how to fix it.`;
                               <span className="truncate">{f.name}</span>
                             </button>
 
-                            {/* Delete button */}
                             {!isDefaultFile && (
                               <button
                                 onClick={() => handleDeleteFile(f.name)}
