@@ -58,22 +58,15 @@ function AppContent() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Toggle Theme Switcher with Maintenance Modal
+  // Toggle Theme Switcher
   const toggleTheme = () => {
     if (theme === 'dark') {
       setTheme('light');
-      setShowMaintenance(true);
       showToast("Light Mode Active", "info");
     } else {
       setTheme('dark');
       showToast("Dracula Theme Active", "info");
     }
-  };
-
-  const handleCloseMaintenance = () => {
-    setShowMaintenance(false);
-    setTheme('dark');
-    showToast("Reverted to Dracula Theme", "info");
   };
 
   // --- Handle Firebase redirect login result on app mount ---
@@ -328,40 +321,7 @@ function AppContent() {
       {/* Shared Footer */}
       {showFooter && <Footer />}
 
-      {/* Theme Maintenance Alert Popup */}
-      {showMaintenance && (
-        <div id="maintenance-modal" className="modal-overlay fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 transition-all duration-300">
-          <div className="w-full max-w-sm rounded-2xl border border-amber-500/25 bg-slate-900/95 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 p-6 text-center animate-fade-in-up flex flex-col items-center gap-4 relative">
-            
-            {/* Close Button X */}
-            <button
-              onClick={handleCloseMaintenance}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none"
-              title="Close and revert to Dark Mode"
-            >
-              <i className="fas fa-times"></i>
-            </button>
 
-            <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-xl animate-pulse">
-              <i className="fas fa-triangle-exclamation"></i>
-            </div>
-            
-            <div>
-              <h3 className="text-base font-bold text-white mb-2">Under Maintenance</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Light Mode is currently undergoing optimization maintenance. We recommend using our premium Dracula Dark Theme for best performance and code rendering!
-              </p>
-            </div>
-
-            <button
-              onClick={handleCloseMaintenance}
-              className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all duration-200 shadow-md shadow-amber-600/10 w-full mt-2"
-            >
-              Got it
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Toast Notification Container */}
       {toast && (

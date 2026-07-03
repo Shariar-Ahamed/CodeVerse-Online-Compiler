@@ -101,6 +101,26 @@ export default function LandingPage({ showToast }) {
   const navigate = useNavigate();
   const [showHomeAI, setShowHomeAI] = useState(false);
 
+  const getCardStyle = (badgeClass) => {
+    let r = 99, g = 102, b = 241; // default Indigo
+    if (!badgeClass) return {};
+    const lower = badgeClass.toLowerCase();
+    if (lower.includes('indigo')) { r = 99; g = 102; b = 241; }
+    else if (lower.includes('orange')) { r = 249; g = 115; b = 22; }
+    else if (lower.includes('blue')) { r = 59; g = 130; b = 246; }
+    else if (lower.includes('purple')) { r = 168; g = 85; b = 247; }
+    else if (lower.includes('amber')) { r = 245; g = 158; b = 11; }
+    else if (lower.includes('yellow')) { r = 234; g = 179; b = 8; }
+    else if (lower.includes('emerald') || lower.includes('green')) { r = 16; g = 185; b = 129; }
+    else if (lower.includes('rose') || lower.includes('red')) { r = 244; g = 63; b = 94; }
+    else if (lower.includes('cyan') || lower.includes('sky')) { r = 6; g = 182; b = 212; }
+
+    return {
+      '--card-glow-color': `rgba(${r}, ${g}, ${b}, 0.30)`,
+      '--card-glow-hover': `rgba(${r}, ${g}, ${b}, 0.50)`,
+    };
+  };
+
   // --- Languages Search & Filter States ---
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -712,7 +732,7 @@ export default function LandingPage({ showToast }) {
             <span>Judge0 CE Compiler Powered</span>
           </span>
 
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] mb-6 leading-tight">
             Write Code. Compile Live.<br className="hidden md:inline" />{' '}
             <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
               No Local Setup.
@@ -762,7 +782,7 @@ export default function LandingPage({ showToast }) {
         
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
               Supported Languages & Workspaces
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
@@ -780,7 +800,7 @@ export default function LandingPage({ showToast }) {
               placeholder="Search by Language/ DB/ Template etc..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-11 py-3 rounded-full text-xs bg-[#121826]/90 border border-slate-600/70 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 focus:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all duration-200"
+              className="w-full pl-11 pr-11 py-3 rounded-full text-xs bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/40 focus:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all duration-200"
             />
             {searchQuery && (
               <button
@@ -801,7 +821,7 @@ export default function LandingPage({ showToast }) {
                 className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${
                   activeCategory === cat
                     ? 'bg-indigo-600/90 text-white border-indigo-500 shadow-md shadow-indigo-600/10'
-                    : 'bg-[#162032]/60 text-slate-300 hover:text-white border-slate-700/60 hover:bg-[#162032]/90 hover:border-slate-600/80'
+                    : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border-[var(--border-color)] hover:bg-[var(--bg-tertiary)]/50 hover:border-[var(--border-color)]'
                 }`}
               >
                 {cat === 'all' ? 'All' : cat}
@@ -835,13 +855,14 @@ export default function LandingPage({ showToast }) {
                     key={lang.id}
                     data-lang={lang.id}
                     onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                    className="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 cursor-pointer group transition-all duration-300 animate-fade-in"
+                    className="lang-card glass-panel p-3.5 rounded-xl border border-[var(--border-color)] flex items-center gap-3 cursor-pointer group transition-all duration-300 animate-fade-in hover:-translate-y-1 hover:scale-[1.02]"
+                    style={getCardStyle(lang.colorClass)}
                   >
                     <div className={`w-9 h-9 rounded-lg border flex items-center justify-center text-base group-hover:scale-110 transition-transform duration-300 ${lang.colorClass}`}>
                       <i className={lang.icon}></i>
                     </div>
                     <div className="text-left">
-                      <h3 className="font-bold text-white text-xs">{lang.name}</h3>
+                      <h3 className="font-bold text-[var(--text-primary)] text-xs">{lang.name}</h3>
                       <p className="text-[9px] text-[var(--text-secondary)] mt-0.5">{lang.desc}</p>
                     </div>
                   </div>
@@ -896,7 +917,7 @@ export default function LandingPage({ showToast }) {
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
               See CodeVerse in Action
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
@@ -905,20 +926,20 @@ export default function LandingPage({ showToast }) {
           </div>
 
           {/* Mock IDE Container */}
-          <div className="glass-panel rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-2xl max-w-5xl mx-auto">
+          <div className="mock-ide-container rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-[0_20px_45px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-shadow duration-300 max-w-5xl mx-auto bg-[#282a36] relative z-10">
             {/* Tab Bar Header */}
-            <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/45 flex items-center justify-between px-4">
+            <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)] flex items-center justify-between px-4">
               <div className="flex items-center gap-4">
                 <div className="flex gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-rose-500"></span>
                   <span className="w-3 h-3 rounded-full bg-amber-500"></span>
                   <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
                 </div>
-                <span id="demo-tab-name" className="text-xs font-mono text-[var(--text-secondary)]">
+                <span id="demo-tab-name" className="text-xs font-mono text-[var(--text-primary)] font-bold">
                   main.cpp
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span className="auto-running-badge px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 Auto Running
               </span>
             </div>
@@ -926,16 +947,16 @@ export default function LandingPage({ showToast }) {
             {/* Content split grid */}
             <div className="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-[var(--border-color)] min-h-[360px]">
               {/* Editor Mock */}
-              <div className="md:col-span-3 p-4 bg-[#1e1e2e]/60 font-mono text-xs text-slate-300 leading-relaxed overflow-hidden relative text-left">
+              <div className="md:col-span-3 p-4 bg-[#282a36] font-mono text-xs text-[#f8f8f2] leading-relaxed overflow-hidden relative text-left">
                 <pre className="relative z-10 select-none whitespace-pre-wrap">
                   <code id="demo-editor-text">{typedCode}</code>
                   <span className="terminal-cursor"></span>
                 </pre>
               </div>
               {/* Output Console Mock */}
-              <div className="md:col-span-2 p-4 bg-[#0a0c10] font-mono text-xs flex flex-col justify-between text-left">
+              <div className="md:col-span-2 p-4 bg-[#14151a] font-mono text-xs flex flex-col justify-between text-left">
                 <div>
-                  <div className="text-[var(--text-muted)] text-[9px] uppercase tracking-wider mb-2 font-bold flex items-center gap-1">
+                  <div className="text-slate-500 text-[9px] uppercase tracking-wider mb-2 font-bold flex items-center gap-1">
                     <i className="fas fa-terminal"></i>
                     <span>Terminal Output</span>
                   </div>
@@ -944,7 +965,7 @@ export default function LandingPage({ showToast }) {
                   </pre>
                 </div>
 
-                <div className="pt-4 border-t border-[var(--border-color)]/30 flex items-center justify-between text-[9px] text-[var(--text-muted)] font-bold">
+                <div className="pt-4 border-t border-[#191a21] flex items-center justify-between text-[9px] text-slate-500 font-bold">
                   <span>Status: {demoStatus}</span>
                   <span>Time: {demoTime}</span>
                 </div>
@@ -969,7 +990,7 @@ export default function LandingPage({ showToast }) {
               <i className="fas fa-map-location-dot text-[10px]"></i>
               <span>Interactive Roadmap</span>
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
               CodeVerse Journey Map
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto">
@@ -988,7 +1009,7 @@ export default function LandingPage({ showToast }) {
             
             <div className="text-center min-w-[200px] sm:min-w-[240px]">
               <span className="lg:hidden text-indigo-400 font-extrabold text-[10px] block mb-1 uppercase tracking-widest">Step {MILESTONES[currentMilestoneIndex].id}</span>
-              <h3 className="text-sm font-bold text-white tracking-wide">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-wide">
                 {MILESTONES[currentMilestoneIndex].title}
               </h3>
               <p className="text-[10px] text-indigo-400/80 font-bold uppercase tracking-widest mt-0.5">
@@ -1052,7 +1073,7 @@ export default function LandingPage({ showToast }) {
                         : 'border-[var(--border-color)] bg-[var(--bg-tertiary)]/20'
                     }`}
                   >
-                    <h4 className="font-bold text-xs text-white group-hover:text-indigo-400 transition-colors duration-200">
+                    <h4 className="font-bold text-xs text-[var(--text-primary)] group-hover:text-indigo-400 transition-colors duration-200">
                       {topic.name}
                     </h4>
                     <p className="text-[10px] text-[var(--text-secondary)] mt-1 leading-relaxed">
@@ -1119,7 +1140,7 @@ export default function LandingPage({ showToast }) {
                         <i className="fas fa-check"></i>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-slate-300 group-hover:text-cyan-300 transition-colors duration-200 leading-relaxed">
+                        <p className="text-xs font-semibold text-[var(--text-secondary)] group-hover:text-cyan-300 transition-colors duration-200 leading-relaxed">
                           {outcome.text}
                         </p>
                       </div>
@@ -1139,7 +1160,7 @@ export default function LandingPage({ showToast }) {
                 <div
                   key={`mar1-${lang.id}-${idx}`}
                   onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
                 >
                   <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
                   <span className="text-xs font-semibold">{lang.name}</span>
@@ -1150,7 +1171,7 @@ export default function LandingPage({ showToast }) {
                 <div
                   key={`mar2-${lang.id}-${idx}`}
                   onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-white hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
                 >
                   <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
                   <span className="text-xs font-semibold">{lang.name}</span>
@@ -1202,7 +1223,7 @@ export default function LandingPage({ showToast }) {
               </div>
             </div>
 
-            <h2 className="text-3xl font-extrabold tracking-tight text-white relative z-10">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)] relative z-10">
               Full-Featured Coding Workspaces
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-2 max-w-xl mx-auto relative z-10">
@@ -1212,13 +1233,13 @@ export default function LandingPage({ showToast }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
             {/* Feature 1 */}
-            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(99,102,241,0.15)] transition-all duration-300 group select-none">
+            <div className="feature-card relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(99,102,241,0.15)] transition-all duration-300 group select-none" style={{ '--card-glow-color': 'rgba(99, 102, 241, 0.06)', '--card-glow-hover': 'rgba(99, 102, 241, 0.22)' }}>
               <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-indigo animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-lg">
                   <i className="fas fa-keyboard"></i>
                 </div>
-                <h3 className="font-bold text-white text-base">VS Code Core (Monaco)</h3>
+                <h3 className="font-bold text-[var(--text-primary)] text-base">VS Code Core (Monaco)</h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   Powered by Monaco Editor. Customize settings, theme configurations, automatic auto-saving, and tab switching layouts.
                 </p>
@@ -1226,13 +1247,13 @@ export default function LandingPage({ showToast }) {
             </div>
 
             {/* Feature 2 */}
-            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(6,182,212,0.15)] transition-all duration-300 group select-none">
+            <div className="feature-card relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(6,182,212,0.15)] transition-all duration-300 group select-none" style={{ '--card-glow-color': 'rgba(6, 182, 212, 0.06)', '--card-glow-hover': 'rgba(6, 182, 212, 0.22)' }}>
               <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-cyan animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg">
                   <i className="fas fa-eye"></i>
                 </div>
-                <h3 className="font-bold text-white text-base">Live Web Sandbox</h3>
+                <h3 className="font-bold text-[var(--text-primary)] text-base">Live Web Sandbox</h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   Write interactive templates using HTML, CSS, and JS. Render web pages inside the iframe preview and monitor output logs.
                 </p>
@@ -1240,13 +1261,13 @@ export default function LandingPage({ showToast }) {
             </div>
 
             {/* Feature 3 */}
-            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(16,185,129,0.15)] transition-all duration-300 group select-none">
+            <div className="feature-card relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(16,185,129,0.15)] transition-all duration-300 group select-none" style={{ '--card-glow-color': 'rgba(16, 185, 129, 0.06)', '--card-glow-hover': 'rgba(16, 185, 129, 0.22)' }}>
               <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-emerald animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg">
                   <i className="fas fa-bolt"></i>
                 </div>
-                <h3 className="font-bold text-white text-base">Low-latency Execution</h3>
+                <h3 className="font-bold text-[var(--text-primary)] text-base">Low-latency Execution</h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   Execute scripts instantly on pre-configured sandboxed backend endpoints without setup parameters.
                 </p>
@@ -1254,13 +1275,13 @@ export default function LandingPage({ showToast }) {
             </div>
 
             {/* Feature 4 */}
-            <div className="relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(168,85,247,0.15)] transition-all duration-300 group select-none">
+            <div className="feature-card relative p-[1.5px] rounded-2xl overflow-hidden hover:-translate-y-2 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(168,85,247,0.15)] transition-all duration-300 group select-none" style={{ '--card-glow-color': 'rgba(168, 85, 247, 0.06)', '--card-glow-hover': 'rgba(168, 85, 247, 0.22)' }}>
               <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-purple animate-border-spin opacity-45 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative bg-[var(--bg-secondary)] p-6 rounded-2xl h-full flex flex-col gap-4">
                 <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
                   <i className="fas fa-sun"></i>
                 </div>
-                <h3 className="font-bold text-white text-base">Dracula & Light Theme</h3>
+                <h3 className="font-bold text-[var(--text-primary)] text-base">Dracula & Light Theme</h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                   Toggle active dark theme settings with standard Dracula syntax highlighting rules and minimal light modes instantly.
                 </p>

@@ -125,36 +125,36 @@ export default function Footer() {
 
           {/* Col 2: Quick Links */}
           <div className="flex flex-col gap-3 text-center md:text-left items-center md:items-start">
-            <h4 className="text-xs uppercase font-bold text-white tracking-wider mb-2">
+            <h4 className="text-xs uppercase font-bold text-[var(--text-primary)] tracking-wider mb-2">
               Platform
             </h4>
             <button
               onClick={() => handleNavClick('hero')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Home
             </button>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Languages
             </button>
             <button
               onClick={() => handleNavClick('features')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Features
             </button>
             <button
               onClick={() => navigate('/about')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               About
             </button>
             <button
               onClick={() => navigate('/contact')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Contact Us
             </button>
@@ -162,36 +162,36 @@ export default function Footer() {
 
           {/* Col 3: Languages */}
           <div className="flex flex-col gap-3 text-center md:text-left items-center md:items-start">
-            <h4 className="text-xs uppercase font-bold text-white tracking-wider mb-2">
+            <h4 className="text-xs uppercase font-bold text-[var(--text-primary)] tracking-wider mb-2">
               Popular Langs
             </h4>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               HTML / CSS / JS
             </button>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               C++ Compiler
             </button>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Python 3 Environment
             </button>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               JavaScript Node Workspace
             </button>
             <button
               onClick={() => handleNavClick('languages')}
-              className="text-xs text-[var(--text-secondary)] hover:text-white transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none bg-transparent border-none p-0 cursor-pointer text-center md:text-left"
             >
               Rust Cargo Compiler
             </button>
@@ -199,12 +199,12 @@ export default function Footer() {
 
           {/* Col 4: Contact info */}
           <div className="flex flex-col gap-3 text-center md:text-left items-center md:items-start">
-            <h4 className="text-xs uppercase font-bold text-white tracking-wider mb-2">
+            <h4 className="text-xs uppercase font-bold text-[var(--text-primary)] tracking-wider mb-2">
               Contact Info
             </h4>
             <a
               href="mailto:shariaralways@gmail.com"
-              className="text-xs text-[var(--text-secondary)] hover:text-white flex items-center gap-2 transition-colors duration-200"
+              className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-2 transition-colors duration-200"
             >
               <i className="fas fa-envelope text-indigo-400"></i>
               <span>shariaralways@gmail.com</span>

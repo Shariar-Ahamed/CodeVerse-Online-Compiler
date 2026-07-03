@@ -1444,3 +1444,125 @@ input:-webkit-autofill:active {
 .group:hover .card-pulse-right {
   animation-duration: 2.6s !important;
 }
+
+/* 3D Glowing Language Cards style overrides */
+.lang-card {
+  box-shadow: 0 10px 25px -8px var(--card-glow-color, rgba(99, 102, 241, 0.12)),
+              0 4px 10px -5px var(--card-glow-color, rgba(99, 102, 241, 0.12)),
+              0 0 0 1px var(--card-glow-color, rgba(99, 102, 241, 0.05)) !important;
+}
+
+.lang-card:hover {
+  box-shadow: 0 15px 30px -5px var(--card-glow-hover, rgba(99, 102, 241, 0.28)),
+              0 8px 15px -8px var(--card-glow-hover, rgba(99, 102, 241, 0.28)),
+              0 0 0 1.5px var(--card-glow-hover, rgba(99, 102, 241, 0.15)) !important;
+  border-color: transparent !important;
+}
+
+/* Light Theme Neumorphism 3D Effect for Language Cards */
+.light .lang-card {
+  background-color: var(--bg-primary) !important;
+  border: none !important;
+  box-shadow: 5px 5px 10px var(--card-glow-color, rgba(99, 102, 241, 0.30)), -5px -5px 10px #ffffff !important;
+}
+
+.light .lang-card:hover {
+  box-shadow: 8px 8px 15px var(--card-glow-hover, rgba(99, 102, 241, 0.50)), -8px -8px 15px #ffffff !important;
+  border: none !important;
+}
+
+/* Global Light Theme Neumorphism 3D Style overrides */
+
+/* Neumorphic 3D Card Panels */
+.light .glass-panel {
+  background-color: var(--bg-primary) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: 7px 7px 14px rgba(15, 23, 42, 0.12), -7px -7px 14px #ffffff !important;
+}
+
+/* Neumorphic Sunken Input Fields */
+.light input[type="text"],
+.light input[type="email"],
+.light input[type="password"],
+.light textarea,
+.light select {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: inset 3px 3px 6px rgba(15, 23, 42, 0.08),
+              inset -3px -3px 6px #ffffff,
+              0 0 0 0 transparent !important;
+  transition: var(--transition-smooth);
+}
+
+.light input[type="text"]:focus,
+.light input[type="email"]:focus,
+.light input[type="password"]:focus,
+.light textarea:focus,
+.light select:focus {
+  box-shadow: inset 2px 2px 4px rgba(15, 23, 42, 0.08),
+              inset -2px -2px 4px #ffffff,
+              0 0 0 2px var(--accent-primary-glow) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+/* Neumorphic 3D Raised Buttons & Interactive Elements */
+.light button.bg-indigo-600,
+.light button.bg-amber-600,
+.light button.bg-emerald-600,
+.light .btn-primary {
+  box-shadow: 4px 4px 10px rgba(15, 23, 42, 0.14),
+              -4px -4px 10px #ffffff !important;
+  transition: var(--transition-smooth);
+}
+
+.light button.bg-indigo-600:hover,
+.light button.bg-amber-600:hover,
+.light button.bg-emerald-600:hover,
+.light .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 12px rgba(15, 23, 42, 0.2),
+              -5px -5px 12px #ffffff !important;
+}
+
+.light button.bg-indigo-600:active,
+.light button.bg-amber-600:active,
+.light button.bg-emerald-600:active,
+.light .btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: inset 3px 3px 6px rgba(15, 23, 42, 0.15),
+              inset -3px -3px 6px #ffffff !important;
+}
+
+/* Light Mode Neumorphism for Feature Cards */
+.light .feature-card {
+  background-color: var(--bg-primary) !important;
+  border: none !important;
+  box-shadow: 7px 7px 15px var(--card-glow-color, rgba(99, 102, 241, 0.12)), -7px -7px 15px #ffffff !important;
+  transition: var(--transition-smooth);
+}
+
+.light .feature-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 10px 10px 20px var(--card-glow-hover, rgba(99, 102, 241, 0.28)), -10px -10px 20px #ffffff !important;
+}
+
+.light .feature-card > div:last-child {
+  background-color: var(--bg-primary) !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Light Mode Neumorphism for Mock IDE Container */
+.light .mock-ide-container {
+  background-color: var(--bg-primary) !important;
+  border: none !important;
+  box-shadow: 15px 15px 35px rgba(15, 23, 42, 0.24),
+              -15px -15px 35px rgba(255, 255, 255, 0.95) !important;
+}
+
+.light .mock-ide-container:hover {
+  box-shadow: 20px 20px 45px rgba(15, 23, 42, 0.3),
+              -20px -20px 45px rgba(255, 255, 255, 0.95) !important;
+}
