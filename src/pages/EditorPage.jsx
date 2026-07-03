@@ -2485,10 +2485,10 @@ Explain why this error occurred and how to fix it.`;
               </div>
             </div>
 
-            {/* 2. Slide Drawer Panel */}
+            {/* 2. Slide Drawer Panel (Renders as overlay on mobile/tablet to avoid editor squishing) */}
             {activeSidebarTab && (
               <div 
-                className="border-r border-[var(--border-color)]/30 bg-[var(--bg-tertiary)]/5 flex flex-col flex-shrink-0 z-10 animate-fade-in relative"
+                className="border-r border-[var(--border-color)]/30 bg-[#0d1321]/95 lg:bg-[var(--bg-tertiary)]/5 flex flex-col flex-shrink-0 z-30 animate-fade-in absolute lg:relative left-12 lg:left-auto top-0 bottom-0 h-full shadow-2xl lg:shadow-none"
                 style={{ width: `${drawerWidth}px` }}
               >
                 {/* Explorer Tab Panel */}
@@ -2945,7 +2945,7 @@ Explain why this error occurred and how to fix it.`;
             {/* 3. Main Monaco Editor Container Wrapper */}
             <div className="flex-grow relative h-[450px] lg:h-full min-w-0">
               <div className="absolute inset-0 w-full h-full">
-                {settingsEditorEngine === "Ace" ? (
+                {settingsEditorEngine === "Ace" || isMobile ? (
                   <VanillaAceEditor
                     mode={getAceMode(currentLanguage, activeFileName, activeWebTab)}
                     theme={getAceTheme(settingsColorTheme)}
@@ -3231,7 +3231,7 @@ Explain why this error occurred and how to fix it.`;
       {showSettings && (
         <div
           onClick={() => setShowSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -3318,11 +3318,11 @@ Explain why this error occurred and how to fix it.`;
             setShowLanguageModal(false);
             setLangSearchQuery("");
           }}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl rounded-2xl border border-[#232f48] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
+            className="w-full max-w-4xl lg:max-w-5xl rounded-2xl border border-[#232f48] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
           >
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[#232f48] bg-[#0f1420]/75 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
@@ -3367,7 +3367,7 @@ Explain why this error occurred and how to fix it.`;
                   <span>No matches found for "{langSearchQuery}"</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                   {filteredLanguages.map((langKey) => {
                     const lang = LANGUAGES[langKey];
                     const isSelected = currentLanguage === langKey;
@@ -3380,14 +3380,14 @@ Explain why this error occurred and how to fix it.`;
                           setShowLanguageModal(false);
                           setLangSearchQuery("");
                         }}
-                        className={`group flex items-center gap-3.5 p-4 rounded-2xl border transition-all duration-300 cursor-pointer select-none active:scale-98 ${
+                        className={`group flex items-center gap-2.5 sm:gap-3.5 p-3 sm:p-4 lg:p-3 rounded-2xl border transition-all duration-300 cursor-pointer select-none active:scale-98 ${
                           isSelected
                             ? 'border-indigo-500 bg-[#1e273d] shadow-lg shadow-indigo-500/5 text-white'
                             : 'border-[#222c3f]/80 bg-[#161e30]/70 hover:bg-[#1a233b] hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                       >
                         {/* Dynamic Colored Icon Container using badgeClass */}
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+                        <div className={`w-9 h-9 sm:w-11 sm:h-11 lg:w-9 lg:h-9 rounded-xl flex items-center justify-center text-sm sm:text-lg lg:text-sm shrink-0 transition-transform duration-300 group-hover:scale-110 ${
                           isSelected ? lang.badgeClass : `${lang.badgeClass} opacity-80 group-hover:opacity-100`
                         }`}>
                           <i className={lang.icon || "fas fa-code"}></i>
@@ -3430,7 +3430,7 @@ Explain why this error occurred and how to fix it.`;
       {showEditorSettings && (
         <div
           onClick={() => setShowEditorSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[8vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -3530,25 +3530,29 @@ Explain why this error occurred and how to fix it.`;
                 </div>
                 <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
-                    onClick={() => {
+                    onClick={isMobile ? null : () => {
                       setSettingsEditorEngine("Monaco");
                       localStorage.setItem("codeverse_settings_editor_engine", "Monaco");
                     }}
-                    className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
-                      settingsEditorEngine === "Monaco" 
-                        ? 'bg-indigo-600 text-white shadow-sm' 
-                        : 'text-slate-400 hover:text-white'
+                    disabled={isMobile}
+                    className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 ${
+                      isMobile 
+                        ? 'text-slate-600 cursor-not-allowed opacity-40'
+                        : (settingsEditorEngine === "Monaco" 
+                            ? 'bg-indigo-600 text-white shadow-sm cursor-pointer' 
+                            : 'text-slate-400 hover:text-white cursor-pointer')
                     }`}
+                    title={isMobile ? "Monaco is disabled on mobile" : ""}
                   >
                     Monaco
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={isMobile ? null : () => {
                       setSettingsEditorEngine("Ace");
                       localStorage.setItem("codeverse_settings_editor_engine", "Ace");
                     }}
                     className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
-                      settingsEditorEngine === "Ace" 
+                      isMobile || settingsEditorEngine === "Ace" 
                         ? 'bg-indigo-600 text-white shadow-sm' 
                         : 'text-slate-400 hover:text-white'
                     }`}

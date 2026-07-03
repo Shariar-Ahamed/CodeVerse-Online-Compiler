@@ -580,7 +580,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           </p>
         </div>
         {isOwnProfile && (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {user && user.role === 'admin' && (
               <button
                 onClick={() => navigate('/admin')}

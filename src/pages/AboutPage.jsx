@@ -108,7 +108,7 @@ export default function AboutPage() {
       <section
         id="about"
         ref={aboutRef}
-        className="w-full py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0b0515] via-[#120624] to-[#090310] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[70vh] overflow-hidden"
+        className="w-full py-10 sm:py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0b0515] via-[#120624] to-[#090310] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[50vh] sm:min-h-[70vh] overflow-hidden"
       >
         <canvas ref={aboutCanvasRef} id="about-particles" className="absolute inset-0 pointer-events-none z-0" />
         

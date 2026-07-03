@@ -22,7 +22,7 @@ export default function Footer() {
     }
   };
   return (
-    <footer className="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/95 pt-16 pb-8 transition-all duration-300 relative overflow-hidden">
+    <footer className="w-full border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/95 pt-10 sm:pt-16 pb-8 transition-all duration-300 relative overflow-hidden">
       {/* High-Tech Wireframe Mesh Wave Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40 select-none">
         <svg className="absolute bottom-0 left-0 w-full h-[320px]" viewBox="0 0 1440 320" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -79,7 +79,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 pb-12">
           {/* Col 1: Brand */}
           <div className="flex flex-col gap-4 text-center md:text-left items-center md:items-start">
             <div className="flex items-center gap-3">

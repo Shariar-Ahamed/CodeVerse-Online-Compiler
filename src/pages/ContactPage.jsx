@@ -251,7 +251,7 @@ export default function ContactPage({ showToast }) {
 
           {/* Centered Header Section for the Entire Card */}
           <div className="text-center mb-10 relative z-10 md:px-12">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white mb-2.5 font-sans">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2.5 font-sans">
               Connect with{' '}
               <TwinklingText className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                 CodeVerse
@@ -262,33 +262,33 @@ export default function ContactPage({ showToast }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left Column: Illustration, Contact Details, Socials */}
             <div className="flex flex-col gap-3 text-center items-center relative z-10 pl-4 md:pl-28 lg:pl-36 pr-4 md:pr-8">
               {/* Animated Vector Illustration using PNG */}
-              <div className="relative w-64 h-64 flex items-center justify-center select-none mx-auto mb-0">
+              <div className="relative w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center select-none mx-auto mb-0">
                 {/* Outer spinning decorative elements */}
-                <div className="absolute w-48 h-48 rounded-full border border-dashed border-indigo-500/20 animate-spin-slow z-0"></div>
-                <div className="absolute w-56 h-56 rounded-full border border-dotted border-purple-500/15 animate-spin-reverse-slow z-0"></div>
+                <div className="absolute w-36 h-36 sm:w-48 sm:h-48 rounded-full border border-dashed border-indigo-500/20 animate-spin-slow z-0"></div>
+                <div className="absolute w-44 h-44 sm:w-56 sm:h-56 rounded-full border border-dotted border-purple-500/15 animate-spin-reverse-slow z-0"></div>
 
                 {/* Ambient background glow aura */}
-                <div className="absolute w-44 h-44 rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/15 to-cyan-500/20 blur-2xl animate-pulse z-0 pointer-events-none"></div>
+                <div className="absolute w-32 h-32 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/15 to-cyan-500/20 blur-2xl animate-pulse z-0 pointer-events-none"></div>
 
                 {/* Floating Bubbles/Dots/Crosses around the PNG to merge it into the animation */}
                 {/* Bubble 1 (Cyan) */}
-                <div className="absolute top-4 left-6 w-3 h-3 rounded-full bg-cyan-400/40 border border-cyan-300/30 blur-[0.5px] animate-bubble-slow z-10"></div>
+                <div className="absolute top-2 left-4 w-2.5 h-2.5 rounded-full bg-cyan-400/40 border border-cyan-300/30 blur-[0.5px] animate-bubble-slow z-10"></div>
                 {/* Bubble 2 (Pink) */}
-                <div className="absolute bottom-22 right-6 w-4 h-4 rounded-full bg-pink-500/35 border border-pink-400/30 blur-[0.5px] animate-bubble-fast z-10"></div>
+                <div className="absolute bottom-16 right-4 w-3.5 h-3.5 rounded-full bg-pink-500/35 border border-pink-400/30 blur-[0.5px] animate-bubble-fast z-10"></div>
                 {/* Bubble 3 (Purple) */}
-                <div className="absolute top-8 right-8 w-2.5 h-2.5 rounded-full bg-purple-400/40 border border-purple-300/30 animate-bubble-slow [animation-delay:1s] z-10"></div>
+                <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-purple-400/40 border border-purple-300/30 animate-bubble-slow [animation-delay:1s] z-10"></div>
                 {/* Bubble 4 (Yellow) */}
-                <div className="absolute bottom-26 left-8 w-3 h-3 rounded-full bg-yellow-400/30 border border-yellow-300/20 animate-bubble-fast [animation-delay:1.5s] z-10"></div>
+                <div className="absolute bottom-20 left-6 w-2.5 h-2.5 rounded-full bg-yellow-400/30 border border-yellow-300/20 animate-bubble-fast [animation-delay:1.5s] z-10"></div>
                 {/* Cross 1 (Indigo/White) */}
-                <span className="absolute top-2 right-16 text-[10px] text-slate-400/60 animate-bubble-slow [animation-delay:2s] z-10">
+                <span className="absolute top-1 right-12 text-[9px] text-slate-400/60 animate-bubble-slow [animation-delay:2s] z-10">
                   <i className="fas fa-plus"></i>
                 </span>
                 {/* Star 1 (Yellow) */}
-                <span className="absolute bottom-16 left-16 text-[10px] text-yellow-300/50 animate-bubble-fast [animation-delay:0.5s] z-10">
+                <span className="absolute bottom-12 left-12 text-[9px] text-yellow-300/50 animate-bubble-fast [animation-delay:0.5s] z-10">
                   <i className="fas fa-star"></i>
                 </span>
 
@@ -296,12 +296,12 @@ export default function ContactPage({ showToast }) {
                 <img
                   src="/contact-img.png"
                   alt="Contact Illustration"
-                  className="w-52 h-52 object-contain z-10 animate-float-main drop-shadow-[0_12px_28px_rgba(99,102,241,0.25)]"
+                  className="w-36 h-36 sm:w-52 sm:h-52 object-contain z-10 animate-float-main drop-shadow-[0_12px_28px_rgba(99,102,241,0.25)]"
                 />
               </div>
 
               {/* Unified Contact Info & Socials Container */}
-              <div className="flex flex-col gap-4 items-center w-full mt-[-28px]">
+              <div className="flex flex-col gap-4 items-center w-full mt-[-16px] sm:mt-[-28px]">
                 {/* Contact Details */}
                 <div className="flex flex-col gap-2 text-center w-full max-w-sm mx-auto">
                   <div className="flex items-center justify-center gap-3">
@@ -416,7 +416,7 @@ export default function ContactPage({ showToast }) {
                 <button
                   type="submit"
                   disabled={submitLoading}
-                  className="w-40 py-2.5 rounded-full font-bold text-[11px] uppercase tracking-wider text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:from-indigo-400 hover:to-purple-500 active:scale-95 transition-all duration-300 shadow-[0_4px_15px_rgba(99,102,241,0.35)] hover:shadow-[0_4px_22px_rgba(99,102,241,0.55)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                  className="w-full sm:w-40 py-2.5 rounded-full font-bold text-[11px] uppercase tracking-wider text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:from-indigo-400 hover:to-purple-500 active:scale-95 transition-all duration-300 shadow-[0_4px_15px_rgba(99,102,241,0.35)] hover:shadow-[0_4px_22px_rgba(99,102,241,0.55)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
                 >
                   {submitLoading ? (
                     <>

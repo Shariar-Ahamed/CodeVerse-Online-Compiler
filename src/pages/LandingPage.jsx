@@ -651,7 +651,7 @@ export default function LandingPage({ showToast }) {
       <section
         id="hero"
         ref={heroRef}
-        className="relative overflow-hidden py-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-primary)] border-b border-[var(--border-color)]"
+        className="relative overflow-hidden pt-6 pb-12 sm:py-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] via-[var(--bg-primary)] to-[var(--bg-primary)] border-b border-[var(--border-color)]"
       >
         <canvas ref={heroCanvasRef} id="hero-particles" className="absolute inset-0 pointer-events-none z-0" />
         <div className="absolute top-10 left-1/4 w-72 h-72 rounded-full bg-indigo-500/10 blur-[100px] animate-pulse pointer-events-none" />
@@ -706,7 +706,7 @@ export default function LandingPage({ showToast }) {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center pt-8 pb-12 relative z-10">
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center pt-3 pb-10 sm:pt-8 sm:pb-12 relative z-10">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-400 mb-5 animate-bounce">
             <i className="fas fa-terminal text-[10px]"></i>
             <span>Judge0 CE Compiler Powered</span>
@@ -977,6 +977,33 @@ export default function LandingPage({ showToast }) {
             </p>
           </div>
 
+          {/* Navigation Controls (Moved to top of container for better mobile UX) */}
+          <div className="flex items-center justify-center gap-6 mb-8 mt-2">
+            <button
+              onClick={handlePrevMilestone}
+              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+            >
+              <i className="fas fa-chevron-left text-xs"></i>
+            </button>
+            
+            <div className="text-center min-w-[200px] sm:min-w-[240px]">
+              <span className="lg:hidden text-indigo-400 font-extrabold text-[10px] block mb-1 uppercase tracking-widest">Step {MILESTONES[currentMilestoneIndex].id}</span>
+              <h3 className="text-sm font-bold text-white tracking-wide">
+                {MILESTONES[currentMilestoneIndex].title}
+              </h3>
+              <p className="text-[10px] text-indigo-400/80 font-bold uppercase tracking-widest mt-0.5">
+                {MILESTONES[currentMilestoneIndex].desc}
+              </p>
+            </div>
+
+            <button
+              onClick={handleNextMilestone}
+              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+            >
+              <i className="fas fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+
           {/* Symmetrical Interactive Container */}
           <div className="relative w-full max-w-5xl mx-auto min-h-[480px] perspective-container">
             
@@ -1010,7 +1037,7 @@ export default function LandingPage({ showToast }) {
             </svg>
 
             {/* Columns Grid */}
-            <div className={`grid grid-cols-1 lg:grid-cols-5 gap-8 items-center relative z-10 min-h-[420px] ${getAnimationClass()}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8 items-center relative z-10 min-h-[420px] ${getAnimationClass()}`}>
               
               {/* Left Column: Topics */}
               <div className="lg:col-span-2 flex flex-col gap-4 justify-between h-full py-2">
@@ -1035,9 +1062,9 @@ export default function LandingPage({ showToast }) {
                 ))}
               </div>
 
-              {/* Center Column: Glossy Folder Card */}
-              <div className="lg:col-span-1 flex flex-col items-center justify-center py-6">
-                <div className="relative w-48 h-40 flex flex-col select-none z-10">
+              {/* Center Column: Glossy Folder Card (Visible and scaled down on mobile/tablet) */}
+              <div className="flex lg:col-span-1 flex-col items-center justify-center py-2 lg:py-6">
+                <div className="relative w-48 h-40 flex flex-col select-none z-10 scale-[0.75] sm:scale-[0.85] lg:scale-100 origin-center my-[-10px] lg:my-0">
                   
                   {/* Folder Tab (Layer 0) */}
                   <div className="absolute top-0 left-3 w-16 h-4 bg-indigo-600 rounded-t-md z-0 border-t border-x border-white/10"></div>
@@ -1102,32 +1129,6 @@ export default function LandingPage({ showToast }) {
               </div>
 
             </div>
-          </div>
-
-          {/* Navigation Controls */}
-          <div className="flex items-center justify-center gap-6 mt-12">
-            <button
-              onClick={handlePrevMilestone}
-              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
-            >
-              <i className="fas fa-chevron-left text-xs"></i>
-            </button>
-            
-            <div className="text-center min-w-[240px]">
-              <h3 className="text-sm font-bold text-white tracking-wide">
-                {MILESTONES[currentMilestoneIndex].title}
-              </h3>
-              <p className="text-[10px] text-indigo-400/80 font-bold uppercase tracking-widest mt-0.5">
-                {MILESTONES[currentMilestoneIndex].desc}
-              </p>
-            </div>
-
-            <button
-              onClick={handleNextMilestone}
-              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
-            >
-              <i className="fas fa-chevron-right text-xs"></i>
-            </button>
           </div>
 
           {/* Infinite Marquee of Languages */}
@@ -1273,7 +1274,7 @@ export default function LandingPage({ showToast }) {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 select-none">
         {/* Sliding AI Panel Container */}
         {showHomeAI && (
-          <div className="w-[360px] h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-mac-dock relative rounded-2xl rounded-br-none overflow-visible bg-[#0b0f19] border border-[var(--border-color)]">
+          <div className="w-[calc(100vw-32px)] sm:w-[360px] h-[75vh] sm:h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-mac-dock relative rounded-2xl rounded-br-none overflow-visible bg-[#0b0f19] border border-[var(--border-color)]">
             <AIPanel
               onClose={() => setShowHomeAI(false)}
               activeCode=""
