@@ -391,6 +391,9 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const [newFolderName, setNewFolderName] = useState("");
   const [expandedFolders, setExpandedFolders] = useState({});
   const [folderForNewFile, setFolderForNewFile] = useState("");
+  const [openTabs, setOpenTabs] = useState([]);
+  const [renamingFileName, setRenamingFileName] = useState("");
+  const [newRenameValue, setNewRenameValue] = useState("");
 
   // Refs to always access latest workspaceFiles and folders in DB saves
   const latestWorkspaceFilesRef = useRef([]);
@@ -427,6 +430,43 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       setFolders([]);
     }
 
+    const syncOpenTabs = (filesList) => {
+      let savedTabs = localStorage.getItem(`codeverse_open_tabs_${currentLanguage}`);
+      let parsedTabs = null;
+      if (savedTabs) {
+        try {
+          parsedTabs = JSON.parse(savedTabs);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (parsedTabs && Array.isArray(parsedTabs) && parsedTabs.length > 0) {
+        const validTabs = parsedTabs.filter(tab => filesList.some(f => f.name === tab));
+        if (validTabs.length > 0) {
+          setOpenTabs(validTabs);
+          const savedActive = localStorage.getItem(`codeverse_active_file_${currentLanguage}`);
+          if (savedActive && validTabs.includes(savedActive)) {
+            setActiveFileName(savedActive);
+          } else {
+            setActiveFileName(validTabs[0]);
+          }
+        } else {
+          const initial = currentLanguage === "html"
+            ? ["index.html", "style.css", "script.js"]
+            : [filesList[0].name];
+          setOpenTabs(initial);
+          setActiveFileName(initial[0]);
+        }
+      } else {
+        const initial = currentLanguage === "html"
+          ? ["index.html", "style.css", "script.js"]
+          : [filesList[0].name];
+        setOpenTabs(initial);
+        setActiveFileName(initial[0]);
+      }
+    };
+
     // Auto-repair logic for old/stuck workspaces in localStorage
     if (parsed && Array.isArray(parsed) && parsed.length > 0) {
       let needsRepair = false;
@@ -462,13 +502,13 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
 
       if (needsRepair) {
         setWorkspaceFiles(repaired);
-        setActiveFileName(repaired[0].name);
         localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(repaired));
+        syncOpenTabs(repaired);
         return;
       }
 
       setWorkspaceFiles(parsed);
-      setActiveFileName(parsed[0].name);
+      syncOpenTabs(parsed);
       return;
     }
     
@@ -488,7 +528,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       ];
     }
     setWorkspaceFiles(defaultFiles);
-    setActiveFileName(defaultFiles[0].name);
+    syncOpenTabs(defaultFiles);
   }, [currentLanguage]);
 
   // Close user profile dropdown on click outside
@@ -1037,6 +1077,47 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     }
   }
 
+  const openFile = (fileName) => {
+    if (editorRef.current) {
+      const currentVal = editorRef.current.getValue();
+      handleWorkspaceCodeChange(currentVal);
+    }
+
+    setActiveFileName(fileName);
+    localStorage.setItem(`codeverse_active_file_${currentLanguage}`, fileName);
+    
+    setOpenTabs(prev => {
+      if (prev.includes(fileName)) return prev;
+      const updated = [...prev, fileName];
+      localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updated));
+      return updated;
+    });
+
+    if (currentLanguage === "html") {
+      if (fileName === "index.html") switchWebTab("html");
+      else if (fileName === "style.css") switchWebTab("css");
+      else if (fileName === "script.js") switchWebTab("js");
+    }
+  };
+
+  const closeTab = (fileName, e) => {
+    e.stopPropagation();
+
+    if (openTabs.length <= 1) {
+      showToast("Cannot close the last open tab!", "info");
+      return;
+    }
+
+    const updated = openTabs.filter(t => t !== fileName);
+    setOpenTabs(updated);
+    localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updated));
+
+    if (activeFileName === fileName) {
+      const nextActive = updated[updated.length - 1];
+      openFile(nextActive);
+    }
+  };
+
   const handleCreateFile = () => {
     if (!newFileName.trim()) {
       setIsCreatingFile(false);
@@ -1072,7 +1153,15 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       }));
     }
 
+    // Add to openTabs and focus!
+    setOpenTabs(prev => {
+      const updatedTabs = prev.includes(name) ? prev : [...prev, name];
+      localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+
     setActiveFileName(name);
+    localStorage.setItem(`codeverse_active_file_${currentLanguage}`, name);
     setIsCreatingFile(false);
     setNewFileName("");
     setFolderForNewFile("");
@@ -1087,8 +1176,18 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     setWorkspaceFiles(updated);
     localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
     
+    const updatedTabs = openTabs.filter(t => t !== fileNameToDelete);
+    setOpenTabs(updatedTabs);
+    localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updatedTabs));
+
     if (activeFileName === fileNameToDelete) {
-      setActiveFileName(updated[0].name);
+      const nextActive = updatedTabs.length > 0 ? updatedTabs[0] : (updated.length > 0 ? updated[0].name : "");
+      setActiveFileName(nextActive);
+      if (nextActive) {
+        localStorage.setItem(`codeverse_active_file_${currentLanguage}`, nextActive);
+      } else {
+        localStorage.removeItem(`codeverse_active_file_${currentLanguage}`);
+      }
     }
     showToast(`Deleted file: ${fileNameToDelete}`, "info");
 
@@ -1128,18 +1227,86 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     setWorkspaceFiles(updatedFiles);
     localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updatedFiles));
 
+    const updatedTabs = openTabs.filter(t => !t.startsWith(folderName + "/"));
+    setOpenTabs(updatedTabs);
+    localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updatedTabs));
+
     showToast(`Deleted folder: ${folderName}`, "info");
 
     if (activeFileName.startsWith(folderName + "/")) {
-      if (updatedFiles.length > 0) {
-        setActiveFileName(updatedFiles[0].name);
+      const nextActive = updatedTabs.length > 0 ? updatedTabs[0] : (updatedFiles.length > 0 ? updatedFiles[0].name : "");
+      setActiveFileName(nextActive);
+      if (nextActive) {
+        localStorage.setItem(`codeverse_active_file_${currentLanguage}`, nextActive);
       } else {
-        setActiveFileName("");
+        localStorage.removeItem(`codeverse_active_file_${currentLanguage}`);
       }
     }
 
     // Save to Firestore
     saveCodeToFirestore(currentLanguage, {});
+  };
+
+  const handleRenameFile = () => {
+    if (!renamingFileName || !newRenameValue.trim()) {
+      setRenamingFileName("");
+      setNewRenameValue("");
+      return;
+    }
+
+    const oldName = renamingFileName;
+    const baseName = newRenameValue.trim();
+
+    // Resolve the new full path
+    let newName = baseName;
+    if (oldName.includes("/")) {
+      const parts = oldName.split("/");
+      parts.pop();
+      newName = `${parts.join("/")}/${baseName}`;
+    }
+
+    if (oldName !== newName) {
+      if (workspaceFiles.some(f => f.name.toLowerCase() === newName.toLowerCase())) {
+        showToast("A file with this name already exists!", "error");
+        setRenamingFileName("");
+        setNewRenameValue("");
+        return;
+      }
+
+      // Update workspaceFiles list
+      const updated = workspaceFiles.map(f => {
+        if (f.name === oldName) {
+          const detectedLang = detectLanguageByExtension(newName);
+          return {
+            ...f,
+            name: newName,
+            language: detectedLang
+          };
+        }
+        return f;
+      });
+      setWorkspaceFiles(updated);
+      localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(updated));
+
+      // Update openTabs list
+      const updatedTabs = openTabs.map(t => t === oldName ? newName : t);
+      setOpenTabs(updatedTabs);
+      localStorage.setItem(`codeverse_open_tabs_${currentLanguage}`, JSON.stringify(updatedTabs));
+
+      // If the renamed file was active, update activeFileName
+      if (activeFileName === oldName) {
+        setActiveFileName(newName);
+        localStorage.setItem(`codeverse_active_file_${currentLanguage}`, newName);
+      }
+
+      showToast(`Renamed file to: ${baseName}`, "success");
+
+      // Save to Firestore
+      saveCodeToFirestore(currentLanguage, {});
+    }
+
+    setRenamingFileName("");
+    setNewRenameValue("");
   };
 
   const handleWorkspaceCodeChange = (val) => {
@@ -2191,42 +2358,54 @@ Explain why this error occurred and how to fix it.`;
         >
           {/* Tab Bar Header */}
           <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex items-center justify-between px-4">
-            <div className="flex items-center gap-4">
-              {currentLanguage !== "html" ? (
-                <div id="editor-title-container" className="flex items-center gap-2">
-                  <i className="fas fa-code text-indigo-400 text-xs"></i>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Source Code Editor</span>
-                </div>
-              ) : (
-                <div id="web-editor-tabs" className="flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border-color)]">
-                  <button
-                    onClick={() => switchWebTab("html")}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all duration-200 ${
-                      activeWebTab === "html" ? "bg-indigo-600 text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    }`}
-                  >
-                    index.html
-                  </button>
-                  <button
-                    onClick={() => switchWebTab("css")}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all duration-200 ${
-                      activeWebTab === "css" ? "bg-indigo-600 text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    }`}
-                  >
-                    style.css
-                  </button>
-                  <button
-                    onClick={() => switchWebTab("js")}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all duration-200 ${
-                      activeWebTab === "js" ? "bg-indigo-600 text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                    }`}
-                  >
-                    script.js
-                  </button>
-                </div>
-              )}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1" style={{ maxWidth: 'calc(100% - 70px)' }}>
+              <div id="editor-tabs" className="flex items-center gap-1 bg-[var(--bg-primary)]/80 p-0.5 rounded-lg border border-[var(--border-color)]/30">
+                {openTabs.map(tab => {
+                  const isActive = tab === activeFileName;
+                  
+                  // Get the basename to display in the tab
+                  let basename = tab;
+                  if (tab.includes("/")) {
+                    basename = tab.split("/").pop();
+                  }
+
+                  let fileIcon = "far fa-file-code text-indigo-400";
+                  const ext = basename.split('.').pop().toLowerCase();
+                  if (ext === 'html') fileIcon = "fab fa-html5 text-orange-500";
+                  else if (ext === 'css') fileIcon = "fab fa-css3-alt text-blue-500";
+                  else if (ext === 'js') fileIcon = "fab fa-js text-yellow-500";
+                  else if (ext === 'py') fileIcon = "fab fa-python text-sky-400";
+                  else if (ext === 'c') fileIcon = "fas fa-copyright text-blue-400";
+                  else if (ext === 'cpp' || ext === 'cc') fileIcon = "fas fa-c text-blue-500";
+
+                  return (
+                    <div
+                      key={tab}
+                      onClick={() => openFile(tab)}
+                      className={`px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1.5 border border-transparent select-none ${
+                        isActive 
+                          ? "bg-indigo-600 text-white" 
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-slate-800/30"
+                      }`}
+                    >
+                      <i className={`${fileIcon} text-[9px]`}></i>
+                      <span className="max-w-[100px] truncate">{basename}</span>
+                      
+                      <button
+                        onClick={(e) => closeTab(tab, e)}
+                        className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all duration-150 hover:bg-slate-700/50 hover:text-white ${
+                          isActive ? "text-indigo-200" : "text-slate-500"
+                        }`}
+                        title="Close tab"
+                      >
+                        <i className="fas fa-times text-[7px]"></i>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
@@ -2363,13 +2542,8 @@ Explain why this error occurred and how to fix it.`;
                       )}
 
                       {/* Inline Input Field for New File Name */}
-                      {isCreatingFile && (
+                      {isCreatingFile && !folderForNewFile && (
                         <div className="flex flex-col gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/80 border border-indigo-500/50 shrink-0">
-                          {folderForNewFile && (
-                            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
-                              In {folderForNewFile}/
-                            </span>
-                          )}
                           <div className="flex items-center gap-2">
                             <i className="far fa-file text-slate-400 text-xs"></i>
                             <input
@@ -2446,12 +2620,44 @@ Explain why this error occurred and how to fix it.`;
                             {/* Nested Files inside Folder */}
                             {isExpanded && (
                               <div className="pl-6 flex flex-col gap-1 border-l border-slate-800/50 ml-4 py-0.5">
-                                {folderFiles.length === 0 ? (
+                                {/* Inline Input Field for New File Name in this folder */}
+                                {isCreatingFile && folderForNewFile === folder && (
+                                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-[var(--bg-primary)]/80 border border-indigo-500/50 shrink-0">
+                                    <i className="far fa-file text-slate-400 text-xs"></i>
+                                    <input
+                                      autoFocus
+                                      type="text"
+                                      placeholder="filename.ext"
+                                      value={newFileName}
+                                      onChange={(e) => setNewFileName(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          handleCreateFile();
+                                        } else if (e.key === 'Escape') {
+                                          setIsCreatingFile(false);
+                                          setNewFileName("");
+                                          setFolderForNewFile("");
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        setTimeout(() => {
+                                          setIsCreatingFile(false);
+                                          setNewFileName("");
+                                          setFolderForNewFile("");
+                                        }, 200);
+                                      }}
+                                      className="w-full bg-transparent text-xs text-white focus:outline-none focus:ring-0 p-0 font-mono"
+                                    />
+                                  </div>
+                                )}
+
+                                {folderFiles.length === 0 && !(isCreatingFile && folderForNewFile === folder) ? (
                                   <span className="text-[10px] text-slate-500 italic px-2 py-0.5 select-none">Empty folder</span>
                                 ) : (
                                   folderFiles.map(f => {
                                     const isActive = f.name === activeFileName;
                                     const basename = f.name.substring(folder.length + 1);
+                                    const isRenaming = renamingFileName === f.name;
                                     
                                     let fileIcon = "far fa-file-code text-indigo-400";
                                     const ext = basename.split('.').pop().toLowerCase();
@@ -2465,40 +2671,55 @@ Explain why this error occurred and how to fix it.`;
                                     return (
                                       <div
                                         key={f.name}
+                                        onDoubleClick={() => {
+                                          setRenamingFileName(f.name);
+                                          setNewRenameValue(basename);
+                                        }}
                                         className={`w-full text-left px-2 py-1 rounded-md text-xs font-semibold flex items-center justify-between transition-all duration-200 group select-none ${
                                           isActive 
                                             ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20" 
                                             : "text-slate-400 hover:text-white hover:bg-slate-800/30 border border-transparent"
                                         }`}
                                       >
-                                        <button
-                                          onClick={() => {
-                                            if (editorRef.current) {
-                                              const currentVal = editorRef.current.getValue();
-                                              handleWorkspaceCodeChange(currentVal);
-                                            }
-                                            
-                                            setActiveFileName(f.name);
-                                            
-                                            if (currentLanguage === "html") {
-                                              if (f.name === "index.html") switchWebTab("html");
-                                              else if (f.name === "style.css") switchWebTab("css");
-                                              else if (f.name === "script.js") switchWebTab("js");
-                                            }
-                                          }}
-                                          className="flex items-center gap-2 flex-grow text-left cursor-pointer"
-                                        >
-                                          <i className={fileIcon}></i>
-                                          <span className="truncate">{basename}</span>
-                                        </button>
+                                        {isRenaming ? (
+                                          <div className="flex items-center gap-2 flex-grow">
+                                            <i className={fileIcon}></i>
+                                            <input
+                                              autoFocus
+                                              type="text"
+                                              value={newRenameValue}
+                                              onChange={(e) => setNewRenameValue(e.target.value)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleRenameFile();
+                                                if (e.key === 'Escape') {
+                                                  setRenamingFileName("");
+                                                  setNewRenameValue("");
+                                                }
+                                              }}
+                                              onBlur={handleRenameFile}
+                                              className="bg-transparent text-xs text-white border-b border-indigo-500 focus:outline-none focus:ring-0 p-0 font-mono w-full"
+                                            />
+                                          </div>
+                                        ) : (
+                                          <button
+                                            onClick={() => openFile(f.name)}
+                                            className="flex items-center gap-2 flex-grow text-left cursor-pointer"
+                                            title="Double click to rename"
+                                          >
+                                            <i className={fileIcon}></i>
+                                            <span className="truncate">{basename}</span>
+                                          </button>
+                                        )}
 
-                                        <button
-                                          onClick={() => handleDeleteFile(f.name)}
-                                          className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
-                                          title="Delete file"
-                                        >
-                                          <i className="far fa-trash-can text-[10px]"></i>
-                                        </button>
+                                        {!isRenaming && (
+                                          <button
+                                            onClick={() => handleDeleteFile(f.name)}
+                                            className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
+                                            title="Delete file"
+                                          >
+                                            <i className="far fa-trash-can text-[10px]"></i>
+                                          </button>
+                                        )}
                                       </div>
                                     );
                                   })
@@ -2512,6 +2733,7 @@ Explain why this error occurred and how to fix it.`;
                       {/* Display Root Files */}
                       {workspaceFiles.filter(f => !f.name.includes("/")).map(f => {
                         const isActive = f.name === activeFileName;
+                        const isRenaming = renamingFileName === f.name;
                         
                         let fileIcon = "far fa-file-code text-indigo-400";
                         const ext = f.name.split('.').pop().toLowerCase();
@@ -2527,34 +2749,51 @@ Explain why this error occurred and how to fix it.`;
                         return (
                           <div
                             key={f.name}
+                            onDoubleClick={() => {
+                              if (!isDefaultFile) {
+                                setRenamingFileName(f.name);
+                                setNewRenameValue(f.name);
+                              } else {
+                                showToast("Cannot rename default workspace files!", "warning");
+                              }
+                            }}
                             className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition-all duration-200 group select-none ${
                               isActive 
                                 ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20" 
                                 : "text-slate-400 hover:text-white hover:bg-slate-800/30 border border-transparent"
                             }`}
                           >
-                            <button
-                              onClick={() => {
-                                if (editorRef.current) {
-                                  const currentVal = editorRef.current.getValue();
-                                  handleWorkspaceCodeChange(currentVal);
-                                }
-                                
-                                setActiveFileName(f.name);
-                                
-                                if (currentLanguage === "html") {
-                                  if (f.name === "index.html") switchWebTab("html");
-                                  else if (f.name === "style.css") switchWebTab("css");
-                                  else if (f.name === "script.js") switchWebTab("js");
-                                }
-                              }}
-                              className="flex items-center gap-2 flex-grow text-left cursor-pointer"
-                            >
-                              <i className={fileIcon}></i>
-                              <span className="truncate">{f.name}</span>
-                            </button>
+                            {isRenaming ? (
+                              <div className="flex items-center gap-2 flex-grow">
+                                <i className={fileIcon}></i>
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={newRenameValue}
+                                  onChange={(e) => setNewRenameValue(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleRenameFile();
+                                    if (e.key === 'Escape') {
+                                      setRenamingFileName("");
+                                      setNewRenameValue("");
+                                    }
+                                  }}
+                                  onBlur={handleRenameFile}
+                                  className="bg-transparent text-xs text-white border-b border-indigo-500 focus:outline-none focus:ring-0 p-0 font-mono w-full"
+                                />
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => openFile(f.name)}
+                                className="flex items-center gap-2 flex-grow text-left cursor-pointer"
+                                title={isDefaultFile ? "" : "Double click to rename"}
+                              >
+                                <i className={fileIcon}></i>
+                                <span className="truncate">{f.name}</span>
+                              </button>
+                            )}
 
-                            {!isDefaultFile && (
+                            {!isDefaultFile && !isRenaming && (
                               <button
                                 onClick={() => handleDeleteFile(f.name)}
                                 className="w-5 h-5 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150 opacity-0 group-hover:opacity-100 cursor-pointer"
