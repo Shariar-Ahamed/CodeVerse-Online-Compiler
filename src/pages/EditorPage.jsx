@@ -2567,10 +2567,10 @@ Explain why this error occurred and how to fix it.`;
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                   <i className="fas fa-sliders text-sm"></i>
@@ -2595,7 +2595,7 @@ Explain why this error occurred and how to fix it.`;
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Font size</span>
                   <span className="text-[10px] text-[var(--text-muted)]">8–32px</span>
                 </div>
-                <div className="flex items-center gap-3 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-3 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={() => {
                       const next = Math.max(8, settingsFontSize - 1);
@@ -2625,7 +2625,7 @@ Explain why this error occurred and how to fix it.`;
                 <div className="text-left">
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Theme</span>
                 </div>
-                <div className="flex items-center gap-1 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={() => {
                       if (theme !== 'light' && toggleTheme) toggleTheme();
@@ -2661,7 +2661,7 @@ Explain why this error occurred and how to fix it.`;
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Editor</span>
                   <span className="text-[10px] text-[var(--text-muted)]">On mobile, Ace is always used.</span>
                 </div>
-                <div className="flex items-center gap-1 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={() => {
                       setSettingsEditorEngine("Monaco");
@@ -2716,7 +2716,7 @@ Explain why this error occurred and how to fix it.`;
                       }
                     }
                   }}
-                  className="px-3 py-1.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer max-w-[150px]"
+                  className="px-3 py-1.5 rounded-xl text-xs bg-[#090d16] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer max-w-[150px]"
                 >
                   <optgroup label="Dark themes" className="bg-[#121824] text-slate-300">
                     <option value="Dark (Default)">Dark (Default)</option>
@@ -2839,7 +2839,7 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420]/75 flex justify-between items-center shrink-0">
+            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420] flex justify-between items-center shrink-0">
               <button
                 onClick={() => {
                   setSettingsFontSize(14);
