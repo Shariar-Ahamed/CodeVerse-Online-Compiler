@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import EditorPage from './pages/EditorPage';
 import ProfilePage from './pages/ProfilePage';
+import HistoryPage from './pages/HistoryPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Toast from './components/Toast';
@@ -295,6 +296,7 @@ function AppContent() {
           <Route path="/editor" element={<EditorPage user={user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} showToast={showToast} />} />
           <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} onUserUpdate={handleLogin} showToast={showToast} />} />
           <Route path="/profile/:username" element={<ProfilePage user={user} onLogout={handleLogout} onUserUpdate={handleLogin} showToast={showToast} />} />
+          <Route path="/profile/:username/history" element={<HistoryPage user={user} showToast={showToast} />} />
           <Route path="/challenges" element={<ChallengesPage user={user} showToast={showToast} />} />
           <Route path="/challenges/:id" element={<ChallengeWorkspacePage user={user} theme={theme} showToast={showToast} />} />
           <Route path="/leaderboard" element={<LeaderboardPage user={user} showToast={showToast} />} />

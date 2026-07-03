@@ -4,7 +4,7 @@ import Editor from '@monaco-editor/react';
 import ace from 'ace-builds';
 ace.config.set('basePath', 'https://cdn.jsdelivr.net/npm/ace-builds@1.37.0/src-noconflict/');
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
-import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment } from 'firebase/firestore';
+import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import AIPanel from '../components/AIPanel';
 const draculaTheme = {
@@ -751,6 +751,52 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       }, { merge: true });
     } catch (e) {
       console.error("Error saving code to Firestore:", e);
+    }
+  };
+
+  // Helper to log compilation/run history both locally and to firestore
+  const logCompilationRun = async (status, message, runTime = "-", runMemory = "-", runCode = "") => {
+    let runFileName = activeFileName;
+    if (!runFileName) {
+      const ext = LANGUAGES[currentLanguage]?.extension || "txt";
+      runFileName = currentLanguage === "html" ? "index.html" : `main.${ext}`;
+    }
+
+    // Get the base filename without folders prefix
+    if (runFileName.includes("/")) {
+      runFileName = runFileName.split("/").pop();
+    }
+
+    const runData = {
+      fileName: runFileName,
+      language: currentLanguage,
+      status: status, // Success, Error, Sandbox, Timeout, or Judge0 status description
+      message: message ? message.substring(0, 500) : "",
+      time: runTime,
+      memory: runMemory,
+      code: runCode ? runCode.substring(0, 15000) : "", // Cap to 15KB to fit Firestore document limits
+      timestamp: new Date().toISOString()
+    };
+
+    // 1. LocalStorage Backup (keeps last 20 entries)
+    try {
+      const savedRuns = localStorage.getItem("codeverse_recent_runs");
+      const localRuns = savedRuns ? JSON.parse(savedRuns) : [];
+      const newRun = { ...runData, id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` };
+      const updatedRuns = [newRun, ...localRuns].slice(0, 20);
+      localStorage.setItem("codeverse_recent_runs", JSON.stringify(updatedRuns));
+    } catch (e) {
+      console.error("Error writing compilation run to LocalStorage:", e);
+    }
+
+    // 2. Firestore Sync (if authenticated user)
+    if (user && !user.isGuest) {
+      try {
+        const userRunsRef = collection(db, "users", user.uid, "recent_runs");
+        await addDoc(userRunsRef, runData);
+      } catch (e) {
+        console.error("Error saving compilation run to Firestore:", e);
+      }
     }
   };
 
@@ -1611,7 +1657,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       }
 
       const { token } = await response.json();
-      pollSubmission(token, headers);
+      pollSubmission(token, headers, codeToCompile);
 
     } catch (error) {
       console.error("Submission error: ", error);
@@ -1621,10 +1667,11 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
         className: 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
       });
       setIsExecuting(false);
+      logCompilationRun("Error", `Connection failed: ${error.message}`, "-", "-", codeToCompile);
     }
   };
 
-  const pollSubmission = async (token, headers) => {
+  const pollSubmission = async (token, headers, codeToCompile) => {
     const maxAttempts = 40;
     let attempts = 0;
 
@@ -1639,6 +1686,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
           className: 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
         });
         setIsExecuting(false);
+        logCompilationRun("Timeout", "Execution queue timeout", "-", "-", codeToCompile);
         return;
       }
 
@@ -1657,7 +1705,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
 
         if (statusId > 2) {
           clearInterval(pollInterval);
-          displayExecutionResult(result);
+          displayExecutionResult(result, codeToCompile);
           setIsExecuting(false);
         }
 
@@ -1669,11 +1717,12 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
           className: 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
         });
         setIsExecuting(false);
+        logCompilationRun("Error", `Polling failed: ${error.message}`, "-", "-", codeToCompile);
       }
     }, 1500);
   };
 
-  const displayExecutionResult = (result) => {
+  const displayExecutionResult = (result, codeToCompile) => {
     const stdout = result.stdout ? decodeBase64(result.stdout) : "";
     const stderr = result.stderr ? decodeBase64(result.stderr) : "";
     const compileOutput = result.compile_output ? decodeBase64(result.compile_output) : "";
@@ -1688,6 +1737,18 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     
     setTimeIndicator(result.time ? `${result.time}s` : "0.00s");
     setMemoryIndicator(result.memory ? `${(result.memory / 1024).toFixed(2)} MB` : "0.0 MB");
+
+    const isSuccess = status.id === 3;
+    const statusText = isSuccess ? "Success" : (status.description || "Error");
+    let runMessage = "";
+    if (isSuccess) {
+      runMessage = "Code compiled and ran successfully";
+    } else {
+      runMessage = compileOutput ? compileOutput.trim() : (stderr ? stderr.trim() : `Execution terminated: ${status.description}`);
+    }
+    const runTime = result.time ? `${result.time}s` : "0.00s";
+    const runMemory = result.memory ? `${(result.memory / 1024).toFixed(2)} MB` : "0.0 MB";
+    logCompilationRun(statusText, runMessage, runTime, runMemory, codeToCompile);
 
     if (status.id === 3) {
       if (stdout.trim() === "") {
@@ -1737,6 +1798,11 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       htmlVal = workspaceFiles.find(f => f.name === "index.html")?.content || "";
       cssVal = workspaceFiles.find(f => f.name === "style.css")?.content || "";
       jsVal = workspaceFiles.find(f => f.name === "script.js")?.content || "";
+    }
+
+    if (!skipSaveToDb) {
+      const combinedCode = `<!-- index.html -->\n${htmlVal}\n\n/* style.css */\n${cssVal}\n\n// script.js\n${jsVal}`;
+      logCompilationRun("Sandbox", "HTML Visual workbench rendered", "0.01s", "0.05 MB", combinedCode);
     }
 
     if (user && !user.isGuest && !skipSaveToDb) {

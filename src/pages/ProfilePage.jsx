@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
@@ -72,6 +72,24 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
     return () => clearInterval(interval);
   }, []);
 
+  const [recentRuns, setRecentRuns] = useState([]);
+
+  const formatRunTime = (timestamp) => {
+    if (!timestamp) return "Just now";
+    const date = new Date(timestamp);
+    const diffMs = Date.now() - date.getTime();
+    if (diffMs < 60000) return "Just now";
+    
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) return `${diffMins}m ago`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
   const formatLastSeen = (lastSeen) => {
     if (!lastSeen) return "Offline";
     const lastSeenDate = new Date(lastSeen);
@@ -97,6 +115,34 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
 
   // Fetch Custom Profile Metadata from Firestore on mount
   useEffect(() => {
+    const fetchRecentRuns = async (uid, isGuestMode) => {
+      if (isGuestMode) {
+        try {
+          const savedRuns = localStorage.getItem("codeverse_recent_runs");
+          const allRuns = savedRuns ? JSON.parse(savedRuns) : [];
+          setRecentRuns(allRuns.slice(0, 5));
+        } catch (err) {
+          console.error("Error reading LocalStorage recent runs:", err);
+          setRecentRuns([]);
+        }
+        return;
+      }
+
+      try {
+        const runsRef = collection(db, "users", uid, "recent_runs");
+        const qRuns = query(runsRef, orderBy("timestamp", "desc"), limit(5));
+        const runsSnap = await getDocs(qRuns);
+        const runs = [];
+        runsSnap.forEach(rDoc => {
+          runs.push({ id: rDoc.id, ...rDoc.data() });
+        });
+        setRecentRuns(runs);
+      } catch (err) {
+        console.error("Error fetching recent runs for uid:", uid, err);
+        setRecentRuns([]);
+      }
+    };
+
     const fetchProfile = async () => {
       try {
         setLoading(true);
@@ -143,6 +189,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               activityLogs: data.activityLogs || {},
               languageStats: data.languageStats || {}
             });
+            fetchRecentRuns(user.uid, !!user.isGuest);
           } else {
             // Document doesn't exist, set from auth state
             const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -176,6 +223,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               lastSeen: new Date().toISOString(),
               activityLogs: {}
             });
+            fetchRecentRuns(user.uid, !!user.isGuest);
           }
         } else {
           // Fetch by querying username (case-insensitive conversion to lowercase)
@@ -208,6 +256,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 lastSeen: '',
                 activityLogs: {}
               });
+              setRecentRuns([]);
             } else {
               setProfileData({
                 name: data.name || 'Developer',
@@ -225,6 +274,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 activityLogs: data.activityLogs || {},
                 languageStats: data.languageStats || {}
               });
+              fetchRecentRuns(docSnap.id, false);
             }
           } else {
             // Try fallback fetch by doc ID (in case it is a UID instead of a username)
@@ -253,6 +303,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   lastSeen: '',
                   activityLogs: {}
                 });
+                setRecentRuns([]);
               } else {
                 setProfileData({
                   name: data.name || 'Developer',
@@ -270,6 +321,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   activityLogs: data.activityLogs || {},
                   languageStats: data.languageStats || {}
                 });
+                fetchRecentRuns(fallbackSnap.id, false);
               }
             } else {
               // Profile not found
@@ -288,6 +340,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                 lastSeen: '',
                 activityLogs: {}
               });
+              setRecentRuns([]);
             }
           }
         }
@@ -1010,52 +1063,77 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Recent Compilation Runs</h4>
             <div className="flex flex-col divide-y divide-[var(--border-color)]/60 text-xs font-sans">
-              
-              {/* Log 1 */}
-              <div className="py-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 text-[10px] font-mono font-bold">C++</div>
-                  <div>
-                    <p className="font-semibold text-[var(--text-primary)]">cpp_main.cpp</p>
-                    <p className="text-[10px] text-[var(--text-muted)]">Code compiled and ran successfully</p>
-                  </div>
+              {recentRuns.length === 0 ? (
+                <div className="py-6 text-center text-slate-500 italic">
+                  No compilation runs recorded yet. Run some code in the editor to see logs here!
                 </div>
-                <div className="text-right">
-                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Success</span>
-                  <span className="block text-[9px] text-[var(--text-muted)] font-mono mt-1">2 mins ago</span>
-                </div>
-              </div>
+              ) : (
+                recentRuns.map((run) => {
+                  let badgeClass = "bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                  if (run.status === "Success") {
+                    badgeClass = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                  } else if (run.status === "Sandbox") {
+                    badgeClass = "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
+                  } else if (run.status === "Timeout") {
+                    badgeClass = "bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                  }
 
-              {/* Log 2 */}
-              <div className="py-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-yellow-500/10 text-yellow-400 flex items-center justify-center border border-yellow-500/20 text-[10px] font-mono font-bold">JS</div>
-                  <div>
-                    <p className="font-semibold text-[var(--text-primary)]">index.html (Web Sandbox)</p>
-                    <p className="text-[10px] text-[var(--text-muted)]">HTML Visual workbench rendered</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Sandbox</span>
-                  <span className="block text-[9px] text-[var(--text-muted)] font-mono mt-1">1 hour ago</span>
-                </div>
-              </div>
+                  let langIcon = "C++";
+                  let langBg = "bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 text-[10px] font-mono font-bold";
+                  
+                  const ext = run.language ? run.language.toLowerCase() : "";
+                  if (ext === "html" || ext === "css" || ext === "javascript" || ext === "js") {
+                    langIcon = "JS";
+                    langBg = "bg-yellow-500/10 text-yellow-400 flex items-center justify-center border border-yellow-500/20 text-[10px] font-mono font-bold";
+                  } else if (ext === "python" || ext === "py") {
+                    langIcon = "PY";
+                    langBg = "bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 text-[10px] font-mono font-bold";
+                  } else if (ext === "c") {
+                    langIcon = "C";
+                    langBg = "bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 text-[10px] font-mono font-bold";
+                  } else if (ext === "go") {
+                    langIcon = "GO";
+                    langBg = "bg-rose-500/10 text-rose-400 flex items-center justify-center border border-rose-500/20 text-[10px] font-mono font-bold";
+                  } else {
+                    langIcon = ext.toUpperCase().substring(0, 3);
+                    langBg = "bg-slate-500/10 text-slate-400 flex items-center justify-center border border-slate-500/20 text-[10px] font-mono font-bold";
+                  }
 
-              {/* Log 3 */}
-              <div className="py-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center border border-rose-500/20 text-[10px] font-mono font-bold">GO</div>
-                  <div>
-                    <p className="font-semibold text-[var(--text-primary)]">main.go</p>
-                    <p className="text-[10px] text-[var(--text-muted)]">Failed at line 13: newline in character literal</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Error</span>
-                  <span className="block text-[9px] text-[var(--text-muted)] font-mono mt-1">3 hours ago</span>
-                </div>
-              </div>
-              
+                  return (
+                    <div key={run.id || run.timestamp} className="py-3 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className={`w-8 h-8 rounded-lg ${langBg} shrink-0`}>
+                          {langIcon}
+                        </div>
+                        <div className="text-left overflow-hidden">
+                          <p className="font-semibold text-[var(--text-primary)] truncate">{run.fileName}</p>
+                          <p className="text-[10px] text-[var(--text-muted)] truncate max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-xl mt-0.5">
+                            {run.message}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${badgeClass}`}>
+                          {run.status}
+                        </span>
+                        <span className="block text-[9px] text-[var(--text-muted)] font-mono mt-1">
+                          {formatRunTime(run.timestamp)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="pt-4 text-center border-t border-[var(--border-color)]/30">
+              <Link
+                to={username ? `/profile/${username}/history` : `/profile/${user?.username || user?.uid}/history`}
+                className="px-5 py-2 text-[10px] font-bold text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 hover:border-indigo-500/30 rounded-xl transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 mx-auto w-max"
+              >
+                <span>View Full Execution History</span>
+                <i className="fas fa-arrow-right text-[8px]"></i>
+              </Link>
             </div>
           </div>
 
