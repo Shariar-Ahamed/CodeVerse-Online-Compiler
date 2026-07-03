@@ -76,13 +76,13 @@ export default function ChallengesPage({ user, showToast }) {
   );
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-white relative">
-      <div className="max-w-6xl mx-auto mt-6 relative z-10">
+    <div className="min-h-screen py-5 sm:py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-white relative">
+      <div className="max-w-6xl mx-auto mt-2 sm:mt-6 relative z-10">
         
         {/* Header Metadata Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-[var(--border-color)]">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Coding Challenges
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
@@ -90,16 +90,16 @@ export default function ChallengesPage({ user, showToast }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="px-5 py-2.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-center">
-              <span className="text-[10px] uppercase font-bold text-indigo-400 block tracking-wider">Your Score</span>
-              <span className="text-xl font-black text-white">{userScore} <span className="text-xs font-medium text-indigo-300">pts</span></span>
+          <div className="flex items-stretch gap-3 w-full md:w-auto">
+            <div className="flex-1 md:flex-initial px-4 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-center flex flex-col justify-center">
+              <span className="text-[9px] uppercase font-bold text-indigo-400 block tracking-wider leading-none mb-1">Your Score</span>
+              <span className="text-lg font-black text-white leading-none">{userScore} <span className="text-[10px] font-medium text-indigo-300">pts</span></span>
             </div>
             <button
               onClick={() => navigate('/leaderboard')}
-              className="px-5 py-3 rounded-2xl bg-[var(--bg-tertiary)] hover:bg-slate-800 border border-[var(--border-color)] font-bold text-xs text-slate-200 hover:text-white flex items-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer"
+              className="flex-1 md:flex-initial justify-center px-4 py-2.5 rounded-xl bg-[var(--bg-tertiary)] hover:bg-slate-800 border border-[var(--border-color)] font-bold text-xs text-slate-200 hover:text-white flex items-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer"
             >
-              <i className="fas fa-trophy text-amber-400"></i>
+              <i className="fas fa-trophy text-amber-400 text-xs"></i>
               <span>Leaderboard</span>
             </button>
           </div>

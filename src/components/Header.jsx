@@ -195,23 +195,34 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             )}
           </div>
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile Menu Trigger with animatable 3 lines */}
           <button
             id="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none"
+            className="md:hidden p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none flex flex-col justify-center items-center gap-1 w-9 h-9"
           >
-            <i className="fas fa-bars text-sm"></i>
+            <span className={`block w-4 h-[2px] bg-slate-300 transition-all duration-300 ease-in-out transform ${
+              mobileMenuOpen ? "rotate-45 translate-y-[6px]" : ""
+            }`}></span>
+            <span className={`block w-4 h-[2px] bg-slate-300 transition-all duration-300 ease-in-out ${
+              mobileMenuOpen ? "opacity-0 scale-x-0" : ""
+            }`}></span>
+            <span className={`block w-4 h-[2px] bg-slate-300 transition-all duration-300 ease-in-out transform ${
+              mobileMenuOpen ? "-rotate-45 -translate-y-[6px]" : ""
+            }`}></span>
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation Panel (Collapsible) */}
-      {mobileMenuOpen && (
-        <div
-          id="mobile-nav"
-          className="md:hidden border-t border-[var(--border-color)] mobile-nav-custom-bg backdrop-blur-xl px-5 py-4 flex flex-col gap-3.5 text-sm font-medium animate-scale-up"
-        >
+      {/* Mobile Navigation Panel (Collapsible) with opening and closing transition */}
+      <div
+        id="mobile-nav"
+        className={`md:hidden border-t border-[var(--border-color)] mobile-nav-custom-bg backdrop-blur-xl px-5 flex flex-col gap-3.5 text-sm font-medium overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileMenuOpen 
+            ? "max-h-[850px] opacity-100 py-4" 
+            : "max-h-0 opacity-0 py-0 border-t-transparent pointer-events-none"
+        }`}
+      >
           <button onClick={() => handleNavClick('hero')} className="mobile-nav-link text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-2 block focus:outline-none flex items-center gap-3 transition-colors duration-200">
             <i className="fas fa-home text-indigo-400 w-5 text-center"></i>
             <span>Home</span>
@@ -307,8 +318,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
               </button>
             )}
           </div>
-        </div>
-      )}
+      </div>
     </header>
   );
 }
