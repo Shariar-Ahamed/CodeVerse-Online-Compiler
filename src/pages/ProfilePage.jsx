@@ -951,7 +951,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           {/* Language Progress Meters Card */}
           <div className="glass-panel p-6 rounded-2xl border border-[var(--border-color)] flex flex-col gap-5">
             <div className="flex items-center justify-between">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Language Preferences</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Language Preferences</h4>
               <span className="text-[10px] text-[var(--text-muted)] font-mono">By Executions</span>
             </div>
 

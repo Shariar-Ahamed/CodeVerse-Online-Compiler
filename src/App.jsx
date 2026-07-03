@@ -142,27 +142,30 @@ function AppContent() {
             firebaseUser.email.toLowerCase().includes('admin')
           );
 
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            userData.role = isAdminEmail ? 'admin' : (data.role || 'user');
-            userData.username = data.username || '';
-          } else {
-            // Document doesn't exist, create it!
-            const baseUsername = firebaseUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
-            const finalUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
-            const assignedRole = isAdminEmail ? 'admin' : 'user';
-            
+          let data = docSnap.exists() ? docSnap.data() : null;
+          const baseUsername = firebaseUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+          const finalUsername = (data && data.username) || `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+          const assignedRole = isAdminEmail ? 'admin' : ((data && data.role) || 'user');
+
+          if (!docSnap.exists() || !data.email || !data.username) {
+            // Document doesn't exist or is incomplete, write/merge it!
             await setDoc(userDocRef, {
-              name: firebaseUser.displayName || baseUsername,
+              name: (data && data.name) || firebaseUser.displayName || baseUsername,
               email: firebaseUser.email.toLowerCase(),
               username: finalUsername,
               role: assignedRole,
-              score: 0,
-              solvedChallenges: [],
-              createdAt: new Date().toISOString()
-            });
+              score: (data && data.score) || 0,
+              solvedChallenges: (data && data.solvedChallenges) || [],
+              createdAt: (data && data.createdAt) || new Date().toISOString()
+            }, { merge: true });
+
             userData.role = assignedRole;
             userData.username = finalUsername;
+          } else {
+            userData.role = assignedRole;
+            userData.username = finalUsername;
+            if (data.photoURL) userData.photoURL = data.photoURL;
+            if (data.name) userData.name = data.name;
           }
         } catch (e) {
           console.error("Error loading user role from Firestore:", e);
@@ -195,7 +198,7 @@ function AppContent() {
 
   // --- Active Presence Heartbeat Effect ---
   useEffect(() => {
-    if (!user || user.isGuest || !user.uid) return;
+    if (authChecking || !user || user.isGuest || !user.uid) return;
 
     const updateUserPresence = async () => {
       try {
@@ -214,7 +217,7 @@ function AppContent() {
     const interval = setInterval(updateUserPresence, 120000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, authChecking]);
 
   const isInitializing = authChecking || redirectChecking;
 
