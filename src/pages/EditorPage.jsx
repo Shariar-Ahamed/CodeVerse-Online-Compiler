@@ -566,12 +566,46 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
               setJsCode(data.jsCode);
               localStorage.setItem("codeverse_web_js", data.jsCode);
             }
+            
+            // Sync with workspaceFiles
+            setWorkspaceFiles(prev => {
+              const files = (prev && prev.length > 0) ? prev : [
+                { name: "index.html", content: data.htmlCode || LANGUAGES.html.defaultCode, language: "html" },
+                { name: "style.css", content: data.cssCode || DEFAULT_WEB_CSS, language: "css" },
+                { name: "script.js", content: data.jsCode || DEFAULT_WEB_JS, language: "javascript" }
+              ];
+              const updated = files.map(f => {
+                if (f.name === "index.html" && data.htmlCode) return { ...f, content: data.htmlCode };
+                if (f.name === "style.css" && data.cssCode) return { ...f, content: data.cssCode };
+                if (f.name === "script.js" && data.jsCode) return { ...f, content: data.jsCode };
+                return f;
+              });
+              localStorage.setItem("codeverse_files_html", JSON.stringify(updated));
+              return updated;
+            });
           } else {
             if (data.code) {
               localStorage.setItem(`codeverse_code_${langId}`, data.code);
               if (currentLanguage === langId) {
                 setCode(data.code);
               }
+              
+              // Sync with workspaceFiles
+              setWorkspaceFiles(prev => {
+                const ext = LANGUAGES[langId]?.extension || 'txt';
+                const defaultName = `main.${ext}`;
+                const files = (prev && prev.length > 0) ? prev : [
+                  { name: defaultName, content: data.code || "", language: langId }
+                ];
+                const updated = files.map(f => {
+                  if (f.name.startsWith("main.") && f.language === langId) {
+                    return { ...f, content: data.code };
+                  }
+                  return f;
+                });
+                localStorage.setItem(`codeverse_files_${langId}`, JSON.stringify(updated));
+                return updated;
+              });
             }
           }
         });
@@ -616,6 +650,32 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       console.error("Error saving code to Firestore:", e);
     }
   };
+
+  // Track latest code state in a ref to fetch on unmount
+  const latestCodeRef = useRef({ htmlCode, cssCode, jsCode, code, currentLanguage });
+  useEffect(() => {
+    latestCodeRef.current = { htmlCode, cssCode, jsCode, code, currentLanguage };
+  }, [htmlCode, cssCode, jsCode, code, currentLanguage]);
+
+  // Save latest workspace changes to cloud on unmount
+  useEffect(() => {
+    return () => {
+      const { htmlCode: latestHtml, cssCode: latestCss, jsCode: latestJs, code: latestCode, currentLanguage: latestLang } = latestCodeRef.current;
+      if (user && !user.isGuest && latestLang) {
+        if (latestLang === "html") {
+          saveCodeToFirestore("html", {
+            htmlCode: latestHtml,
+            cssCode: latestCss,
+            jsCode: latestJs
+          });
+        } else if (latestLang !== "text") {
+          saveCodeToFirestore(latestLang, {
+            code: latestCode
+          });
+        }
+      }
+    };
+  }, [user]);
 
   const handleCreateNote = async () => {
     if (!user || user.isGuest) {
