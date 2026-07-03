@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import AceEditor from 'react-ace';
 import ace from 'ace-builds';
 ace.config.set('basePath', 'https://cdn.jsdelivr.net/npm/ace-builds@1.37.0/src-noconflict/');
 import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
@@ -173,6 +172,86 @@ const getAceTheme = (themeName) => {
   return "tomorrow_night_eighties";
 };
 
+// Opaque Vanilla Ace Editor React wrapper compatible with React 19 concurrent mode
+const VanillaAceEditor = ({ mode, theme, value, onChange, fontSize, wordWrap, disableAutocomplete, style }) => {
+  const containerRef = useRef(null);
+  const editorRef = useRef(null);
+  const isSettingValueRef = useRef(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Initialize Ace Editor instance directly on the container reference
+    const editor = ace.edit(containerRef.current);
+    editorRef.current = editor;
+
+    // Configure startup options
+    editor.setOptions({
+      enableBasicAutocompletion: !disableAutocomplete,
+      enableLiveAutocompletion: !disableAutocomplete,
+      showLineNumbers: true,
+      tabSize: 4,
+      useWorker: false, // Disables background worker scripts to prevent Vite resolving issues
+      fontFamily: "Fira Code, JetBrains Mono, monospace"
+    });
+
+    // Populate initial text
+    editor.setValue(value || "", -1);
+
+    // Bind change listener and propagate state updates
+    editor.on('change', () => {
+      if (isSettingValueRef.current) return;
+      const currentVal = editor.getValue();
+      if (onChange) {
+        onChange(currentVal);
+      }
+    });
+
+    return () => {
+      editor.destroy();
+    };
+  }, []);
+
+  // Update editor values safely if modified externally
+  useEffect(() => {
+    if (editorRef.current) {
+      const currentVal = editorRef.current.getValue();
+      if (currentVal !== value) {
+        isSettingValueRef.current = true;
+        editorRef.current.setValue(value || "", -1);
+        isSettingValueRef.current = false;
+      }
+    }
+  }, [value]);
+
+  // Synchronize options dynamically
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setOption("fontSize", fontSize);
+    }
+  }, [fontSize]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setOption("wrap", wordWrap);
+    }
+  }, [wordWrap]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.session.setMode("ace/mode/" + mode);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setTheme("ace/theme/" + theme);
+    }
+  }, [theme]);
+
+  return <div ref={containerRef} style={{ width: '100%', height: '100%', ...style }} />;
+};
+
 export default function EditorPage({ user, theme, toggleTheme, showToast }) {
   // --- States ---
   const [searchParams] = useSearchParams();
@@ -266,7 +345,10 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
     return localStorage.getItem("codeverse_settings_avoid_auto_scrolling") === "true";
   });
   const [settingsEditorEngine, setSettingsEditorEngine] = useState(() => {
-    return localStorage.getItem("codeverse_settings_editor_engine") || "Monaco";
+    const saved = localStorage.getItem("codeverse_settings_editor_engine");
+    if (saved) return saved;
+    // Default dynamically based on device size: Ace for mobile, Monaco for PC
+    return window.innerWidth < 1024 ? "Ace" : "Monaco";
   });
   
   // Panel resizing states
@@ -1344,22 +1426,16 @@ export default function EditorPage({ user, theme, toggleTheme, showToast }) {
 
     const iframe = previewFrameRef.current;
     if (iframe) {
-      // Navigate to about:blank to destroy any running scripts/intervals of the previous document
-      iframe.contentWindow.location.replace("about:blank");
-      
-      // Delay slightly to allow the load of about:blank to complete, then write the new document
-      setTimeout(() => {
-        try {
-          const frameDoc = iframe.contentDocument || iframe.contentWindow.document;
-          if (frameDoc) {
-            frameDoc.open();
-            frameDoc.write(fullDocument);
-            frameDoc.close();
-          }
-        } catch (err) {
-          console.error("Failed to write to iframe: ", err);
+      try {
+        const frameDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (frameDoc) {
+          frameDoc.open();
+          frameDoc.write(fullDocument);
+          frameDoc.close();
         }
-      }, 50);
+      } catch (err) {
+        console.error("Failed to write to iframe: ", err);
+      }
     }
 
     setWebLogs([]);
@@ -2149,26 +2225,15 @@ Explain why this error occurred and how to fix it.`;
             {/* 3. Main Monaco Editor Container Wrapper */}
             <div className="flex-grow relative h-[450px] lg:h-full min-w-0">
               <div className="absolute inset-0 w-full h-full">
-                {settingsEditorEngine === "Ace" || isMobile ? (
-                  <AceEditor
+                {settingsEditorEngine === "Ace" ? (
+                  <VanillaAceEditor
                     mode={getAceMode(currentLanguage, activeFileName, activeWebTab)}
                     theme={getAceTheme(settingsColorTheme)}
                     value={workspaceFiles.find(f => f.name === activeFileName)?.content || ""}
                     onChange={handleWorkspaceCodeChange}
-                    name="codeverse_ace_editor"
                     fontSize={settingsFontSize}
-                    width="100%"
-                    height="100%"
-                    editorProps={{ $blockScrolling: true }}
-                    setOptions={{
-                      enableBasicAutocompletion: !settingsDisableAutocomplete,
-                      enableLiveAutocompletion: !settingsDisableAutocomplete,
-                      showLineNumbers: true,
-                      tabSize: 4,
-                      useWorker: false, // Turn off syntax validator workers to avoid external worker path issues in Vite
-                      wrap: settingsWordWrap,
-                      fontFamily: "Fira Code, JetBrains Mono, monospace"
-                    }}
+                    wordWrap={settingsWordWrap}
+                    disableAutocomplete={settingsDisableAutocomplete}
                     style={{
                       borderRadius: '0px',
                       background: settingsColorTheme === 'Dracula' ? '#282a36' : (['Light (Default)', 'One Light', 'GitHub Light', 'Solarized Light', 'Night Owl Light', 'Catppuccin Latte', 'Min Light', 'Vitesse Light', 'High Contrast Light'].includes(settingsColorTheme) ? '#f5f5f5' : '#1e1e1e')
