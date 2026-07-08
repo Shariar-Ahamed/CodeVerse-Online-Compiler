@@ -648,21 +648,21 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                         {res.input && (
                           <div className="mb-2 font-mono text-[11px]">
                             <span className="text-slate-500">Input: </span>
-                            <span className="text-slate-300 bg-black/40 px-1.5 py-0.5 rounded">{res.input}</span>
+                            <span className="text-[var(--text-primary)] bg-slate-100 dark:bg-black/40 px-1.5 py-0.5 rounded border border-slate-200 dark:border-transparent">{res.input}</span>
                           </div>
                         )}
                         
                         {res.expected && (
                           <div className="mb-2 font-mono text-[11px]">
                             <span className="text-slate-500">Expected: </span>
-                            <span className="text-slate-300 bg-black/40 px-1.5 py-0.5 rounded">{res.expected}</span>
+                            <span className="text-[var(--text-primary)] bg-slate-100 dark:bg-black/40 px-1.5 py-0.5 rounded border border-slate-200 dark:border-transparent">{res.expected}</span>
                           </div>
                         )}
 
                         {res.output && (
                           <div className="mt-2">
                             <span className="text-[10px] text-slate-500 font-bold block mb-1">Stdout Output:</span>
-                            <pre className="bg-black/30 p-2.5 rounded text-slate-300 overflow-x-auto font-mono text-[11px] max-h-36 scrollbar-thin">
+                            <pre className="bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-transparent p-2.5 rounded text-[var(--text-primary)] overflow-x-auto font-mono text-[11px] max-h-36 scrollbar-thin">
                               {res.output}
                             </pre>
                           </div>

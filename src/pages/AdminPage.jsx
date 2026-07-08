@@ -15,6 +15,8 @@ export default function AdminPage({ user, showToast }) {
   const [contacts, setContacts] = useState([]);
   const [contactsLoading, setContactsLoading] = useState(false);
 
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+
   // Form states
   const [editingId, setEditingId] = useState(null); // null means creating new
   const [title, setTitle] = useState('');
@@ -281,8 +283,10 @@ export default function AdminPage({ user, showToast }) {
   const mediumCount = challenges.filter(c => c.difficulty === 'Medium').length;
   const hardCount = challenges.filter(c => c.difficulty === 'Hard').length;
 
+  const filteredChallenges = challenges.filter(c => filterDifficulty === 'All' || c.difficulty === filterDifficulty);
+
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-white relative">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-[var(--text-primary)] relative">
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
@@ -292,7 +296,7 @@ export default function AdminPage({ user, showToast }) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-[var(--border-color)]/30">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
-              <i className="fas fa-crown text-indigo-400 text-2xl"></i>
+              <i className="fas fa-crown text-indigo-500 dark:text-indigo-400 text-2xl"></i>
               <span>Admin Workspace Manager</span>
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
@@ -318,7 +322,7 @@ export default function AdminPage({ user, showToast }) {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
               activeTab === 'challenges'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50'
             }`}
           >
             <i className="fas fa-code"></i>
@@ -329,7 +333,7 @@ export default function AdminPage({ user, showToast }) {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
               activeTab === 'users'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50'
             }`}
           >
             <i className="fas fa-user-check"></i>
@@ -340,7 +344,7 @@ export default function AdminPage({ user, showToast }) {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
               activeTab === 'contacts'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50'
             }`}
           >
             <i className="fas fa-envelope-open-text"></i>
@@ -353,86 +357,114 @@ export default function AdminPage({ user, showToast }) {
           <>
             {/* Dashboard Statistics summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-[#0d1321]/30 glass-panel border border-[var(--border-color)] rounded-xl p-5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider mb-1">Total Problems</span>
-                <span className="text-2xl font-black text-white">{challenges.length}</span>
+              <div 
+                onClick={() => setFilterDifficulty('All')}
+                className={`cursor-pointer transition-all duration-200 glass-panel border rounded-xl p-5 text-center active:scale-95 ${
+                  filterDifficulty === 'All'
+                    ? 'bg-indigo-500/10 border-indigo-500 shadow-lg shadow-indigo-500/10 scale-[1.02]'
+                    : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-500/40'
+                }`}
+              >
+                <span className="text-[10px] uppercase font-bold text-[var(--text-secondary)] block tracking-wider mb-1">Total Problems</span>
+                <span className="text-2xl font-black text-[var(--text-primary)]">{challenges.length}</span>
               </div>
-              <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 text-center">
-                <span className="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider mb-1">Easy</span>
-                <span className="text-2xl font-black text-emerald-300">{easyCount}</span>
+              <div 
+                onClick={() => setFilterDifficulty('Easy')}
+                className={`cursor-pointer transition-all duration-200 glass-panel border rounded-xl p-5 text-center active:scale-95 ${
+                  filterDifficulty === 'Easy'
+                    ? 'bg-emerald-500/15 border-emerald-500 shadow-lg shadow-emerald-500/15 scale-[1.02]'
+                    : 'bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/30'
+                }`}
+              >
+                <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 block tracking-wider mb-1">Easy</span>
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-300">{easyCount}</span>
               </div>
-              <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-5 text-center">
-                <span className="text-[10px] uppercase font-bold text-amber-400 block tracking-wider mb-1">Medium</span>
-                <span className="text-2xl font-black text-amber-300">{mediumCount}</span>
+              <div 
+                onClick={() => setFilterDifficulty('Medium')}
+                className={`cursor-pointer transition-all duration-200 glass-panel border rounded-xl p-5 text-center active:scale-95 ${
+                  filterDifficulty === 'Medium'
+                    ? 'bg-amber-500/15 border-amber-500 shadow-lg shadow-amber-500/15 scale-[1.02]'
+                    : 'bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/30'
+                }`}
+              >
+                <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 block tracking-wider mb-1">Medium</span>
+                <span className="text-2xl font-black text-amber-600 dark:text-amber-300">{mediumCount}</span>
               </div>
-              <div className="bg-rose-500/5 border border-rose-500/10 rounded-xl p-5 text-center">
-                <span className="text-[10px] uppercase font-bold text-rose-400 block tracking-wider mb-1">Hard</span>
-                <span className="text-2xl font-black text-rose-300">{hardCount}</span>
+              <div 
+                onClick={() => setFilterDifficulty('Hard')}
+                className={`cursor-pointer transition-all duration-200 glass-panel border rounded-xl p-5 text-center active:scale-95 ${
+                  filterDifficulty === 'Hard'
+                    ? 'bg-rose-500/15 border-rose-500 shadow-lg shadow-rose-500/15 scale-[1.02]'
+                    : 'bg-rose-500/5 border border-rose-500/10 hover:border-rose-500/30'
+                }`}
+              >
+                <span className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 block tracking-wider mb-1">Hard</span>
+                <span className="text-2xl font-black text-rose-600 dark:text-rose-300">{hardCount}</span>
               </div>
             </div>
 
             {/* Challenges table view */}
-            <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
               {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-4">
                   <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Challenges list...</p>
                 </div>
-              ) : challenges.length === 0 ? (
-                <div className="py-16 text-center text-slate-400 text-xs italic">
-                  No challenges loaded. Click Add New Challenge to populate.
+              ) : filteredChallenges.length === 0 ? (
+                <div className="py-16 text-center text-[var(--text-secondary)] text-xs italic">
+                  No {filterDifficulty !== 'All' ? `${filterDifficulty} ` : ''}challenges found.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Order</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Title</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Difficulty</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Score Reward</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Test Cases</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Actions</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Order</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Title</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Difficulty</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Score Reward</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-center">Test Cases</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
-                      {challenges.map((c) => (
-                        <tr key={c.id} className="hover:bg-slate-900/30 transition-all">
-                          <td className="px-6 py-4 text-xs font-bold text-slate-400">
+                      {filteredChallenges.map((c) => (
+                        <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/20 transition-all">
+                          <td className="px-6 py-4 text-xs font-bold text-[var(--text-secondary)]">
                             #{c.order}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="font-bold text-xs text-white">{c.title}</span>
+                            <span className="font-bold text-xs text-[var(--text-primary)]">{c.title}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold border ${
                               c.difficulty === 'Easy' 
-                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                 : c.difficulty === 'Medium'
-                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                             }`}>
                               {c.difficulty}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-xs font-bold text-indigo-400 font-mono">
+                          <td className="px-6 py-4 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono">
                             {c.points} pts
                           </td>
-                          <td className="px-6 py-4 text-xs font-semibold text-slate-300 text-center font-mono">
+                          <td className="px-6 py-4 text-xs font-semibold text-[var(--text-secondary)] text-center font-mono">
                             {Array.isArray(c.testCases) ? c.testCases.length : 0}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex justify-end gap-2">
                               <button
                                 onClick={() => handleEdit(c)}
-                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-indigo-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 active:scale-95 transition-all cursor-pointer"
+                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-indigo-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95 transition-all cursor-pointer"
                                 title="Edit Challenge"
                               >
                                 <i className="fas fa-edit text-xs"></i>
                               </button>
                               <button
                                 onClick={() => handleDelete(c.id)}
-                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                                className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-rose-600 dark:hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
                                 title="Delete Challenge"
                               >
                                 <i className="fas fa-trash text-xs"></i>
@@ -450,14 +482,14 @@ export default function AdminPage({ user, showToast }) {
         )}
 
         {activeTab === 'users' && (
-          <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
             {usersLoading ? (
               <div className="py-20 flex flex-col items-center justify-center gap-4">
                 <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                 <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Users list...</p>
               </div>
             ) : users.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-xs italic">
+              <div className="py-16 text-center text-[var(--text-secondary)] text-xs italic">
                 No user records loaded.
               </div>
             ) : (
@@ -465,27 +497,34 @@ export default function AdminPage({ user, showToast }) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Developer</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Email</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Score</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Solved</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Verification Status</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Developer</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Email</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-center">Score</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-center">Solved</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right">Verification Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
                     {users.map((u) => (
-                      <tr key={u.uid} className="hover:bg-slate-900/30 transition-all">
+                      <tr key={u.uid} className="hover:bg-[var(--bg-tertiary)]/20 transition-all">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            {u.photoURL ? (
-                              <img src={u.photoURL} alt={u.name} className="w-8 h-8 rounded-full object-cover border border-white/10" />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10">
-                                {(u.name || 'U').charAt(0)}
-                              </div>
-                            )}
+                            <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden flex items-center justify-center relative bg-slate-800 select-none">
+                              <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs">
+                                {(u.name || 'U').charAt(0).toUpperCase()}
+                              </span>
+                              {u.photoURL && (
+                                <img
+                                  src={u.photoURL}
+                                  alt={u.name}
+                                  className="absolute inset-0 w-full h-full object-cover z-10"
+                                  referrerPolicy="no-referrer"
+                                  onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                              )}
+                            </div>
                             <div>
-                              <span className="font-bold text-xs text-white flex items-center gap-1.5">
+                              <span className="font-bold text-xs text-[var(--text-primary)] flex items-center gap-1.5">
                                 <span>{u.name || 'Developer'}</span>
                                 {u.isVerified && (
                                   <span className="text-[10px]" style={{ color: '#1D9BF0' }} title="Verified Creator">
@@ -494,18 +533,18 @@ export default function AdminPage({ user, showToast }) {
                                 )}
                               </span>
                               {u.username && (
-                                <span className="text-[10px] text-slate-400 font-mono block">@{u.username}</span>
+                                <span className="text-[10px] text-[var(--text-secondary)] font-mono block">@{u.username}</span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-xs font-mono text-slate-400">
+                        <td className="px-6 py-4 text-xs font-mono text-[var(--text-secondary)]">
                           {u.email || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-xs font-bold text-indigo-400 font-mono text-center">
+                        <td className="px-6 py-4 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-mono text-center">
                           {u.score || 0} pts
                         </td>
-                        <td className="px-6 py-4 text-xs font-semibold text-emerald-400 font-mono text-center">
+                        <td className="px-6 py-4 text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono text-center">
                           {Array.isArray(u.solvedChallenges) ? u.solvedChallenges.length : 0} problems
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -514,8 +553,8 @@ export default function AdminPage({ user, showToast }) {
                               onClick={() => handleToggleVerification(u)}
                               className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider uppercase border active:scale-95 transition-all duration-200 cursor-pointer ${
                                 u.isVerified
-                                  ? 'border-rose-500/30 bg-rose-500/5 text-rose-400 hover:bg-rose-500/10'
-                                  : 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400 hover:bg-indigo-500/10'
+                                  ? 'border-rose-500/30 bg-rose-500/5 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
+                                  : 'border-indigo-500/30 bg-indigo-500/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
                               }`}
                             >
                               {u.isVerified ? (
@@ -532,7 +571,7 @@ export default function AdminPage({ user, showToast }) {
                             </button>
                             <button
                               onClick={() => handleDeleteUser(u.uid, u.name)}
-                              className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                              className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-rose-600 dark:hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
                               title="Delete User from Leaderboard"
                             >
                               <i className="fas fa-trash text-xs"></i>
@@ -549,14 +588,14 @@ export default function AdminPage({ user, showToast }) {
         )}
 
         {activeTab === 'contacts' && (
-          <div className="bg-[#0d1321]/20 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-2xl glass-panel">
             {contactsLoading ? (
               <div className="py-20 flex flex-col items-center justify-center gap-4">
                 <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                 <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider animate-pulse">Loading Messages list...</p>
               </div>
             ) : contacts.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-xs italic">
+              <div className="py-16 text-center text-[var(--text-secondary)] text-xs italic">
                 No contact messages found.
               </div>
             ) : (
@@ -564,31 +603,31 @@ export default function AdminPage({ user, showToast }) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-[var(--border-color)]/60 bg-[var(--bg-tertiary)]/50">
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Date</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Sender Details</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400">Message Content</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-right">Actions</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Date</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Sender Details</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Message Content</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border-color)]/30 font-sans">
                     {contacts.map((c) => (
-                      <tr key={c.id} className="hover:bg-slate-900/30 transition-all align-top">
-                        <td className="px-6 py-4 text-xs text-slate-400 font-mono">
+                      <tr key={c.id} className="hover:bg-[var(--bg-tertiary)]/20 transition-all align-top">
+                        <td className="px-6 py-4 text-xs text-[var(--text-secondary)] font-mono">
                           {c.createdAt ? new Date(c.createdAt).toLocaleString() : 'N/A'}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-xs text-white">{c.name}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">{c.email}</span>
+                            <span className="font-bold text-xs text-[var(--text-primary)]">{c.name}</span>
+                            <span className="text-[10px] text-[var(--text-secondary)] font-mono">{c.email}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-xs text-slate-300 whitespace-pre-wrap leading-relaxed max-w-md">
+                        <td className="px-6 py-4 text-xs text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed max-w-md">
                           {c.message}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => handleDeleteContact(c.id)}
-                            className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg border border-[var(--border-color)] hover:border-rose-500/40 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-rose-600 dark:hover:text-rose-400 active:scale-95 transition-all cursor-pointer"
                             title="Delete Message"
                           >
                             <i className="fas fa-trash-can text-xs"></i>
@@ -607,17 +646,17 @@ export default function AdminPage({ user, showToast }) {
       {/* Add / Edit Challenge Form Modal Overlay */}
       {isFormOpen && (
         <div className="modal-overlay fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-3xl rounded-2xl border border-[var(--border-color)] bg-[#0c101b] shadow-2xl p-6 md:p-8 animate-fade-in-up my-8 max-h-[85vh] flex flex-col justify-between overflow-hidden">
+          <div className="w-full max-w-3xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-2xl p-6 md:p-8 animate-fade-in-up my-8 max-h-[85vh] flex flex-col justify-between overflow-hidden">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)] mb-6 shrink-0">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <i className="fas fa-circle-info text-indigo-400"></i>
+              <h2 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <i className="fas fa-circle-info text-indigo-500 dark:text-indigo-400"></i>
                 <span>{editingId ? "Edit Coding Challenge" : "Create New Coding Challenge"}</span>
               </h2>
               <button
                 onClick={() => setIsFormOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -629,23 +668,23 @@ export default function AdminPage({ user, showToast }) {
               {/* Row 1: Title & Points & Order */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-2 flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Challenge Title</label>
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Challenge Title</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. FizzBuzz, Prime Number Check"
-                    className="px-4 py-2.5 rounded-xl bg-[#090d16]/70 border border-slate-800/80 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/70 font-medium text-xs transition-all shadow-inner"
+                    className="px-4 py-2.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-indigo-500/70 font-medium text-xs transition-all shadow-inner"
                     required
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Difficulty & Score</label>
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Difficulty & Score</label>
                   <div className="flex gap-2">
                     <select
                       value={difficulty}
                       onChange={(e) => setDifficulty(e.target.value)}
-                      className="px-3 py-2.5 rounded-xl bg-[#090d16]/70 border border-slate-800/80 text-white focus:outline-none focus:border-indigo-500/70 font-semibold text-xs transition-all w-full select-none"
+                      className="px-3 py-2.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/70 font-semibold text-xs transition-all w-full select-none"
                     >
                       <option value="Easy">Easy</option>
                       <option value="Medium">Medium</option>
@@ -656,19 +695,19 @@ export default function AdminPage({ user, showToast }) {
                       value={points}
                       onChange={(e) => setPoints(e.target.value)}
                       min="1"
-                      className="px-3 py-2.5 w-24 rounded-xl bg-[#090d16]/70 border border-slate-800/80 text-white focus:outline-none focus:border-indigo-500/70 font-bold text-xs transition-all text-center"
+                      className="px-3 py-2.5 w-24 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/70 font-bold text-xs transition-all text-center"
                       required
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sequence Order</label>
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Sequence Order</label>
                   <input
                     type="number"
                     value={order}
                     onChange={(e) => setOrder(e.target.value)}
                     min="1"
-                    className="px-3 py-2.5 rounded-xl bg-[#090d16]/70 border border-slate-800/80 text-white focus:outline-none focus:border-indigo-500/70 font-bold text-xs transition-all text-center w-full shadow-inner"
+                    className="px-3 py-2.5 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500/70 font-bold text-xs transition-all text-center w-full shadow-inner"
                     required
                   />
                 </div>
@@ -676,12 +715,12 @@ export default function AdminPage({ user, showToast }) {
 
               {/* Description */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Problem Description (Instructions)</label>
+                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Problem Description (Instructions)</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Explain the problem description, constraints, and standard inputs..."
-                  className="w-full h-32 p-3 bg-[#090d16]/70 border border-slate-800/80 text-slate-300 focus:outline-none focus:border-indigo-500/70 rounded-xl font-sans text-xs leading-relaxed resize-none transition-all shadow-inner"
+                  className="w-full h-32 p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-indigo-500/70 rounded-xl font-sans text-xs leading-relaxed resize-none transition-all shadow-inner"
                   required
                 />
               </div>
@@ -690,13 +729,13 @@ export default function AdminPage({ user, showToast }) {
               <div className="border-t border-[var(--border-color)]/65 pt-5 mb-2">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Test Suite Cases</h3>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Define inputs and expected outputs to run compiler diagnostics.</p>
+                    <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider">Test Suite Cases</h3>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Define inputs and expected outputs to run compiler diagnostics.</p>
                   </div>
                   <button
                     type="button"
                     onClick={handleAddTestCase}
-                    className="px-4 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-600 hover:text-white font-bold text-[10px] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white font-bold text-[10px] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <i className="fas fa-plus"></i>
                     <span>Add Testcase Row</span>
@@ -706,26 +745,26 @@ export default function AdminPage({ user, showToast }) {
                 {/* Testcases list layout */}
                 <div className="space-y-4">
                   {testCases.map((tc, idx) => (
-                    <div key={idx} className="bg-slate-900/20 rounded-2xl border border-white/5 p-4 space-y-3 relative shadow-inner">
+                    <div key={idx} className="bg-[var(--bg-tertiary)]/20 rounded-2xl border border-[var(--border-color)]/30 p-4 space-y-3 relative shadow-inner">
                       {/* Title row with delete action */}
-                      <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <div className="flex items-center justify-between border-b border-[var(--border-color)]/30 pb-2">
+                        <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                           Test Case #{idx + 1}
                         </span>
                         <div className="flex items-center gap-4">
-                          <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 cursor-pointer select-none">
+                          <label className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
                             <input
                               type="checkbox"
                               checked={tc.isHidden}
                               onChange={(e) => handleTestCaseChange(idx, 'isHidden', e.target.checked)}
-                              className="w-3.5 h-3.5 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-0 cursor-pointer"
+                              className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-0 cursor-pointer"
                             />
                             <span>Hidden Case? (for Submit evaluation)</span>
                           </label>
                           <button
                             type="button"
                             onClick={() => handleRemoveTestCase(idx)}
-                            className="text-rose-400 hover:text-rose-300 text-[10px] font-bold flex items-center gap-1 active:scale-95 cursor-pointer"
+                            className="text-rose-600 dark:text-rose-400 hover:text-rose-500 text-[10px] font-bold flex items-center gap-1 active:scale-95 cursor-pointer"
                           >
                             <i className="fas fa-trash-can"></i>
                             <span>Remove</span>
@@ -736,21 +775,21 @@ export default function AdminPage({ user, showToast }) {
                       {/* Inputs & outputs split */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Standard Input (stdin)</span>
+                          <span className="text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">Standard Input (stdin)</span>
                           <textarea
                             value={tc.input}
                             onChange={(e) => handleTestCaseChange(idx, 'input', e.target.value)}
                             placeholder="e.g. 5"
-                            className="w-full h-16 p-2 bg-[#090d16]/80 border border-slate-800/80 text-slate-300 font-mono text-[10px] focus:outline-none focus:border-indigo-500/70 rounded-lg resize-none transition-all"
+                            className="w-full h-16 p-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] font-mono text-[10px] focus:outline-none focus:border-indigo-500/70 rounded-lg resize-none transition-all"
                           />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Expected Output (stdout)</span>
+                          <span className="text-[9px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">Expected Output (stdout)</span>
                           <textarea
                             value={tc.output}
                             onChange={(e) => handleTestCaseChange(idx, 'output', e.target.value)}
                             placeholder="e.g. 1 2 Fizz 4 Buzz"
-                            className="w-full h-16 p-2 bg-[#090d16]/80 border border-slate-800/80 text-slate-300 font-mono text-[10px] focus:outline-none focus:border-indigo-500/70 rounded-lg resize-none transition-all"
+                            className="w-full h-16 p-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] font-mono text-[10px] focus:outline-none focus:border-indigo-500/70 rounded-lg resize-none transition-all"
                             required
                           />
                         </div>
@@ -765,7 +804,7 @@ export default function AdminPage({ user, showToast }) {
                 <button
                   type="button"
                   onClick={() => setIsFormOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-[var(--border-color)] hover:bg-slate-800 font-bold text-xs text-slate-300 hover:text-white transition-all duration-200 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] font-bold text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -99,7 +99,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="flex-grow flex flex-col justify-center items-center w-full bg-[#0b0515] relative overflow-hidden">
+    <div className="flex-grow flex flex-col justify-center items-center w-full bg-[var(--bg-primary)] relative overflow-hidden">
       {/* Background Central Glow Orb */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-purple-600/10 blur-[130px] z-0 pointer-events-none animate-pulse"></div>
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
@@ -108,14 +108,13 @@ export default function AboutPage() {
       <section
         id="about"
         ref={aboutRef}
-        className="w-full py-10 sm:py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#0b0515] via-[#120624] to-[#090310] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[50vh] sm:min-h-[70vh] overflow-hidden"
+        className="w-full py-10 sm:py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-secondary)] to-[var(--bg-primary)] border-b border-[var(--border-color)] relative flex flex-col justify-center min-h-[50vh] sm:min-h-[70vh] overflow-hidden"
       >
         <canvas ref={aboutCanvasRef} id="about-particles" className="absolute inset-0 pointer-events-none z-0" />
         
 
-
         <div className="max-w-4xl mx-auto text-center relative z-10 animate-fade-in-up">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent mb-6">
             About CodeVerse
           </h2>
           <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-6">

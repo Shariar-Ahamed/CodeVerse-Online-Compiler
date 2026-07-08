@@ -29,8 +29,8 @@
 
 /* Light Theme overrides */
 :root.light {
-  --bg-primary: #f1f5f9;
-  --bg-secondary: #ffffff;
+  --bg-primary: #eef2f6;
+  --bg-secondary: #f8fafc;
   --bg-tertiary: #e2e8f0;
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -110,6 +110,21 @@ body::before {
   -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
+}
+
+/* Hero language bubble styles */
+.hero-lang-bubble {
+  background: rgba(15, 22, 36, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-width: 2px !important;
+}
+
+.light .hero-lang-bubble {
+  background: #ffffff !important;
+  border-width: 1px !important;
+  border-color: rgba(226, 232, 240, 0.85) !important;
+  box-shadow: 6px 6px 15px rgba(15, 23, 42, 0.08), -6px -6px 15px #ffffff !important;
 }
 
 /* Glowing Elements */
@@ -355,6 +370,9 @@ body::before {
   color: #b91c1c;
   background-color: rgba(220, 38, 38, 0.05);
 }
+.light .console-log-error .console-log-body {
+  color: #000000 !important;
+}
 
 .console-log-warn {
   color: #fbbf24;
@@ -467,11 +485,65 @@ html {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* ==========================================================================
-   Multi-Page Refactoring Additions
-   ========================================================================== */
+.light #profile-name {
+  color: #0f172a !important;
+}
 
-/* Active tab style logic fallback/enhancements */
+/* Contact Page Neumorphism 3D overrides for light mode */
+@media (max-width: 767px) {
+  .light .contact-panel-container {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 10px 10px 24px rgba(15, 23, 42, 0.06), -10px -10px 24px #ffffff !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .light .contact-panel-container {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.light .contact-panel-vector {
+  fill: #ffffff !important;
+  stroke: rgba(15, 23, 42, 0.08) !important;
+}
+
+.light .contact-svg-filter {
+  filter: drop-shadow(0 25px 35px rgba(15, 23, 42, 0.16)) !important;
+}
+
+/* Editor Header Buttons 3D Shadow for Light Mode */
+.light .editor-header-btn {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 2px 2px 5px rgba(15, 23, 42, 0.04), -2px -2px 5px #ffffff !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.light .editor-header-btn:hover {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: inset 1px 1px 3px rgba(15, 23, 42, 0.08), inset -1px -1px 3px #ffffff !important;
+}
+
+/* Toast Notification Styles */
+.toast-notification {
+  background-color: rgba(18, 25, 38, 0.95) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.light .toast-notification {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+
 #auth-tab-login, #auth-tab-signup {
   cursor: pointer;
 }
@@ -1565,4 +1637,182 @@ input:-webkit-autofill:active {
 .light .mock-ide-container:hover {
   box-shadow: 20px 20px 45px rgba(15, 23, 42, 0.3),
               -20px -20px 45px rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Light Mode overrides for Navigation Login Button & Theme Toggle */
+.light #nav-signin-btn {
+  background-color: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25),
+              0 2px 4px rgba(79, 70, 229, 0.15) !important;
+}
+
+.light #nav-signin-btn:hover {
+  background-color: #3b30e0 !important; /* Slightly darker indigo */
+  color: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.35),
+              0 3px 6px rgba(79, 70, 229, 0.2) !important;
+}
+
+.light #theme-toggle {
+  background-color: var(--bg-primary) !important;
+  border: none !important;
+  box-shadow: 3px 3px 8px rgba(15, 23, 42, 0.08),
+              -3px -3px 8px #ffffff !important;
+}
+
+.light #theme-toggle:hover {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: 4px 4px 10px rgba(15, 23, 42, 0.12),
+              -4px -4px 10px #ffffff !important;
+}
+
+/* Light Mode Header Separation overrides */
+.light header {
+  background-color: rgba(238, 242, 246, 0.8) !important; /* Solid/frosted #eef2f6 background */
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important; /* Soft distinct drop shadow */
+  border-bottom: 1px solid rgba(203, 213, 225, 0.7) !important; /* Soft visible border */
+}
+
+/* AI Chat Panel Custom Shadow & Border overrides in Light Mode (Placed at the bottom to prevent override by global glass-panel styles) */
+.light .chat-panel-container,
+.light .glass-panel.chat-panel-container {
+  border-left: none !important;
+  box-shadow: 8px 8px 6px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* AI Chat Panel History Scroll Area Background override */
+.chat-history-scroll {
+  background-color: var(--bg-primary) !important;
+}
+
+.light .chat-history-scroll {
+  background-color: #e2e8f0 !important;
+}
+
+/* Journey map navigation controls 3D styling */
+.journey-nav-btn {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04) !important;
+  transition: var(--transition-smooth);
+}
+
+.light .journey-nav-btn {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 3px 3px 6px rgba(15, 23, 42, 0.08), -3px -3px 6px #ffffff !important;
+}
+
+.light .journey-nav-btn:hover {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: inset 1px 1px 3px rgba(15, 23, 42, 0.08), inset -1px -1px 3px #ffffff !important;
+}
+
+/* Auth Page Light Mode Card and Input focus styling overrides */
+.light #auth-card-solid .glass-panel {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.light .auth-input-wrapper:focus-within + .auth-label,
+.light .glow-input-focus:focus-within .auth-label {
+  color: #4f46e5 !important;
+  text-shadow: none !important;
+}
+
+.light .auth-social-btn:hover {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+.light .auth-social-btn-github:hover {
+  border-color: rgba(15, 23, 42, 0.4) !important;
+}
+
+.light .auth-social-btn-google:hover {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.light .auth-social-btn-facebook:hover {
+  border-color: rgba(24, 119, 242, 0.4) !important;
+}
+
+/* Specific override to keep auth-input transparent in light mode */
+.light input.auth-input,
+.light input.auth-input:focus {
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Remove top/left white shadow from left side of Auth page in light mode */
+.light #auth-card-solid .book-face-inner.glass-panel {
+  box-shadow: 7px 7px 14px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Neumorphic 3D shadow for small buttons on Auth page in light mode */
+.light .auth-back-btn,
+.light .auth-social-btn,
+.light .auth-guest-btn,
+.light .auth-back-login-btn {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 2px 2px 5px rgba(15, 23, 42, 0.06), -2px -2px 5px #ffffff !important;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.light .auth-back-btn:hover,
+.light .auth-social-btn:hover,
+.light .auth-guest-btn:hover,
+.light .auth-back-login-btn:hover {
+  background-color: var(--bg-tertiary) !important;
+  box-shadow: 3px 3px 8px rgba(15, 23, 42, 0.1), -3px -3px 8px #ffffff !important;
+  transform: translateY(-1.5px) !important;
+}
+
+.light .auth-back-btn:active,
+.light .auth-social-btn:active,
+.light .auth-guest-btn:active,
+.light .auth-back-login-btn:active {
+  transform: translateY(0.5px) !important;
+  box-shadow: inset 1px 1px 3px rgba(15, 23, 42, 0.08), inset -1px -1px 3px #ffffff !important;
+}
+
+/* Premium Light Mode Mockup Code Block inside Auth page */
+.light .auth-code-mockup {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 3px 3px 8px rgba(15, 23, 42, 0.04), -3px -3px 8px #ffffff !important;
+}
+
+/* Remove top/left white shadow from Output Console card in light mode */
+.light .output-console-card.glass-panel {
+  box-shadow: 7px 7px 14px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Landing Page Mock IDE Container theme-adaptive shadows */
+.mock-ide-container {
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35) !important;
+  transition: box-shadow 0.3s ease;
+}
+.mock-ide-container:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
+}
+.light .mock-ide-container {
+  box-shadow: 15px 15px 35px rgba(15, 23, 42, 0.08), -15px -15px 35px #ffffff !important;
+}
+.light .mock-ide-container:hover {
+  box-shadow: 15px 15px 35px rgba(15, 23, 42, 0.12), -15px -15px 35px #ffffff !important;
+}
+
+/* Landing Page Marquee Language Cards theme-adaptive shadows */
+.marquee-lang-card {
+  box-shadow: none !important;
+}
+.light .marquee-lang-card {
+  box-shadow: 5px 5px 12px rgba(15, 23, 42, 0.06), -5px -5px 12px #ffffff !important;
 }

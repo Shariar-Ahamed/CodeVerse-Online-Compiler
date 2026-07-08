@@ -2033,7 +2033,7 @@ Explain why this error occurred and how to fix it.`;
       return (
         <div className={`relative flex items-center gap-2 ${isMobileView ? 'pl-2' : 'border-l border-[var(--border-color)] pl-3 ml-1'} select-none`}>
           {/* User Name */}
-          <span className="hidden md:inline text-xs font-bold text-slate-300 max-w-[80px] truncate">
+          <span className="hidden md:inline text-xs font-bold text-[var(--text-primary)] max-w-[80px] truncate">
             {user.name}
           </span>
           
@@ -2043,25 +2043,30 @@ Explain why this error occurred and how to fix it.`;
               e.stopPropagation();
               setUserDropdownOpen(prev => !prev);
             }}
-            className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
+            className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden relative"
             title="View Profile Actions"
           >
-            {user.photoURL ? (
-              <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm">
-                {(user.name || 'U').charAt(0).toUpperCase()}
-              </span>
+            <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm select-none">
+              {(user.name || 'U').charAt(0).toUpperCase()}
+            </span>
+            {user.photoURL && (
+              <img
+                src={user.photoURL}
+                alt="Avatar"
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                referrerPolicy="no-referrer"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
             )}
           </button>
 
           {/* Dropdown Menu */}
           {userDropdownOpen && (
-            <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[#0f1420] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up" style={{ backgroundColor: '#0f1420', opacity: 1 }}>
+            <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up">
               {/* Account Info summary */}
               <div className="px-2.5 py-1.5 border-b border-[var(--border-color)]/30 mb-1 flex flex-col text-left">
-                <span className="text-[10px] font-bold text-slate-400 truncate">{user.name}</span>
-                <span className="text-[8px] font-mono text-slate-500 truncate mt-0.5">{user.email}</span>
+                <span className="text-[10px] font-bold text-[var(--text-secondary)] truncate">{user.name}</span>
+                <span className="text-[8px] font-mono text-[var(--text-muted)] truncate mt-0.5">{user.email}</span>
               </div>
 
               <button
@@ -2069,7 +2074,7 @@ Explain why this error occurred and how to fix it.`;
                   setUserDropdownOpen(false);
                   navigate(`/profile/${user.username || ''}`);
                 }}
-                className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-primary)]/80 hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
               >
                 <i className="far fa-user text-[10px] text-indigo-400 w-4 text-center"></i>
                 <span>My account</span>
@@ -2084,7 +2089,7 @@ Explain why this error occurred and how to fix it.`;
                     openSettingsModal();
                   }
                 }}
-                className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-primary)]/80 hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
               >
                 <i className="fas fa-sliders text-[10px] text-cyan-400 w-4 text-center"></i>
                 <span>{user.role === 'admin' ? 'Admin Panel' : 'API Console'}</span>
@@ -2110,8 +2115,9 @@ Explain why this error occurred and how to fix it.`;
       return (
         <div className={isMobileView ? 'pl-2' : 'border-l border-[var(--border-color)] pl-3 ml-1'}>
           <button
+            id="nav-signin-btn"
             onClick={() => navigate('/login')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 active:scale-95 transition-all duration-200"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 hover:border-indigo-500/50 shadow-md shadow-indigo-500/5 active:scale-95 transition-all duration-200"
           >
             <i className="fas fa-sign-in-alt"></i>
             <span>Login</span>
@@ -2134,7 +2140,7 @@ Explain why this error occurred and how to fix it.`;
           {/* Left Side: Back button */}
           <Link
             to="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 relative z-20 editor-header-btn"
           >
             <i className="fas fa-arrow-left text-[10px] sm:text-xs"></i>
             <span>Back</span>
@@ -2144,7 +2150,7 @@ Explain why this error occurred and how to fix it.`;
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLanguageModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:border-indigo-500/30 editor-header-btn"
             >
               <i className="fas fa-cubes text-[10px] sm:text-xs text-indigo-400"></i>
               <span className="text-[var(--text-secondary)] text-[10px] sm:text-xs">Language:</span>
@@ -2172,7 +2178,7 @@ Explain why this error occurred and how to fix it.`;
             {/* Clear Button */}
             <button
               onClick={currentLanguage === "text" ? () => handleUpdateNote('content', '') : clearConsole}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
             >
               <i className="fas fa-eraser text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Clear Note" : "Clear"}</span>
@@ -2181,7 +2187,7 @@ Explain why this error occurred and how to fix it.`;
             {/* Copy Button */}
             <button
               onClick={currentLanguage === "text" ? handleCopyNote : copyCodeToClipboard}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
             >
               <i className="fas fa-copy text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Copy Note" : "Copy"}</span>
@@ -2190,7 +2196,7 @@ Explain why this error occurred and how to fix it.`;
             {/* Download Button */}
             <button
               onClick={currentLanguage === "text" ? handleDownloadNote : downloadCodeFile}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
             >
               <i className="fas fa-download text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
@@ -2207,7 +2213,7 @@ Explain why this error occurred and how to fix it.`;
                 {/* Settings Modal Button */}
                 <button
                   onClick={openSettingsModal}
-                  className="p-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                  className="p-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
                   title="API Credentials Configuration"
                 >
                   <i className="fas fa-sliders text-xs"></i>
@@ -2219,7 +2225,7 @@ Explain why this error occurred and how to fix it.`;
                   className={`p-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
                     showAIPanel
                       ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
-                      : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)]'
+                      : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] editor-header-btn'
                   }`}
                   title="AI Code Assistant"
                 >
@@ -3120,7 +3126,7 @@ Explain why this error occurred and how to fix it.`;
               </div>
 
               {/* Output Terminal Panel */}
-              <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
+              <div className="output-console-card flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-xl transition-all duration-300 ide-neon-border">
                 <div className="h-auto py-2 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 flex flex-col gap-2 px-4 justify-center">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -3156,7 +3162,7 @@ Explain why this error occurred and how to fix it.`;
 
                 {/* Console Output box */}
                 <div id="console-output-container" className="flex-grow p-4 bg-[var(--console-bg)] overflow-y-auto min-h-[220px] relative">
-                  <pre id="output-console" className="text-slate-300 font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
+                  <pre id="output-console" className="text-[var(--text-primary)] font-mono text-xs whitespace-pre-wrap select-text leading-relaxed">
                     {consoleOutput}
                     <span className="terminal-cursor"></span>
                   </pre>
@@ -3388,10 +3394,10 @@ Explain why this error occurred and how to fix it.`;
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl lg:max-w-5xl rounded-2xl border border-[#232f48] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
+            className="w-full max-w-4xl lg:max-w-5xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col max-h-[85vh]"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[#232f48] bg-[#0f1420]/75 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+            <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-secondary)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                   <i className="fas fa-cubes text-sm"></i>
@@ -3409,7 +3415,7 @@ Explain why this error occurred and how to fix it.`;
                   placeholder="Search languages..."
                   value={langSearchQuery}
                   onChange={(e) => setLangSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-4 py-1.5 rounded-xl text-xs bg-[#0c101c] border border-[#232f48] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                  className="w-full pl-8 pr-4 py-1.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
                 />
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-[var(--text-secondary)]">
                   <i className="fas fa-search text-[10px]"></i>
@@ -3417,7 +3423,7 @@ Explain why this error occurred and how to fix it.`;
                 {langSearchQuery && (
                   <button
                     onClick={() => setLangSearchQuery("")}
-                    className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-white transition-colors duration-200"
+                    className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-[var(--text-primary)] transition-colors duration-200"
                   >
                     <i className="fas fa-times text-[10px]"></i>
                   </button>
@@ -3448,8 +3454,8 @@ Explain why this error occurred and how to fix it.`;
                         }}
                         className={`group flex items-center gap-2.5 sm:gap-3.5 p-3 sm:p-4 lg:p-3 rounded-2xl border transition-all duration-300 cursor-pointer select-none active:scale-98 ${
                           isSelected
-                            ? 'border-indigo-500 bg-[#1e273d] shadow-lg shadow-indigo-500/5 text-white'
-                            : 'border-[#222c3f]/80 bg-[#161e30]/70 hover:bg-[#1a233b] hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                            ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/5 text-[var(--text-primary)] font-black'
+                            : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                       >
                         {/* Dynamic Colored Icon Container using badgeClass */}
@@ -3476,14 +3482,14 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3.5 border-t border-[#232f48] bg-[#0f1420]/75 flex items-center justify-between shrink-0 text-[10px] text-[var(--text-secondary)]">
+            <div className="px-6 py-3.5 border-t border-[var(--border-color)] bg-[var(--bg-secondary)] flex items-center justify-between shrink-0 text-[10px] text-[var(--text-secondary)]">
               <span>{filteredLanguages.length} environments available</span>
               <button
                 onClick={() => {
                   setShowLanguageModal(false);
                   setLangSearchQuery("");
                 }}
-                className="px-3.5 py-1.5 rounded-lg border border-[#232f48] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[#1c263e] active:scale-95 transition-all duration-200"
+                className="px-3.5 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] active:scale-95 transition-all duration-200"
               >
                 Close
               </button>
@@ -3500,10 +3506,10 @@ Explain why this error occurred and how to fix it.`;
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col"
+            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420] flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[var(--bg-secondary)] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                   <i className="fas fa-sliders text-sm"></i>
@@ -3528,7 +3534,7 @@ Explain why this error occurred and how to fix it.`;
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Font size</span>
                   <span className="text-[10px] text-[var(--text-muted)]">8–32px</span>
                 </div>
-                <div className="flex items-center gap-3 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-3 bg-[var(--bg-tertiary)] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={() => {
                       const next = Math.max(8, settingsFontSize - 1);
@@ -3539,7 +3545,7 @@ Explain why this error occurred and how to fix it.`;
                   >
                     <i className="fas fa-minus"></i>
                   </button>
-                  <span className="text-xs font-mono font-bold text-white w-8 text-center">{settingsFontSize}px</span>
+                  <span className="text-xs font-mono font-bold text-[var(--text-primary)] w-8 text-center">{settingsFontSize}px</span>
                   <button
                     onClick={() => {
                       const next = Math.min(32, settingsFontSize + 1);
@@ -3558,15 +3564,15 @@ Explain why this error occurred and how to fix it.`;
                 <div className="text-left">
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Theme</span>
                 </div>
-                <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={() => {
                       if (theme !== 'light' && toggleTheme) toggleTheme();
                     }}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
                       theme === 'light' 
-                        ? 'bg-indigo-600 text-white shadow-sm' 
-                        : 'text-slate-400 hover:text-white'
+                         ? 'bg-indigo-600 text-white shadow-sm' 
+                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <i className="far fa-sun text-[10px]"></i>
@@ -3578,8 +3584,8 @@ Explain why this error occurred and how to fix it.`;
                     }}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
                       theme === 'dark' 
-                        ? 'bg-indigo-600 text-white shadow-sm' 
-                        : 'text-slate-400 hover:text-white'
+                         ? 'bg-indigo-600 text-white shadow-sm' 
+                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <i className="far fa-moon text-[10px]"></i>
@@ -3594,7 +3600,7 @@ Explain why this error occurred and how to fix it.`;
                   <span className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Editor</span>
                   <span className="text-[10px] text-[var(--text-muted)]">On mobile, Ace is always used.</span>
                 </div>
-                <div className="flex items-center gap-1 bg-[#090d16] p-1 rounded-xl border border-[var(--border-color)]/50">
+                <div className="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl border border-[var(--border-color)]/50">
                   <button
                     onClick={isMobile ? null : () => {
                       setSettingsEditorEngine("Monaco");
@@ -3606,7 +3612,7 @@ Explain why this error occurred and how to fix it.`;
                         ? 'text-slate-600 cursor-not-allowed opacity-40'
                         : (settingsEditorEngine === "Monaco" 
                             ? 'bg-indigo-600 text-white shadow-sm cursor-pointer' 
-                            : 'text-slate-400 hover:text-white cursor-pointer')
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer')
                     }`}
                     title={isMobile ? "Monaco is disabled on mobile" : ""}
                   >
@@ -3620,7 +3626,7 @@ Explain why this error occurred and how to fix it.`;
                     className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
                       isMobile || settingsEditorEngine === "Ace" 
                         ? 'bg-indigo-600 text-white shadow-sm' 
-                        : 'text-slate-400 hover:text-white'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     Ace
@@ -3653,22 +3659,22 @@ Explain why this error occurred and how to fix it.`;
                       }
                     }
                   }}
-                  className="px-3 py-1.5 rounded-xl text-xs bg-[#090d16] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer max-w-[150px]"
+                  className="px-3 py-1.5 rounded-xl text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer max-w-[150px]"
                 >
-                  <optgroup label="Dark themes" className="bg-[#121824] text-slate-300">
-                    <option value="Dark (Default)">Dark (Default)</option>
-                    <option value="One Dark Pro">One Dark Pro</option>
-                    <option value="Dracula">Dracula</option>
-                    <option value="Monokai">Monokai</option>
-                    <option value="Night Owl">Night Owl</option>
-                    <option value="GitHub Dark">GitHub Dark</option>
-                    <option value="Tokyo Night">Tokyo Night</option>
-                    <option value="Catppuccin Mocha">Catppuccin Mocha</option>
-                    <option value="Nord">Nord</option>
-                    <option value="Solarized Dark">Solarized Dark</option>
-                    <option value="High Contrast Dark">High Contrast Dark</option>
+                  <optgroup label="Dark themes" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">
+                    <option value="Dark (Default)" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Dark (Default)</option>
+                    <option value="One Dark Pro" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">One Dark Pro</option>
+                    <option value="Dracula" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Dracula</option>
+                    <option value="Monokai" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Monokai</option>
+                    <option value="Night Owl" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Night Owl</option>
+                    <option value="GitHub Dark" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">GitHub Dark</option>
+                    <option value="Tokyo Night" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Tokyo Night</option>
+                    <option value="Catppuccin Mocha" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Catppuccin Mocha</option>
+                    <option value="Nord" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Nord</option>
+                    <option value="Solarized Dark" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">Solarized Dark</option>
+                    <option value="High Contrast Dark" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">High Contrast Dark</option>
                   </optgroup>
-                  <optgroup label="Light themes" className="bg-[#121824] text-slate-300">
+                  <optgroup label="Light themes" className="bg-[var(--bg-secondary)] text-[var(--text-primary)]">
                     <option value="Light (Default)">Light (Default)</option>
                     <option value="One Light">One Light</option>
                     <option value="GitHub Light">GitHub Light</option>
@@ -3696,7 +3702,7 @@ Explain why this error occurred and how to fix it.`;
                     localStorage.setItem("codeverse_settings_word_wrap", next);
                   }}
                   className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
-                    settingsWordWrap ? 'bg-indigo-600' : 'bg-slate-700'
+                    settingsWordWrap ? 'bg-indigo-600' : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)]/30'
                   }`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
@@ -3719,7 +3725,7 @@ Explain why this error occurred and how to fix it.`;
                     localStorage.setItem("codeverse_settings_disable_autocomplete", next);
                   }}
                   className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
-                    settingsDisableAutocomplete ? 'bg-indigo-600' : 'bg-slate-700'
+                    settingsDisableAutocomplete ? 'bg-indigo-600' : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)]/30'
                   }`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
@@ -3742,7 +3748,7 @@ Explain why this error occurred and how to fix it.`;
                     localStorage.setItem("codeverse_settings_preserve_error_log", next);
                   }}
                   className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
-                    settingsPreserveErrorLog ? 'bg-indigo-600' : 'bg-slate-700'
+                    settingsPreserveErrorLog ? 'bg-indigo-600' : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)]/30'
                   }`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
@@ -3765,7 +3771,7 @@ Explain why this error occurred and how to fix it.`;
                     localStorage.setItem("codeverse_settings_avoid_auto_scrolling", next);
                   }}
                   className={`w-10 h-5 rounded-full flex items-center p-0.5 shrink-0 transition-colors duration-200 cursor-pointer ${
-                    settingsAvoidAutoScrolling ? 'bg-indigo-600' : 'bg-slate-700'
+                    settingsAvoidAutoScrolling ? 'bg-indigo-600' : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)]/30'
                   }`}
                 >
                   <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
@@ -3776,7 +3782,7 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420] flex justify-between items-center shrink-0">
+            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-secondary)] flex justify-between items-center shrink-0">
               <button
                 onClick={() => {
                   setSettingsFontSize(14);

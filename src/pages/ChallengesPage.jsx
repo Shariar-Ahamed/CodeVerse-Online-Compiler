@@ -76,7 +76,7 @@ export default function ChallengesPage({ user, showToast }) {
   );
 
   return (
-    <div className="min-h-screen py-5 sm:py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-white relative">
+    <div className="min-h-screen py-5 sm:py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-[var(--text-primary)] relative">
       <div className="max-w-6xl mx-auto mt-2 sm:mt-6 relative z-10">
         
         {/* Header Metadata Section */}
@@ -93,11 +93,11 @@ export default function ChallengesPage({ user, showToast }) {
           <div className="flex items-stretch gap-3 w-full md:w-auto">
             <div className="flex-1 md:flex-initial px-4 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-center flex flex-col justify-center">
               <span className="text-[9px] uppercase font-bold text-indigo-400 block tracking-wider leading-none mb-1">Your Score</span>
-              <span className="text-lg font-black text-white leading-none">{userScore} <span className="text-[10px] font-medium text-indigo-300">pts</span></span>
+              <span className="text-lg font-black text-[var(--text-primary)] leading-none">{userScore} <span className="text-[10px] font-medium text-indigo-300">pts</span></span>
             </div>
             <button
               onClick={() => navigate('/leaderboard')}
-              className="flex-1 md:flex-initial justify-center px-4 py-2.5 rounded-xl bg-[var(--bg-tertiary)] hover:bg-slate-800 border border-[var(--border-color)] font-bold text-xs text-slate-200 hover:text-white flex items-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer"
+              className="flex-1 md:flex-initial justify-center px-4 py-2.5 rounded-xl bg-[var(--bg-tertiary)]/75 hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] font-bold text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer"
             >
               <i className="fas fa-trophy text-amber-400 text-xs"></i>
               <span>Leaderboard</span>
@@ -114,7 +114,7 @@ export default function ChallengesPage({ user, showToast }) {
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
                 filterDifficulty === diff
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                  : 'bg-[var(--bg-tertiary)]/40 text-slate-400 hover:text-white border border-[var(--border-color)]/60'
+                  : 'bg-[var(--bg-tertiary)]/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/70 border border-[var(--border-color)]/60'
               }`}
             >
               {diff}
@@ -141,8 +141,8 @@ export default function ChallengesPage({ user, showToast }) {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 bg-[var(--bg-tertiary)]/20 rounded-3xl border border-[var(--border-color)]/50 p-8">
             <i className="fas fa-search text-3xl text-slate-500 mb-3 block"></i>
-            <h3 className="font-bold text-white mb-1">No Challenges Found</h3>
-            <p className="text-xs text-slate-400">Try switching your difficulty filter to locate problems.</p>
+            <h3 className="font-bold text-[var(--text-primary)] mb-1">No Challenges Found</h3>
+            <p className="text-xs text-[var(--text-secondary)]">Try switching your difficulty filter to locate problems.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3.5">
@@ -163,12 +163,12 @@ export default function ChallengesPage({ user, showToast }) {
                       navigate(`/challenges/${item.id}`);
                     }
                   }}
-                  className="w-full bg-[#0d1321]/30 glass-panel border border-[var(--border-color)] border-l-4 border-l-transparent rounded-xl p-5 hover:border-indigo-500/30 hover:border-l-indigo-500/90 hover:bg-[#0d1321]/60 hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(99,102,241,0.08)] transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-5 text-left cursor-pointer select-none"
+                  className="w-full bg-[var(--bg-secondary)] glass-panel border border-[var(--border-color)] border-l-4 border-l-transparent rounded-xl p-5 hover:border-indigo-500/30 hover:border-l-indigo-500/90 hover:bg-[var(--bg-tertiary)]/30 hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(99,102,241,0.08)] transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-5 text-left cursor-pointer select-none"
                 >
                   <div className="flex-grow space-y-1.5 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h3 className="font-extrabold text-white text-base tracking-tight flex items-center gap-2">
-                        <span className="text-slate-300 font-mono font-bold">#{item.order || 0}.</span>
+                      <h3 className="font-extrabold text-[var(--text-primary)] text-base tracking-tight flex items-center gap-2">
+                        <span className="text-[var(--text-secondary)] font-mono font-bold">#{item.order || 0}.</span>
                         <span>{item.title}</span>
                         {isSolved && (
                           <i className="fas fa-circle-check text-emerald-400 text-sm" title="Solved successfully"></i>
@@ -178,19 +178,19 @@ export default function ChallengesPage({ user, showToast }) {
                         {item.difficulty}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 font-normal leading-relaxed line-clamp-1">
+                    <p className="text-xs text-[var(--text-secondary)] font-normal leading-relaxed line-clamp-1">
                       {item.description}
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-6 shrink-0 w-full sm:w-auto border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
                     <div className="flex flex-col items-start sm:items-end">
-                      <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Reward</span>
+                      <span className="text-[9px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Reward</span>
                       <span className="text-xs font-black text-indigo-400">+{item.points} pts</span>
                     </div>
 
                     <button
-                      className="px-5 py-2.5 rounded-xl font-bold text-xs bg-[var(--bg-tertiary)] hover:bg-indigo-600 hover:text-white border border-[var(--border-color)] active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0"
+                      className="px-5 py-2.5 rounded-xl font-bold text-xs bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-indigo-600 hover:text-white border border-[var(--border-color)] active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0"
                     >
                       <span>{isSolved ? "Resolve" : "Solve"}</span>
                       <i className="fas fa-play text-[9px]"></i>

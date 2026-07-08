@@ -35,7 +35,7 @@ const getPasswordStrength = (password) => {
   }
 };
 
-export default function AuthPage({ user, onLogin, showToast }) {
+export default function AuthPage({ user, onLogin, showToast, theme }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
   
@@ -829,14 +829,14 @@ export default function AuthPage({ user, onLogin, showToast }) {
         >
           
           {/* INNER FACE (Visible when open) */}
-          <div className="book-face-inner p-10 flex flex-col justify-between glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-br from-indigo-950/20 via-slate-900/10 to-cyan-950/10 shadow-2xl">
+          <div className="book-face-inner p-10 flex flex-col justify-between glass-panel border border-[var(--border-color)] rounded-l-[32px] border-r-0 bg-gradient-to-br from-indigo-950/20 via-slate-900/10 to-cyan-950/10 dark:bg-gradient-to-br dark:from-indigo-950/20 dark:via-slate-900/10 dark:to-cyan-950/10 shadow-2xl">
             {/* Logo Brand at top left */}
             <div className="flex items-center gap-3 cursor-pointer text-left" onClick={() => navigate('/')}>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-md shadow-indigo-500/25">
                 <i className="fas fa-cubes text-white text-base"></i>
               </div>
               <div>
-                <span className="text-base font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-base font-extrabold tracking-tight bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
                   CodeVerse
                 </span>
                 <span className="text-[10px] block text-[var(--text-secondary)] font-medium leading-none">Online Compiler</span>
@@ -849,13 +849,13 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 <span className="px-3 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 uppercase tracking-wider inline-block">
                   Developer Workbench
                 </span>
-                <h2 className="text-3xl font-black tracking-tight leading-tight text-white">
+                <h2 className="text-3xl font-black tracking-tight leading-tight text-[var(--text-primary)]">
                   Write Code. Compile Live.<br />
-                  <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400 bg-clip-text text-transparent">
                     No Local Setup.
                   </span>
                 </h2>
-                <p className="text-slate-400 text-xs max-w-sm leading-relaxed">
+                <p className="text-[var(--text-secondary)] text-xs max-w-sm leading-relaxed">
                   Experience a fast, secure, and fully-featured cloud compilation platform with support for over 30+ languages, web sandboxes, and personalized activity stats.
                 </p>
               </div>
@@ -866,30 +866,30 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   <div className="w-6.5 h-6.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                     <i className="fas fa-check text-[10px]"></i>
                   </div>
-                  <span className="text-xs font-semibold text-slate-300">30+ Languages</span>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">30+ Languages</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6.5 h-6.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                     <i className="fas fa-bolt text-[10px]"></i>
                   </div>
-                  <span className="text-xs font-semibold text-slate-300">Instant Execution</span>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Instant Execution</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6.5 h-6.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                     <i className="fas fa-code text-[10px]"></i>
                   </div>
-                  <span className="text-xs font-semibold text-slate-300">Live Web Sandbox</span>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Live Web Sandbox</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6.5 h-6.5 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
                     <i className="fas fa-chart-line text-[10px]"></i>
                   </div>
-                  <span className="text-xs font-semibold text-slate-300">Activity Analytics</span>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Activity Analytics</span>
                 </div>
               </div>
 
               {/* Glowing Code Block Mockup */}
-              <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-4 font-mono text-[10px] text-slate-300 relative overflow-hidden backdrop-blur-md max-w-sm shadow-lg mt-1">
+              <div className="auth-code-mockup rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/40 p-4 font-mono text-[10px] text-slate-700 dark:text-slate-300 relative overflow-hidden backdrop-blur-md max-w-sm shadow-lg mt-1">
                 <div className="absolute top-3 left-3 flex gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
@@ -897,28 +897,28 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 </div>
                 <span className="absolute top-2.5 right-4 text-[9px] text-slate-500 select-none">workspace.py</span>
                 <div className="mt-3.5 space-y-1">
-                  <p className="text-slate-500"><span className="text-pink-400">import</span> codeverse <span className="text-pink-400">as</span> cv</p>
-                  <p className="text-slate-500"><span className="text-pink-400">def</span> <span className="text-blue-400">compile_now</span>(user_id):</p>
-                  <p className="pl-4 text-slate-300">env = cv.connect(user_id)</p>
-                  <p className="pl-4 text-slate-300">print(<span className="text-green-300">f"Connecting to {"{env.name}"}..."</span>)</p>
-                  <p className="pl-4 text-indigo-400">env.run() <span className="text-slate-500"># Success!</span></p>
+                  <p className="text-slate-400 dark:text-slate-500"><span className="text-pink-600 dark:text-pink-400">import</span> codeverse <span className="text-pink-600 dark:text-pink-400">as</span> cv</p>
+                  <p className="text-slate-400 dark:text-slate-500"><span className="text-pink-600 dark:text-pink-400">def</span> <span className="text-blue-600 dark:text-blue-400">compile_now</span>(user_id):</p>
+                  <p className="pl-4 text-slate-700 dark:text-slate-300">env = cv.connect(user_id)</p>
+                  <p className="pl-4 text-slate-700 dark:text-slate-300">print(<span className="text-green-600 dark:text-green-300">f"Connecting to {"{env.name}"}..."</span>)</p>
+                  <p className="pl-4 text-indigo-600 dark:text-indigo-400">env.run() <span className="text-slate-400 dark:text-slate-500"># Success!</span></p>
                 </div>
               </div>
             </div>
 
             {/* Footer inside Left visual */}
-            <div className="text-[9px] text-slate-500 text-left">
+            <div className="text-[9px] text-[var(--text-muted)] text-left">
               &copy; {new Date().getFullYear()} CodeVerse. Built for developers worldwide.
             </div>
           </div>
 
           {/* OUTER COVER FACE (Visible when closed / folded over the login form) */}
-          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center border border-[var(--border-color)] rounded-r-[32px] border-l-0 shadow-2xl bg-[#0c101d]" style={{ background: 'linear-gradient(135deg, #0c101d 0%, #070a12 100%)' }}>
+          <div className="book-face-outer p-10 flex flex-col justify-center items-center text-center border border-[var(--border-color)] rounded-r-[32px] border-l-0 shadow-2xl bg-[var(--bg-secondary)]" style={{ background: theme === 'light' ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' : 'linear-gradient(135deg, #0c101d 0%, #070a12 100%)' }}>
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-5 relative group">
               <div className="absolute inset-0 rounded-2xl bg-indigo-400/20 blur-md animate-pulse"></div>
               <i className="fas fa-cubes text-white text-3xl animate-pulse relative z-10"></i>
             </div>
-            <h1 className="text-3xl font-black tracking-wider text-white bg-gradient-to-r from-slate-100 to-indigo-100 bg-clip-text text-transparent">CodeVerse</h1>
+            <h1 className="text-3xl font-black tracking-wider text-[var(--text-primary)] bg-gradient-to-r from-[var(--text-primary)] to-[var(--accent-primary)] bg-clip-text text-transparent">CodeVerse</h1>
             <p className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-[0.25em] mt-2">Online Compiler</p>
             <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent my-6"></div>
             <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase animate-pulse">
@@ -942,7 +942,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
           <div className="absolute top-6 left-6">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 text-[9px] font-bold text-slate-400 hover:text-white transition-all duration-200 bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800/80 hover:border-indigo-500/30 px-3 py-1.5 rounded-lg cursor-pointer focus:outline-none shadow-sm hover:-translate-x-0.5"
+              className="auth-back-btn inline-flex items-center gap-1.5 text-[9px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 bg-[var(--bg-primary)]/50 hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] px-3 py-1.5 rounded-lg cursor-pointer focus:outline-none shadow-sm hover:-translate-x-0.5"
             >
               <i className="fas fa-arrow-left text-[8px] text-indigo-400"></i>
               <span>BACK HOME</span>
@@ -965,7 +965,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
             {/* Header on Desktop (Just details) */}
             <div className="hidden lg:block text-center mb-1">
-              <h1 className="text-xl font-black text-white">Welcome to CodeVerse</h1>
+              <h1 className="text-xl font-black text-[var(--text-primary)]">Welcome to CodeVerse</h1>
               <p className="text-xs text-[var(--text-secondary)] mt-1">Access your compiler workbench</p>
             </div>
 
@@ -974,7 +974,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
               <button
                 onClick={() => setActiveTab('login')}
                 className={`w-1/2 pb-2 text-center transition-all duration-300 cursor-pointer focus:outline-none z-10 ${
-                  activeTab === 'login' ? 'text-white' : 'text-[var(--text-secondary)] hover:text-white'
+                  activeTab === 'login' ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 Login
@@ -982,7 +982,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
               <button
                 onClick={() => setActiveTab('signup')}
                 className={`w-1/2 pb-2 text-center transition-all duration-300 cursor-pointer focus:outline-none z-10 ${
-                  activeTab === 'signup' ? 'text-white' : 'text-[var(--text-secondary)] hover:text-white'
+                  activeTab === 'signup' ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 Create Account
@@ -1412,9 +1412,9 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
             {/* Social Buttons */}
             <div className="grid grid-cols-3 gap-2">
-              <button
+             <button
                 onClick={() => handleSocialLogin('github')}
-                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-slate-100 hover:text-white text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-github"
+                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-github"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -1423,7 +1423,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
               </button>
               <button
                 onClick={() => handleSocialLogin('google')}
-                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-slate-100 hover:text-white text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-google"
+                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-google"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1435,7 +1435,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
               </button>
               <button
                 onClick={() => handleSocialLogin('facebook')}
-                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-slate-100 hover:text-white text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-facebook"
+                className="flex items-center justify-center gap-2 py-2 px-1 rounded-xl bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-semibold active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none auth-social-btn auth-social-btn-facebook"
               >
                 <svg className="w-3.5 h-3.5 fill-[#1877F2]" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -1456,7 +1456,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 showToast("Entering Workspace as Guest", "info");
                 navigate('/editor');
               }}
-              className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-900/50 hover:bg-indigo-600/20 border border-slate-800/80 hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer text-center mt-2.5 shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
+              className="auth-guest-btn w-full py-2.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-primary)]/50 hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer text-center mt-2.5 shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
             >
               <i className="fas fa-user-secret mr-1.5 text-indigo-400"></i>
               <span>Continue as Guest</span>
@@ -1465,7 +1465,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
 
           {/* Forgot Password Overlay */}
           {activeTab === 'forgot' && (
-            <div className="absolute inset-0 bg-[#0f1624] z-20 p-6 sm:p-10 flex flex-col justify-center gap-5 animate-scale-up rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px]">
+            <div className="absolute inset-0 bg-[var(--bg-secondary)] z-20 p-6 sm:p-10 flex flex-col justify-center gap-5 animate-scale-up rounded-[32px] lg:rounded-l-none lg:rounded-r-[32px]">
               
               {/* Header */}
               <div className="text-center flex flex-col items-center gap-2">
@@ -1473,7 +1473,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   <i className="fas fa-key text-white text-base"></i>
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white">Reset Password</h3>
+                  <h3 className="text-lg font-black text-[var(--text-primary)]">Reset Password</h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-1.5 max-w-xs leading-relaxed mx-auto">
                     Enter your email address and we'll send you a recovery link to reset your password.
                   </p>
@@ -1484,7 +1484,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                 {/* Email Input */}
                 <div className="flex flex-col gap-1.5 text-left">
                   <label className="auth-label">
-                    Email Address
+                     Email Address
                   </label>
                   <div className="auth-input-wrapper">
                     <input
@@ -1511,7 +1511,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                   <button
                     type="button"
                     onClick={() => setActiveTab('login')}
-                    className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-900/50 hover:bg-indigo-600/20 border border-slate-800/80 hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
+                    className="auth-back-login-btn w-full py-2.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-primary)]/50 hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] hover:border-indigo-500/40 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:shadow-indigo-500/5"
                   >
                     Back to Login
                   </button>
@@ -1532,7 +1532,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                     setShowOtpModal(false);
                     setSignupPayload(null);
                   }}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors duration-200 focus:outline-none"
+                  className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-200 focus:outline-none"
                   title="Cancel Verification"
                 >
                   <i className="fas fa-times"></i>
@@ -1583,7 +1583,7 @@ export default function AuthPage({ user, onLogin, showToast }) {
                       <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
                       <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
                     </svg>
-                    <h3 className="text-base font-bold text-white mb-1">
+                    <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">
                       {signupPayload?.isPhone ? "Phone Verified!" : "Email Verified!"}
                     </h3>
                     <p className="text-xs text-[var(--text-secondary)]">
@@ -1597,19 +1597,19 @@ export default function AuthPage({ user, onLogin, showToast }) {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-black text-white">
+                      <h3 className="text-lg font-black text-[var(--text-primary)]">
                         {signupPayload?.isPhone ? "Verify Your Phone" : "Verify Your Email"}
                       </h3>
                       <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
                         {signupPayload?.isPhone ? (
                           <>
                             We've sent a 6-digit verification code to <br />
-                            <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.phone}</span>.
+                            <span className="text-[var(--text-primary)] font-bold font-mono text-[11px]">{signupPayload?.phone}</span>.
                           </>
                         ) : (
                           <>
                             We've sent a 6-digit verification code to <br />
-                            <span className="text-slate-200 font-bold font-mono text-[11px]">{signupPayload?.email}</span>.
+                            <span className="text-[var(--text-primary)] font-bold font-mono text-[11px]">{signupPayload?.email}</span>.
                           </>
                         )}
                       </p>

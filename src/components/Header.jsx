@@ -86,7 +86,11 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             Leaderboard
           </button>
           {user && user.role === 'admin' && (
-            <button onClick={() => navigate('/admin')} className="nav-link text-indigo-400 hover:text-indigo-300 font-extrabold transition-colors duration-200 focus:outline-none flex items-center gap-1">
+            <button onClick={() => navigate('/admin')} className={`nav-link font-extrabold transition-colors duration-200 focus:outline-none flex items-center gap-1 text-indigo-400 ${
+              theme === 'light' 
+                ? 'hover:text-[#1B4EF5]' 
+                : 'hover:text-indigo-300'
+            }`}>
               <i className="fas fa-crown text-[10px] text-amber-400"></i>
               <span>Admin Panel</span>
             </button>
@@ -119,7 +123,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             ) : (
               <div id="nav-user-profile" className={`${mobileMenuOpen ? 'hidden md:flex' : 'flex'} items-center gap-2 relative`}>
                 {/* User Name */}
-                <span className="hidden md:inline text-xs font-bold text-slate-300 max-w-[100px] truncate">
+                <span className="hidden md:inline text-xs font-bold text-[var(--text-primary)] max-w-[100px] truncate">
                   {user.name}
                 </span>
 
@@ -130,25 +134,30 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                     e.stopPropagation();
                     setDropdownOpen(prev => !prev);
                   }}
-                  className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden"
+                  className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-sans overflow-hidden relative"
                   title="View Profile Actions"
                 >
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm">
-                      {(user.name || 'U').charAt(0).toUpperCase()}
-                    </span>
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-sm select-none">
+                    {(user.name || 'U').charAt(0).toUpperCase()}
+                  </span>
+                  {user.photoURL && (
+                    <img
+                      src={user.photoURL}
+                      alt="Avatar"
+                      className="absolute inset-0 w-full h-full object-cover z-10"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
                   )}
                 </button>
 
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[#0f1420] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up">
+                  <div className="absolute right-0 top-10 w-44 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-2xl p-1.5 flex flex-col gap-1 z-50 animate-scale-up">
                     {/* Account Info summary */}
                     <div className="px-2.5 py-1.5 border-b border-[var(--border-color)]/30 mb-1 flex flex-col text-left">
-                      <span className="text-[10px] font-bold text-slate-400 truncate">{user.name}</span>
-                      <span className="text-[8px] font-mono text-slate-500 truncate mt-0.5">{user.email}</span>
+                      <span className="text-[10px] font-bold text-[var(--text-secondary)] truncate">{user.name}</span>
+                      <span className="text-[8px] font-mono text-[var(--text-muted)] truncate mt-0.5">{user.email}</span>
                     </div>
 
                     <button
@@ -156,7 +165,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                         setDropdownOpen(false);
                         navigate(`/profile/${user.username || ''}`);
                       }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-primary)]/80 hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
                     >
                       <i className="far fa-user text-[10px] text-indigo-400 w-4 text-center"></i>
                       <span>My account</span>
@@ -171,7 +180,7 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
                           navigate('/editor');
                         }
                       }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-primary)]/80 hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]/50 transition-all duration-150 cursor-pointer flex items-center gap-2"
                     >
                       <i className="fas fa-sliders text-[10px] text-cyan-400 w-4 text-center"></i>
                       <span>{user.role === 'admin' ? 'Admin Panel' : 'API Console'}</span>
@@ -252,7 +261,11 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             <span>Leaderboard</span>
           </button>
           {user && user.role === 'admin' && (
-            <button onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} className="mobile-nav-link text-left text-indigo-400 font-extrabold py-2 block focus:outline-none flex items-center gap-3 transition-colors duration-200">
+            <button onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} className={`mobile-nav-link text-left font-extrabold py-2 block focus:outline-none flex items-center gap-3 transition-colors duration-200 text-indigo-400 ${
+              theme === 'light' 
+                ? 'hover:text-[#1B4EF5]' 
+                : 'hover:text-indigo-300'
+            }`}>
               <i className="fas fa-crown text-amber-400 w-5 text-center animate-pulse"></i>
               <span>Admin Panel</span>
             </button>
@@ -276,15 +289,20 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
             ) : (
               <div id="mobile-user-profile" className="flex flex-col gap-2.5 bg-[var(--bg-tertiary)]/20 p-3 rounded-xl border border-[var(--border-color)]">
                 <div className="flex items-center gap-2.5">
-                  <div id="mobile-user-avatar" className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold font-mono overflow-hidden flex items-center justify-center">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
-                        {(user.name || 'U').charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
+                   <div id="mobile-user-avatar" className="w-8 h-8 rounded-full border border-[var(--border-color)] text-white text-xs font-bold font-mono overflow-hidden flex items-center justify-center relative">
+                     <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center select-none font-sans">
+                       {(user.name || 'U').charAt(0).toUpperCase()}
+                     </span>
+                     {user.photoURL && (
+                       <img
+                         src={user.photoURL}
+                         alt="Avatar"
+                         className="absolute inset-0 w-full h-full object-cover z-10"
+                         referrerPolicy="no-referrer"
+                         onError={(e) => { e.target.style.display = 'none'; }}
+                       />
+                     )}
+                   </div>
                   <div className="flex flex-col text-left">
                     <span id="mobile-user-name" className="text-xs font-bold text-[var(--text-primary)]">{user.name || 'User'}</span>
                     <span id="mobile-user-email" className="text-[10px] text-[var(--text-secondary)] font-mono">{user.email || ''}</span>

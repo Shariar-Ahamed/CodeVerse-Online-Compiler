@@ -188,7 +188,7 @@ export default function HistoryPage({ user, showToast }) {
   const activeLanguagesFilter = ["all", "html", "cpp", "python", "javascript", "c", "go"];
 
   return (
-    <main className="flex-grow bg-[#090d16] py-12 px-4 relative min-h-[calc(100vh-4rem)]">
+    <main className="flex-grow bg-[var(--bg-primary)] py-12 px-4 relative min-h-[calc(100vh-4rem)]">
       {/* Background radial highlight */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none select-none z-0"></div>
 
@@ -208,7 +208,7 @@ export default function HistoryPage({ user, showToast }) {
               <i className="fas fa-terminal text-indigo-400 text-base animate-pulse"></i>
               <span>{getProfileTitle()}</span>
             </h2>
-            <span className="text-[10px] text-[var(--text-muted)] font-mono tracking-widest bg-[#121926] px-2.5 py-1 rounded-lg border border-[#232f48]">
+            <span className="text-[10px] text-[var(--text-muted)] font-mono tracking-widest bg-[var(--bg-secondary)] px-2.5 py-1 rounded-lg border border-[var(--border-color)]">
               SNAPSHOT SUMMARY
             </span>
           </div>
@@ -227,7 +227,7 @@ export default function HistoryPage({ user, showToast }) {
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wide transition-all cursor-pointer select-none active:scale-95 border ${
                     selectedLanguage === lang
                       ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-                      : "bg-[#101622]/40 text-slate-400 border-[#232f48]/55 hover:border-slate-500/30 hover:text-slate-300"
+                      : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-slate-400/50 hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {lang === "all" ? "All Languages" : (LANGUAGES[lang]?.name || lang.toUpperCase())}
@@ -247,7 +247,7 @@ export default function HistoryPage({ user, showToast }) {
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wide transition-all cursor-pointer select-none active:scale-95 border ${
                     selectedStatus === status
                       ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-                      : "bg-[#101622]/40 text-slate-400 border-[#232f48]/55 hover:border-slate-500/30 hover:text-slate-300"
+                      : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-slate-400/50 hover:text-[var(--text-primary)]"
                   }`}
                 >
                   {status === "all" ? "All Statuses" : status}
@@ -287,8 +287,8 @@ export default function HistoryPage({ user, showToast }) {
                     key={run.id || run.timestamp}
                     className={`rounded-xl border transition-all duration-300 overflow-hidden ${
                       isExpanded 
-                        ? 'border-indigo-500 bg-[#151c2d]/70 shadow-lg shadow-indigo-500/5' 
-                        : 'border-[#232f48]/70 bg-[#121926]/40 hover:bg-[#151d2c]/50 hover:border-slate-700/60'
+                        ? 'border-indigo-500 bg-[var(--bg-secondary)] shadow-lg shadow-indigo-500/5' 
+                        : 'border-[var(--border-color)] bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-tertiary)]/50 hover:border-[var(--border-color)]/80'
                     }`}
                   >
                     {/* Row Header Details */}
@@ -317,14 +317,14 @@ export default function HistoryPage({ user, showToast }) {
                       </div>
 
                       {/* Performance Indicators */}
-                      <div className="hidden md:flex items-center gap-6 font-mono text-[10px] text-slate-400 text-left shrink-0">
+                      <div className="hidden md:flex items-center gap-6 font-mono text-[10px] text-[var(--text-secondary)] text-left shrink-0">
                         <div>
-                          <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Time</p>
-                          <p className="mt-0.5 font-semibold text-slate-300">{run.time || "0.00s"}</p>
+                          <p className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Time</p>
+                          <p className="mt-0.5 font-semibold text-[var(--text-primary)]">{run.time || "0.00s"}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Memory</p>
-                          <p className="mt-0.5 font-semibold text-slate-300">{run.memory || "0.0 MB"}</p>
+                          <p className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Memory</p>
+                          <p className="mt-0.5 font-semibold text-[var(--text-primary)]">{run.memory || "0.0 MB"}</p>
                         </div>
                       </div>
 
@@ -333,7 +333,7 @@ export default function HistoryPage({ user, showToast }) {
                         <span className={`px-2 py-0.5 rounded text-[9px] font-black ${statusClass}`}>
                           {run.status}
                         </span>
-                        <div className={`w-6 h-6 rounded-lg bg-[#0e1420] border border-[#232f48] flex items-center justify-center text-slate-400 transition-transform duration-300 ${
+                        <div className={`w-6 h-6 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-color)] flex items-center justify-center text-slate-400 transition-transform duration-300 ${
                           isExpanded ? 'rotate-180 text-indigo-400 border-indigo-500/30' : ''
                         }`}>
                           <i className="fas fa-chevron-down text-[9px]"></i>
@@ -343,18 +343,18 @@ export default function HistoryPage({ user, showToast }) {
 
                     {/* Inline Expandable Output/Code Drawer */}
                     {isExpanded && (
-                      <div className="px-4 pb-5 pt-2 border-t border-[#232f48]/50 bg-[#0d1320]/60 flex flex-col gap-4">
+                      <div className="px-4 pb-5 pt-2 border-t border-[var(--border-color)] bg-[var(--bg-primary)] flex flex-col gap-4">
                         
                         {/* Mobile Performance Stats */}
-                        <div className="flex md:hidden items-center justify-around py-2 rounded-lg bg-[#090d16]/80 border border-[#232f48]/50 font-mono text-[10px] text-slate-400 mt-1">
+                        <div className="flex md:hidden items-center justify-around py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] font-mono text-[10px] text-[var(--text-secondary)] mt-1">
                           <div className="text-center">
-                            <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Time: </span>
-                            <span className="font-semibold text-slate-300 ml-1">{run.time || "0.00s"}</span>
+                            <span className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Time: </span>
+                            <span className="font-semibold text-[var(--text-primary)] ml-1">{run.time || "0.00s"}</span>
                           </div>
                           <div className="text-slate-600">|</div>
                           <div className="text-center">
-                            <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Memory: </span>
-                            <span className="font-semibold text-slate-300 ml-1">{run.memory || "0.0 MB"}</span>
+                            <span className="text-[9px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Memory: </span>
+                            <span className="font-semibold text-[var(--text-primary)] ml-1">{run.memory || "0.0 MB"}</span>
                           </div>
                         </div>
 
@@ -368,8 +368,8 @@ export default function HistoryPage({ user, showToast }) {
 
                         {/* Code Snapshot box */}
                         <div className="flex flex-col gap-1.5 mt-2">
-                          <div className="bg-[#0b0f19] border border-[#232f48] rounded-xl overflow-hidden flex flex-col shadow-inner">
-                            <div className="bg-[#0f1420]/80 border-b border-[#232f48] px-4 py-2 flex items-center justify-between">
+                          <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl overflow-hidden flex flex-col shadow-inner">
+                            <div className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-4 py-2 flex items-center justify-between">
                               <span className="text-[9px] uppercase font-extrabold text-slate-400 font-mono tracking-wider">Source Code Snapshot</span>
                               <button
                                 onClick={() => {
@@ -382,7 +382,7 @@ export default function HistoryPage({ user, showToast }) {
                                 <span>Copy Code</span>
                               </button>
                             </div>
-                            <pre className="p-4 font-mono text-[11px] text-slate-300 select-text overflow-x-auto max-h-[300px] overflow-y-auto whitespace-pre text-left bg-[#070b13]">
+                            <pre className="p-4 font-mono text-[11px] text-[var(--text-primary)] select-text overflow-x-auto max-h-[300px] overflow-y-auto whitespace-pre text-left bg-[var(--bg-primary)]">
                               {run.code || "// No source code snapshot was recorded for this execution."}
                             </pre>
                           </div>

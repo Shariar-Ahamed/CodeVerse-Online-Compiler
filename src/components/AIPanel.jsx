@@ -314,13 +314,13 @@ Respond in clean markdown format. When providing code fixes or optimized version
   };
 
   return (
-    <div className={`w-full h-full glass-panel shadow-2xl flex flex-col relative z-30 transition-all duration-300 overflow-hidden ${isHome ? 'rounded-2xl rounded-br-none' : 'rounded-2xl'}`}>
+    <div className={`w-full h-full glass-panel shadow-2xl flex flex-col relative z-30 transition-all duration-300 overflow-hidden chat-panel-container ${isHome ? 'rounded-2xl rounded-br-none' : 'rounded-2xl'}`}>
       {/* Side Glow Effects */}
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-indigo-500/5 blur-2xl pointer-events-none z-0"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-cyan-500/5 blur-2xl pointer-events-none z-0"></div>
 
       {/* Header */}
-      <div className="h-14 border-b border-[var(--border-color)]/50 flex items-center justify-between px-4 bg-black/10 relative z-10 flex-shrink-0">
+      <div className="h-14 border-b border-[var(--border-color)]/50 flex items-center justify-between px-4 bg-[var(--bg-secondary)] relative z-10 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs animate-pulse">
             <i className="fas fa-brain text-emerald-400"></i>
@@ -329,7 +329,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
         </div>
         <button
           onClick={onClose}
-          className="w-7 h-7 rounded-lg border border-[var(--border-color)]/60 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-color)] hover:bg-[var(--bg-tertiary)]/50 transition-all duration-200 cursor-pointer"
+          className="w-7 h-7 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all duration-200 cursor-pointer editor-header-btn"
         >
           <i className="fas fa-times text-xs"></i>
         </button>
@@ -365,15 +365,15 @@ Respond in clean markdown format. When providing code fixes or optimized version
       {/* Messages Scroll Area */}
       <div
         ref={messageContainerRef}
-        className="flex-grow p-4 overflow-y-auto flex flex-col gap-2.5 scrollbar-thin relative z-10"
+        className="flex-grow p-4 overflow-y-auto flex flex-col gap-2.5 scrollbar-thin relative z-10 chat-history-scroll border-y border-[var(--border-color)]/20"
       >
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`max-w-[82%] rounded-2xl px-3.5 py-1.5 flex flex-col text-left transition-all duration-200 ${
+            className={`max-w-[82%] rounded-2xl px-3.5 py-1.5 flex flex-col text-left transition-all duration-300 ${
               msg.role === 'user'
                 ? 'self-end bg-indigo-600 text-white rounded-tr-none shadow-sm shadow-indigo-600/5 border border-indigo-500/10'
-                : 'self-start bg-[var(--bg-primary)] text-[var(--text-primary)] rounded-tl-none border border-[var(--border-color)]/40 shadow-sm'
+                : 'self-start bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-tl-none border border-[var(--border-color)]/50 shadow-sm'
             }`}
           >
             <div className="break-words text-[12px] leading-relaxed">
@@ -383,7 +383,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
         ))}
 
         {isGenerating && (
-          <div className="self-start max-w-[80%] rounded-2xl rounded-bl-none p-3 bg-[var(--bg-primary)] text-[var(--text-secondary)] border border-[var(--border-color)]/40 flex items-center gap-2">
+          <div className="self-start max-w-[80%] rounded-2xl rounded-bl-none p-3 bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-color)]/50 flex items-center gap-2">
             <div className="flex gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-75"></span>
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-150"></span>
@@ -400,7 +400,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
           e.preventDefault();
           handleSendPrompt();
         }}
-        className="p-3 border-t border-[var(--border-color)]/50 bg-black/20 flex gap-2 items-end relative z-10 flex-shrink-0"
+        className="p-3 border-t border-[var(--border-color)]/50 bg-[var(--bg-secondary)] flex gap-2 items-end relative z-10 flex-shrink-0"
       >
         <textarea
           ref={textareaRef}
@@ -414,7 +414,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
         />
         {isGenerating ? (
           <div className="w-8 h-8 rounded-xl border border-indigo-500/30 bg-indigo-500/5 flex items-center justify-center animate-pulse shrink-0">
-            <i className="fas fa-circle-notch fa-spin text-indigo-400 text-xs"></i>
+             <i className="fas fa-circle-notch fa-spin text-indigo-400 text-xs"></i>
           </div>
         ) : (
           <button
@@ -422,8 +422,8 @@ Respond in clean markdown format. When providing code fixes or optimized version
             disabled={!input.trim()}
             className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
               !input.trim()
-                ? 'bg-[var(--bg-primary)] opacity-40 text-[var(--text-muted)] border border-[var(--border-color)]/30 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-400 text-white border border-blue-400/20 shadow-[0_0_12px_rgba(59,130,246,0.7)] hover:shadow-[0_0_20px_rgba(59,130,246,0.95)] hover:scale-105 active:scale-95'
+                ? 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] border border-[var(--border-color)]/30 opacity-70 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/20 shadow-[0_4px_12px_rgba(99,102,241,0.25)] hover:shadow-[0_4px_20px_rgba(99,102,241,0.45)] hover:scale-105 active:scale-95'
             }`}
           >
             <i className="fas fa-paper-plane text-xs text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.8)]"></i>

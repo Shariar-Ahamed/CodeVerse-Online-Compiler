@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AIPanel from '../components/AIPanel';
+import TwinklingText from '../components/TwinklingText';
 
 import { LANGUAGES as LANGUAGES_MAP } from '../utils/languages';
 
@@ -97,7 +98,7 @@ const MILESTONES = [
   }
 ];
 
-export default function LandingPage({ showToast }) {
+export default function LandingPage({ showToast, theme }) {
   const navigate = useNavigate();
   const [showHomeAI, setShowHomeAI] = useState(false);
 
@@ -266,11 +267,13 @@ export default function LandingPage({ showToast }) {
         canvas.width = rect.width;
         canvas.height = rect.height;
 
+        const isLight = document.documentElement.classList.contains('light');
+        const defaultColor = isLight ? 'rgba(71, 85, 105, 0.4)' : 'rgba(129, 140, 248, 0.25)';
         const spacing = 35;
         for (let y = spacing / 2; y < canvas.height; y += spacing) {
           for (let x = spacing / 2; x < canvas.width; x += spacing) {
             gridPoints.push({
-              x: x, y: y, originX: x, originY: y, color: 'rgba(129, 140, 248, 0.25)'
+              x: x, y: y, originX: x, originY: y, color: defaultColor
             });
           }
         }
@@ -279,6 +282,7 @@ export default function LandingPage({ showToast }) {
       const animate = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let needsUpdating = false;
+        const isLight = document.documentElement.classList.contains('light');
 
         for (let pt of gridPoints) {
           let dx = 0, dy = 0, dist = Infinity;
@@ -301,9 +305,9 @@ export default function LandingPage({ showToast }) {
             targetY = pt.originY - Math.sin(angle) * force * 15;
             size = 1.2 + force * 1.5;
             opacity = 0.25 + force * 0.55;
-            pt.color = `rgba(34, 211, 238, ${opacity})`;
+            pt.color = isLight ? `rgba(79, 70, 229, ${0.45 + force * 0.4})` : `rgba(34, 211, 238, ${opacity})`;
           } else {
-            pt.color = 'rgba(129, 140, 248, 0.25)';
+            pt.color = isLight ? 'rgba(71, 85, 105, 0.4)' : 'rgba(129, 140, 248, 0.25)';
           }
 
           const diffX = targetX - pt.x;
@@ -680,48 +684,48 @@ export default function LandingPage({ showToast }) {
         {/* Floating Language Badges (Hidden on mobile) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden lg:block hidden">
           {/* 1. Python (Left Topmost - Medium) */}
-          <div className="absolute left-[3%] top-[15%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#3776ab]/70 shadow-[inset_0_0_10px_rgba(55,118,171,0.55),_0_0_12px_rgba(55,118,171,0.2)] flex items-center justify-center animate-float-1 select-none">
+          <div className="absolute left-[3%] top-[15%] w-14 h-14 rounded-xl hero-lang-bubble border-[#3776ab]/70 shadow-[inset_0_0_10px_rgba(55,118,171,0.55),_0_0_12px_rgba(55,118,171,0.2)] flex items-center justify-center animate-float-1 select-none">
             <i className="fab fa-python text-[#3776ab] text-2xl"></i>
           </div>
           {/* 2. Swift (Left Inner Top - Medium - Fills Circle 1) */}
-          <div className="absolute left-[16%] top-[25%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#fa7343]/70 shadow-[inset_0_0_10px_rgba(250,115,67,0.55),_0_0_12px_rgba(250,115,67,0.2)] flex items-center justify-center animate-float-2 select-none">
+          <div className="absolute left-[16%] top-[25%] w-14 h-14 rounded-xl hero-lang-bubble border-[#fa7343]/70 shadow-[inset_0_0_10px_rgba(250,115,67,0.55),_0_0_12px_rgba(250,115,67,0.2)] flex items-center justify-center animate-float-2 select-none">
             <i className="fab fa-swift text-[#fa7343] text-2xl"></i>
           </div>
           {/* 3. C++ (Left Mid - Small) */}
-          <div className="absolute left-[6%] top-[50%] -translate-y-1/2 w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#00599c]/70 shadow-[inset_0_0_8px_rgba(0,89,156,0.5),_0_0_10px_rgba(0,89,156,0.18)] flex items-center justify-center animate-float-3 select-none">
+          <div className="absolute left-[6%] top-[50%] -translate-y-1/2 w-11 h-11 rounded-lg hero-lang-bubble border-[#00599c]/70 shadow-[inset_0_0_8px_rgba(0,89,156,0.5),_0_0_10px_rgba(0,89,156,0.18)] flex items-center justify-center animate-float-3 select-none">
             <i className="fas fa-code text-[#00599c] text-lg"></i>
           </div>
           {/* 4. Bash Shell (Left Inner Bottom - Small - Fills Circle 2) */}
-          <div className="absolute left-[18%] bottom-[20%] w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#34d399]/70 shadow-[inset_0_0_8px_rgba(52,211,153,0.5),_0_0_10px_rgba(52,211,153,0.18)] flex items-center justify-center animate-float-1 select-none">
+          <div className="absolute left-[18%] bottom-[20%] w-11 h-11 rounded-lg hero-lang-bubble border-[#34d399]/70 shadow-[inset_0_0_8px_rgba(52,211,153,0.5),_0_0_10px_rgba(52,211,153,0.18)] flex items-center justify-center animate-float-1 select-none">
             <i className="fas fa-terminal text-[#34d399] text-lg"></i>
           </div>
           {/* 5. Java (Left Bottommost - Large) */}
-          <div className="absolute left-[4%] bottom-[12%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#ea2d2e]/70 shadow-[inset_0_0_12px_rgba(234,45,46,0.6),_0_0_15px_rgba(234,45,46,0.25)] flex items-center justify-center animate-float-2 select-none">
+          <div className="absolute left-[4%] bottom-[12%] w-16 h-16 rounded-2xl hero-lang-bubble border-[#ea2d2e]/70 shadow-[inset_0_0_12px_rgba(234,45,46,0.6),_0_0_15px_rgba(234,45,46,0.25)] flex items-center justify-center animate-float-2 select-none">
             <i className="fab fa-java text-[#ea2d2e] text-3xl"></i>
           </div>
 
           {/* 6. Ruby (Right Inner Top - Medium - Fills Circle 3) */}
-          <div className="absolute right-[18%] top-[14%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#e0115f]/70 shadow-[inset_0_0_10px_rgba(224,17,95,0.55),_0_0_12px_rgba(224,17,95,0.2)] flex items-center justify-center animate-float-3 select-none">
+          <div className="absolute right-[18%] top-[14%] w-14 h-14 rounded-xl hero-lang-bubble border-[#e0115f]/70 shadow-[inset_0_0_10px_rgba(224,17,95,0.55),_0_0_12px_rgba(224,17,95,0.2)] flex items-center justify-center animate-float-3 select-none">
             <i className="fas fa-gem text-[#e0115f] text-2xl"></i>
           </div>
           {/* 7. JavaScript (Right Topmost - Large) */}
-          <div className="absolute right-[4%] top-[18%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#eab308]/70 shadow-[inset_0_0_12px_rgba(234,179,8,0.6),_0_0_15px_rgba(234,179,8,0.25)] flex items-center justify-center animate-float-2 select-none">
+          <div className="absolute right-[4%] top-[18%] w-16 h-16 rounded-2xl hero-lang-bubble border-[#eab308]/70 shadow-[inset_0_0_12px_rgba(234,179,8,0.6),_0_0_15px_rgba(234,179,8,0.25)] flex items-center justify-center animate-float-2 select-none">
             <i className="fab fa-js text-[#eab308] text-3xl"></i>
           </div>
           {/* 7.5. Go (Right Inner Mid - Medium - Fills the empty right side area) */}
-          <div className="absolute right-[21%] top-[42%] w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#00add8]/70 shadow-[inset_0_0_10px_rgba(0,173,216,0.55),_0_0_12px_rgba(0,173,216,0.2)] flex items-center justify-center animate-float-3 select-none">
+          <div className="absolute right-[21%] top-[42%] w-14 h-14 rounded-xl hero-lang-bubble border-[#00add8]/70 shadow-[inset_0_0_10px_rgba(0,173,216,0.55),_0_0_12px_rgba(0,173,216,0.2)] flex items-center justify-center animate-float-3 select-none">
             <i className="fas fa-code text-[#00add8] text-2xl"></i>
           </div>
           {/* 8. HTML5 (Right Mid - Medium) */}
-          <div className="absolute right-[5%] top-[50%] -translate-y-1/2 w-14 h-14 rounded-xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#e34f26]/70 shadow-[inset_0_0_10px_rgba(227,79,38,0.55),_0_0_12px_rgba(227,79,38,0.2)] flex items-center justify-center animate-float-1 select-none">
+          <div className="absolute right-[5%] top-[50%] -translate-y-1/2 w-14 h-14 rounded-xl hero-lang-bubble border-[#e34f26]/70 shadow-[inset_0_0_10px_rgba(227,79,38,0.55),_0_0_12px_rgba(227,79,38,0.2)] flex items-center justify-center animate-float-1 select-none">
             <i className="fab fa-html5 text-[#e34f26] text-2xl"></i>
           </div>
           {/* 9. PHP (Right Inner Bottom - Large - Fills Circle 4) */}
-          <div className="absolute right-[16%] bottom-[14%] w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#777bb4]/70 shadow-[inset_0_0_12px_rgba(119,123,180,0.6),_0_0_15px_rgba(119,123,180,0.25)] flex items-center justify-center animate-float-1 select-none">
+          <div className="absolute right-[16%] bottom-[14%] w-16 h-16 rounded-2xl hero-lang-bubble border-[#777bb4]/70 shadow-[inset_0_0_12px_rgba(119,123,180,0.6),_0_0_15px_rgba(119,123,180,0.25)] flex items-center justify-center animate-float-1 select-none">
             <i className="fab fa-php text-[#777bb4] text-3xl"></i>
           </div>
           {/* 10. SQL (Right Bottommost - Small) */}
-          <div className="absolute right-[3%] bottom-[10%] w-11 h-11 rounded-lg bg-[var(--bg-tertiary)]/50 backdrop-blur-sm border-2 border-[#0064a5]/70 shadow-[inset_0_0_8px_rgba(0,100,165,0.5),_0_0_10px_rgba(0,100,165,0.18)] flex items-center justify-center animate-float-3 select-none">
+          <div className="absolute right-[3%] bottom-[10%] w-11 h-11 rounded-lg hero-lang-bubble border-[#0064a5]/70 shadow-[inset_0_0_8px_rgba(0,100,165,0.5),_0_0_10px_rgba(0,100,165,0.18)] flex items-center justify-center animate-float-3 select-none">
             <i className="fas fa-database text-[#0064a5] text-lg"></i>
           </div>
         </div>
@@ -734,9 +738,15 @@ export default function LandingPage({ showToast }) {
 
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] mb-6 leading-tight">
             Write Code. Compile Live.<br className="hidden md:inline" />{' '}
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              No Local Setup.
-            </span>
+            {theme !== 'light' ? (
+              <TwinklingText className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                No Local Setup.
+              </TwinklingText>
+            ) : (
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                No Local Setup.
+              </span>
+            )}
           </h2>
 
           <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-xl mb-8 leading-relaxed">
@@ -926,7 +936,7 @@ export default function LandingPage({ showToast }) {
           </div>
 
           {/* Mock IDE Container */}
-          <div className="mock-ide-container rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-[0_20px_45px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-shadow duration-300 max-w-5xl mx-auto bg-[#282a36] relative z-10">
+          <div className="mock-ide-container rounded-2xl border border-[var(--border-color)] overflow-hidden max-w-5xl mx-auto bg-[#282a36] relative z-10">
             {/* Tab Bar Header */}
             <div className="h-11 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)] flex items-center justify-between px-4">
               <div className="flex items-center gap-4">
@@ -1002,7 +1012,7 @@ export default function LandingPage({ showToast }) {
           <div className="flex items-center justify-center gap-6 mb-8 mt-2">
             <button
               onClick={handlePrevMilestone}
-              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+              className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer journey-nav-btn text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <i className="fas fa-chevron-left text-xs"></i>
             </button>
@@ -1019,7 +1029,7 @@ export default function LandingPage({ showToast }) {
 
             <button
               onClick={handleNextMilestone}
-              className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 hover:bg-[var(--bg-tertiary)] hover:border-indigo-500/50 text-[var(--text-secondary)] hover:text-white flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer"
+              className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 focus:outline-none cursor-pointer journey-nav-btn text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <i className="fas fa-chevron-right text-xs"></i>
             </button>
@@ -1153,14 +1163,14 @@ export default function LandingPage({ showToast }) {
           </div>
 
           {/* Infinite Marquee of Languages */}
-          <div className="mt-10 overflow-hidden relative w-full mask-gradient">
-            <div className="animate-marquee-rtl hover:[animation-play-state:paused] flex gap-4">
+          <div className="mt-10 overflow-hidden relative w-full mask-gradient py-4">
+            <div className="animate-marquee-rtl hover:[animation-play-state:paused] flex gap-4 py-2">
               {/* 1st list */}
               {LANGUAGES.filter(lang => lang.id !== 'text').map((lang, idx) => (
                 <div
                   key={`mar1-${lang.id}-${idx}`}
                   onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  className="marquee-lang-card flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]/70 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0 glass-panel"
                 >
                   <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
                   <span className="text-xs font-semibold">{lang.name}</span>
@@ -1171,7 +1181,7 @@ export default function LandingPage({ showToast }) {
                 <div
                   key={`mar2-${lang.id}-${idx}`}
                   onClick={() => navigate(`/editor?lang=${lang.id}`)}
-                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/20 border border-[var(--border-color)]/60 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0"
+                  className="marquee-lang-card flex items-center gap-2.5 px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]/70 text-[var(--text-primary)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-300 select-none cursor-pointer shrink-0 glass-panel"
                 >
                   <span className={`${lang.colorClass} w-6 h-6 rounded-md flex items-center justify-center text-xs`}><i className={lang.icon}></i></span>
                   <span className="text-xs font-semibold">{lang.name}</span>
@@ -1295,7 +1305,7 @@ export default function LandingPage({ showToast }) {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 select-none">
         {/* Sliding AI Panel Container */}
         {showHomeAI && (
-          <div className="w-[calc(100vw-32px)] sm:w-[360px] h-[75vh] sm:h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-mac-dock relative rounded-2xl rounded-br-none overflow-visible bg-[#0b0f19] border border-[var(--border-color)]">
+          <div className="w-[calc(100vw-32px)] sm:w-[360px] h-[75vh] sm:h-[550px] md:w-[380px] md:h-[600px] shadow-2xl animate-mac-dock relative rounded-2xl rounded-br-none overflow-visible bg-[var(--bg-secondary)] border border-[var(--border-color)] chat-panel-container">
             <AIPanel
               onClose={() => setShowHomeAI(false)}
               activeCode=""
@@ -1306,8 +1316,8 @@ export default function LandingPage({ showToast }) {
             />
             {/* Curved speech-bubble tail pointing down to the brain icon */}
             <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-[-15.5px] right-[-1px] pointer-events-none overflow-visible z-40">
-              <path d="M0 0 C8 0, 12 12, 16 16 C18 12, 21 4, 24 0" stroke="var(--border-color)" strokeWidth="1.5" fill="#0b0f19" />
-              <path d="M-1 -2 L25 -2 L25 0.5 L-1 0.5 Z" fill="#0b0f19" />
+              <path d="M0 0 C8 0, 12 12, 16 16 C18 12, 21 4, 24 0" stroke="var(--border-color)" strokeWidth="1.5" fill="var(--bg-secondary)" />
+              <path d="M-1 -2 L25 -2 L25 0.5 L-1 0.5 Z" fill="var(--bg-secondary)" />
             </svg>
           </div>
         )}

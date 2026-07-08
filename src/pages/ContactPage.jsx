@@ -209,49 +209,51 @@ export default function ContactPage({ showToast }) {
           className="absolute inset-0 pointer-events-none z-0"
         />
 
-        <div className="w-full max-w-5xl mx-auto relative z-10 w-full animate-fade-in-up bg-[#0d1321]/95 border border-[var(--border-color)]/70 md:border-none md:bg-transparent rounded-3xl md:rounded-none pt-6 pb-12 px-6 md:pt-12 md:pb-20 md:px-16 overflow-visible relative shadow-[0_20px_50px_rgba(99,102,241,0.12)] md:shadow-none">
+        <div className="w-full max-w-5xl mx-auto relative z-10 w-full animate-fade-in-up bg-[#0d1321]/95 border border-[var(--border-color)]/70 md:border-none md:bg-transparent rounded-3xl md:rounded-none pt-6 pb-12 px-6 md:pt-12 md:pb-20 md:px-16 overflow-visible relative shadow-[0_20px_50px_rgba(99,102,241,0.12)] md:shadow-none contact-panel-container">
           {/* Desktop Custom SVG Background with custom cutouts & tabs */}
-          <div className="absolute inset-0 -z-10 pointer-events-none hidden md:block">
-            <svg
-              className="w-full h-full filter drop-shadow-[0_25px_45px_rgba(99,102,241,0.22)]"
-              viewBox="0 0 1000 620"
-              preserveAspectRatio="none"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M 140,40 
-                   L 860,40 
-                   A 40,40 0 0 1 900,80 
-                   A 25,25 0 0 1 900,130
-                   L 900,420
-                   A 20,20 0 0 0 900,460
-                   A 25,25 0 0 1 900,510
-                   L 900,530
-                   A 40,40 0 0 1 860,570
-                   L 140,570
-                   A 40,40 0 0 1 100,530
-                   L 100,310
-                   A 20,20 0 0 0 100,270
-                   A 25,25 0 0 1 100,220
-                   A 20,20 0 0 0 100,180
-                   L 100,140
-                   A 20,20 0 0 0 100,100
-                   L 100,80
-                   A 40,40 0 0 1 140,40
-                   Z"
-                fill="#0d1321"
-                fillOpacity="0.95"
-                stroke="rgba(99, 102, 241, 0.35)"
-                strokeWidth="1.5"
-                vectorEffect="non-scaling-stroke"
-              />
-            </svg>
-          </div>
+            <div className="absolute inset-0 -z-10 pointer-events-none hidden md:block">
+              <svg
+                className="w-full h-full filter drop-shadow-[0_25px_45px_rgba(99,102,241,0.22)] contact-svg-filter"
+                viewBox="0 0 1000 620"
+                preserveAspectRatio="none"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M 140,40 
+                     L 860,40 
+                     A 40,40 0 0 1 900,80 
+                     A 25,25 0 0 1 900,130
+                     L 900,420
+                     A 20,20 0 0 0 900,460
+                     A 25,25 0 0 1 900,510
+                     L 900,530
+                     L 900,530
+                     A 40,40 0 0 1 860,570
+                     L 140,570
+                     A 40,40 0 0 1 100,530
+                     L 100,310
+                     A 20,20 0 0 0 100,270
+                     A 25,25 0 0 1 100,220
+                     A 20,20 0 0 0 100,180
+                     L 100,140
+                     A 20,20 0 0 0 100,100
+                     L 100,80
+                     A 40,40 0 0 1 140,40
+                     Z"
+                  fill="#0d1321"
+                  fillOpacity="0.95"
+                  stroke="rgba(99, 102, 241, 0.35)"
+                  strokeWidth="1.5"
+                  vectorEffect="non-scaling-stroke"
+                  className="contact-panel-vector transition-all duration-300"
+                />
+              </svg>
+            </div>
 
           {/* Centered Header Section for the Entire Card */}
           <div className="text-center mb-10 relative z-10 md:px-12">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2.5 font-sans">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)] mb-2.5 font-sans">
               Connect with{' '}
               <TwinklingText className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                 CodeVerse
@@ -308,7 +310,7 @@ export default function ContactPage({ showToast }) {
                     <div className="text-indigo-400 text-sm shrink-0">
                       <i className="fas fa-map-marker-alt"></i>
                     </div>
-                    <p className="text-[12px] text-slate-300 leading-relaxed">
+                    <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
                       Dhaka, Bangladesh
                     </p>
                   </div>
@@ -317,7 +319,7 @@ export default function ContactPage({ showToast }) {
                     <div className="text-cyan-400 text-sm shrink-0">
                       <i className="fas fa-phone-alt"></i>
                     </div>
-                    <p className="text-[12px] text-slate-300 leading-relaxed">
+                    <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
                       +8801320916624
                     </p>
                   </div>
@@ -328,7 +330,7 @@ export default function ContactPage({ showToast }) {
                     </div>
                     <a
                       href="mailto:shariaralways@gmail.com"
-                      className="text-[12px] text-slate-300 hover:text-indigo-400 leading-relaxed transition-colors duration-150"
+                      className="text-[12px] text-[var(--text-secondary)] hover:text-indigo-400 leading-relaxed transition-colors duration-150"
                     >
                       shariaralways@gmail.com
                     </a>
@@ -372,7 +374,7 @@ export default function ContactPage({ showToast }) {
                 className="flex flex-col gap-4"
               >
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-2">
                     Your Name
                   </label>
                   <input
@@ -380,13 +382,13 @@ export default function ContactPage({ showToast }) {
                     required
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
-                    className="w-full px-6 py-3 rounded-full text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
+                    className="w-full px-6 py-3 rounded-full text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)]/70 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
                     placeholder="Write your name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-2">
                     Your Email
                   </label>
                   <input
@@ -394,13 +396,13 @@ export default function ContactPage({ showToast }) {
                     required
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    className="w-full px-6 py-3 rounded-full text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
+                    className="w-full px-6 py-3 rounded-full text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)]/70 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200"
                     placeholder="abc@yourdomain.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-semibold text-indigo-200 mb-2">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-2">
                     Your Message
                   </label>
                   <textarea
@@ -408,7 +410,7 @@ export default function ContactPage({ showToast }) {
                     rows="4"
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
-                    className="w-full px-6 py-3.5 rounded-2xl text-xs bg-slate-950/60 border border-slate-700/80 text-white placeholder-slate-400/65 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200 resize-none"
+                    className="w-full px-6 py-3.5 rounded-2xl text-xs bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)]/70 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-200 resize-none"
                     placeholder="Type something if you want..."
                   ></textarea>
                 </div>

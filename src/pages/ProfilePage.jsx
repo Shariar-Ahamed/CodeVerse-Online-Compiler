@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { doc, getDoc, setDoc, collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { db, auth } from '../firebase';
 
@@ -132,7 +132,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         try {
           const savedRuns = localStorage.getItem("codeverse_recent_runs");
           const allRuns = savedRuns ? JSON.parse(savedRuns) : [];
-          setRecentRuns(allRuns.slice(0, 5));
+          setRecentRuns(allRuns.slice(0, 3));
         } catch (err) {
           console.error("Error reading LocalStorage recent runs:", err);
           setRecentRuns([]);
@@ -142,7 +142,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
 
       try {
         const runsRef = collection(db, "users", uid, "recent_runs");
-        const qRuns = query(runsRef, orderBy("timestamp", "desc"), limit(5));
+        const qRuns = query(runsRef, orderBy("timestamp", "desc"), limit(3));
         const runsSnap = await getDocs(qRuns);
         const runs = [];
         runsSnap.forEach(rDoc => {
@@ -415,7 +415,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
         await deleteDoc(followingRef);
         setIsFollowing(false);
         setFollowerCount(prev => Math.max(0, prev - 1));
-        showToast("Unfollowed developer", "info");
+        showToast(`Unfollowed ${profileData.name || 'developer'}`, "info");
       } else {
         // Follow
         const currentUserRef = doc(db, "users", user.uid);
@@ -752,7 +752,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             <div className="glass-panel p-6 rounded-2xl border border-indigo-500/25 bg-slate-900/60 flex flex-col gap-4 relative overflow-hidden animate-fade-in">
               <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-indigo-500/5 blur-xl"></div>
               
-              <h3 className="font-bold text-base text-white border-b border-[var(--border-color)] pb-2 mb-2 flex items-center gap-2">
+              <h3 className="font-bold text-base text-[var(--text-primary)] border-b border-[var(--border-color)] pb-2 mb-2 flex items-center gap-2">
                 <i className="fas fa-user-pen text-indigo-400"></i>
                 <span>Edit Profile Details</span>
               </h3>
@@ -760,12 +760,17 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               {/* Avatar Upload Preview */}
               <div className="flex flex-col items-center gap-2 mb-3 relative group">
                 <div className="w-18 h-18 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800">
-                  {inputs.photoURL ? (
-                    <img src={inputs.photoURL} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xl">
-                      {(inputs.name || 'U').charAt(0).toUpperCase()}
-                    </span>
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xl select-none">
+                    {(inputs.name || 'U').charAt(0).toUpperCase()}
+                  </span>
+                  {inputs.photoURL && (
+                    <img
+                      src={inputs.photoURL}
+                      alt="Preview"
+                      className="absolute inset-0 w-full h-full object-cover z-10"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
                   )}
                   {/* File selection cover overlay */}
                   <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 text-white text-[10px] gap-1 select-none">
@@ -923,14 +928,19 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               {/* Large Avatar */}
               <div
                 id="profile-avatar-large"
-                className="w-20 h-20 rounded-full border-2 border-indigo-400 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg shadow-indigo-500/20 font-sans select-none overflow-hidden bg-slate-800"
+                className="w-20 h-20 rounded-full border-2 border-indigo-400 flex items-center justify-center text-white text-3xl font-extrabold shadow-lg shadow-indigo-500/20 font-sans select-none overflow-hidden bg-slate-800 relative"
               >
-                {profileData.photoURL ? (
-                  <img src={profileData.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center">
-                    {(profileData.name || 'U').charAt(0).toUpperCase()}
-                  </span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center select-none">
+                  {(profileData.name || 'U').charAt(0).toUpperCase()}
+                </span>
+                {profileData.photoURL && (
+                  <img
+                    src={profileData.photoURL}
+                    alt="Avatar"
+                    className="absolute inset-0 w-full h-full object-cover z-10"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
                 )}
               </div>
 
@@ -985,7 +995,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                       href={profileData.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 text-xs"
                       title="GitHub Profile"
                     >
                       <i className="fab fa-github"></i>
@@ -996,7 +1006,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                       href={profileData.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 text-xs"
                       title="LinkedIn Profile"
                     >
                       <i className="fab fa-linkedin"></i>
@@ -1007,7 +1017,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                       href={profileData.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-slate-800 border border-[var(--border-color)]/80 flex items-center justify-center text-slate-300 hover:text-white transition-all duration-200 text-xs"
+                      className="w-8 h-8 rounded-lg bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 text-xs"
                       title="Personal Website"
                     >
                       <i className="fas fa-globe"></i>
@@ -1070,7 +1080,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                     disabled={followLoading}
                     className={`w-full py-2.5 rounded-xl text-xs font-black transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 border ${
                       isFollowing 
-                        ? 'bg-transparent border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-300' 
+                        ? 'bg-transparent border-rose-500/30 text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/50 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300' 
                         : 'bg-indigo-600 border-indigo-500/30 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/15'
                     }`}
                   >
@@ -1276,7 +1286,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
           
           {/* Modal Header */}
           <div className="flex items-center justify-between border-b border-[var(--border-color)] p-4 sm:p-5 select-none bg-slate-950/10">
-            <h3 className="font-black text-sm uppercase tracking-wider text-white flex items-center gap-2">
+            <h3 className="font-black text-sm uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-2">
               <i className={followModalType === 'followers' ? "fas fa-users text-indigo-400" : "fas fa-user-plus text-indigo-400"}></i>
               <span>{followModalType === 'followers' ? 'Followers' : 'Following'} ({followUsersList.length})</span>
             </h3>
@@ -1315,17 +1325,22 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                   className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--bg-tertiary)]/50 border border-[var(--border-color)] hover:border-indigo-500/20 transition-all duration-200 animate-fade-in-up"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="w-9 h-9 rounded-full border border-[var(--border-color)] flex items-center justify-center bg-slate-800 shrink-0 overflow-hidden select-none">
-                      {usr.photoURL ? (
-                        <img src={usr.photoURL} alt={usr.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white uppercase">
-                          {(usr.name || 'U').charAt(0)}
-                        </span>
+                    <div className="w-9 h-9 rounded-full border border-[var(--border-color)] flex items-center justify-center bg-slate-800 shrink-0 overflow-hidden select-none relative">
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white uppercase">
+                        {(usr.name || 'U').charAt(0)}
+                      </span>
+                      {usr.photoURL && (
+                        <img
+                          src={usr.photoURL}
+                          alt={usr.name}
+                          className="absolute inset-0 w-full h-full object-cover z-10"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
                       )}
                     </div>
                     <div className="text-left overflow-hidden">
-                      <p className="font-bold text-xs text-white truncate leading-snug">{usr.name || 'Developer'}</p>
+                      <p className="font-bold text-xs text-[var(--text-primary)] truncate leading-snug">{usr.name || 'Developer'}</p>
                       <p className="text-[10px] text-indigo-400 font-mono font-semibold truncate leading-normal">@{usr.username}</p>
                     </div>
                   </div>

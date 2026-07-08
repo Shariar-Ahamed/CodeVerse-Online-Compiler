@@ -74,7 +74,7 @@ export default function LeaderboardPage({ user, showToast }) {
   }, []);
 
   return (
-    <div className="min-h-screen py-5 sm:py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-white relative">
+    <div className="min-h-screen py-5 sm:py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-primary)] text-[var(--text-primary)] relative">
       <div className="max-w-4xl mx-auto mt-2 sm:mt-6 relative z-10">
         
         {/* Back and title bar */}
@@ -93,7 +93,7 @@ export default function LeaderboardPage({ user, showToast }) {
 
           <button
             onClick={() => navigate('/challenges')}
-            className="px-4 py-2 rounded-xl bg-[var(--bg-tertiary)] hover:bg-slate-800 border border-[var(--border-color)] text-xs font-bold text-slate-300 hover:text-white transition-all duration-200 cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
+            className="px-4 py-2 rounded-xl bg-[var(--bg-tertiary)]/70 hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all duration-200 cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
           >
             <i className="fas fa-arrow-left text-[10px]"></i>
             <span>Challenges</span>
@@ -122,26 +122,26 @@ export default function LeaderboardPage({ user, showToast }) {
             {/* Spinning decorative frame glow */}
             <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-purple animate-border-spin opacity-10 pointer-events-none"></div>
 
-            <div className="relative bg-[#0d1321]/95 rounded-3xl overflow-hidden border border-[var(--border-color)]/70">
+            <div className="relative bg-[var(--bg-secondary)] glass-panel rounded-3xl overflow-hidden border border-[var(--border-color)]/70 shadow-[10px_10px_24px_rgba(15,23,42,0.06),-10px_-10px_24px_#ffffff] dark:shadow-none">
               
               {/* Desktop Table View */}
               <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-[var(--border-color)] bg-slate-950/40 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    <tr className="border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/30 text-[10px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
                       <th className="py-4 px-6 text-center w-20">Rank</th>
                       <th className="py-4 px-6">Developer</th>
                       <th className="py-4 px-6 text-center w-36">Solved</th>
                       <th className="py-4 px-6 text-right w-36 pr-8">Score</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-[var(--border-color)]/30">
                     {leaderboard.map((player, index) => {
                       const rankNum = index + 1;
                       const isCurrentUser = user && user.uid === player.uid;
                       
                       let rankBadge = null;
-                      let rankRowBg = isCurrentUser ? "bg-indigo-500/5 hover:bg-indigo-500/10" : "hover:bg-white/5";
+                      let rankRowBg = isCurrentUser ? "bg-indigo-500/5 hover:bg-indigo-500/10" : "hover:bg-[var(--bg-tertiary)]/20";
 
                       if (rankNum === 1) {
                         rankBadge = <i className="fas fa-trophy text-yellow-400 text-lg" title="First Place (Gold)"></i>;
@@ -150,7 +150,7 @@ export default function LeaderboardPage({ user, showToast }) {
                       } else if (rankNum === 3) {
                         rankBadge = <i className="fas fa-trophy text-amber-600 text-lg" title="Third Place (Bronze)"></i>;
                       } else {
-                        rankBadge = <span className="font-extrabold text-sm text-slate-400">{rankNum}</span>;
+                        rankBadge = <span className="font-extrabold text-sm text-[var(--text-secondary)]">{rankNum}</span>;
                       }
 
                       return (
@@ -172,25 +172,28 @@ export default function LeaderboardPage({ user, showToast }) {
                               className="flex items-center gap-3 cursor-pointer group/dev hover:scale-[1.03] origin-left transition-all duration-200"
                             >
                               <div className="relative flex-shrink-0">
-                                {player.photoURL ? (
-                                  <img
-                                    src={player.photoURL}
-                                    alt={player.name}
-                                    className="w-9 h-9 rounded-full object-cover border border-white/10 group-hover/dev:border-indigo-400 transition-colors"
-                                  />
-                                ) : (
-                                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner group-hover/dev:border-indigo-400 transition-colors">
+                                <div className="w-9 h-9 rounded-full border border-[var(--border-color)]/20 overflow-hidden relative bg-slate-800 select-none group-hover/dev:border-indigo-400 transition-colors">
+                                  <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs shadow-inner">
                                     {player.name.charAt(0)}
                                   </div>
-                                )}
+                                  {player.photoURL && (
+                                    <img
+                                      src={player.photoURL}
+                                      alt={player.name}
+                                      className="absolute inset-0 w-full h-full object-cover z-10"
+                                      referrerPolicy="no-referrer"
+                                      onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                  )}
+                                </div>
                                 {player.lastSeen && (Date.now() - new Date(player.lastSeen).getTime() < 300000) && (
-                                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[#0d1321] bg-emerald-400">
+                                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                   </span>
                                 )}
                               </div>
                               <div className="flex flex-col text-left">
-                                <span className={`font-bold flex items-center gap-1.5 group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-300 text-sm" : "text-white"}`}>
+                                <span className={`font-bold flex items-center gap-1.5 group-hover/dev:text-indigo-500 dark:group-hover/dev:text-indigo-300 transition-colors ${isCurrentUser ? "text-indigo-600 dark:text-indigo-300 text-sm" : "text-[var(--text-primary)]"}`}>
                                   <span>{player.name}</span>
                                   {player.isVerified && (
                                     <span className="text-xs" style={{ color: '#1D9BF0' }} title="Verified Creator">
@@ -204,20 +207,20 @@ export default function LeaderboardPage({ user, showToast }) {
                                   )}
                                 </span>
                                 {player.username && (
-                                  <span className="text-slate-400 font-mono font-semibold text-[10px] select-all text-left mt-0.5">@{player.username}</span>
+                                  <span className="text-[var(--text-secondary)] font-mono font-semibold text-[10px] select-all text-left mt-0.5">@{player.username}</span>
                                 )}
                               </div>
                             </div>
                           </td>
 
                           {/* Solved challenge count column */}
-                          <td className="py-4 px-6 text-center font-bold text-slate-300">
-                            {player.solvedCount} <span className="text-[10px] font-normal text-slate-500">problems</span>
+                          <td className="py-4 px-6 text-center font-bold text-[var(--text-primary)]">
+                            {player.solvedCount} <span className="text-[10px] font-normal text-[var(--text-muted)]">problems</span>
                           </td>
 
                           {/* Score column */}
                           <td className="py-4 px-6 text-right pr-8">
-                            <span className="font-black text-white text-sm tracking-wide">
+                            <span className="font-black text-[var(--text-primary)] text-sm tracking-wide">
                               {player.score}
                             </span>
                             <span className="text-[10px] font-bold text-indigo-400 ml-1">pts</span>
@@ -230,12 +233,12 @@ export default function LeaderboardPage({ user, showToast }) {
               </div>
 
               {/* Mobile Card List View */}
-              <div className="block sm:hidden divide-y divide-white/5">
+              <div className="block sm:hidden divide-y divide-[var(--border-color)]/30">
                 {leaderboard.map((player, index) => {
                   const rankNum = index + 1;
                   const isCurrentUser = user && user.uid === player.uid;
                   let rankBadge = null;
-                  let rowBg = isCurrentUser ? "bg-indigo-500/5 hover:bg-indigo-500/10" : "hover:bg-white/5";
+                  let rowBg = isCurrentUser ? "bg-indigo-500/5 hover:bg-indigo-500/10" : "hover:bg-[var(--bg-tertiary)]/20";
 
                   if (rankNum === 1) {
                     rankBadge = <i className="fas fa-trophy text-yellow-400 text-base" title="First Place"></i>;
@@ -244,7 +247,7 @@ export default function LeaderboardPage({ user, showToast }) {
                   } else if (rankNum === 3) {
                     rankBadge = <i className="fas fa-trophy text-amber-600 text-base" title="Third Place"></i>;
                   } else {
-                    rankBadge = <span className="font-extrabold text-xs text-slate-400">{rankNum}</span>;
+                    rankBadge = <span className="font-extrabold text-xs text-[var(--text-secondary)]">{rankNum}</span>;
                   }
 
                   return (
@@ -260,26 +263,29 @@ export default function LeaderboardPage({ user, showToast }) {
                         </div>
                         
                         {/* Avatar */}
-                        <div className="relative flex-shrink-0">
-                          {player.photoURL ? (
-                            <img
-                              src={player.photoURL}
-                              alt={player.name}
-                              className="w-9 h-9 rounded-full object-cover border border-white/10"
-                            />
-                          ) : (
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs border border-white/10 shadow-inner">
-                              {player.name.charAt(0)}
-                            </div>
-                          )}
+                         <div className="relative flex-shrink-0">
+                           <div className="w-9 h-9 rounded-full border border-[var(--border-color)]/20 overflow-hidden relative bg-slate-800 select-none">
+                             <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white uppercase text-xs shadow-inner">
+                               {player.name.charAt(0)}
+                             </div>
+                             {player.photoURL && (
+                               <img
+                                 src={player.photoURL}
+                                 alt={player.name}
+                                 className="absolute inset-0 w-full h-full object-cover z-10"
+                                 referrerPolicy="no-referrer"
+                                 onError={(e) => { e.target.style.display = 'none'; }}
+                               />
+                             )}
+                           </div>
                           {player.lastSeen && (Date.now() - new Date(player.lastSeen).getTime() < 300000) && (
-                            <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-[#0d1321] bg-emerald-400"></span>
+                            <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400"></span>
                           )}
                         </div>
 
                         {/* Name & Username */}
                         <div className="flex flex-col min-w-0 text-left">
-                          <span className="font-bold text-white text-xs flex items-center gap-1 truncate">
+                          <span className="font-bold text-[var(--text-primary)] text-xs flex items-center gap-1 truncate">
                             <span className="truncate">{player.name}</span>
                             {player.isVerified && (
                               <span className="text-[10px] text-[#1D9BF0] flex-shrink-0">
@@ -293,17 +299,17 @@ export default function LeaderboardPage({ user, showToast }) {
                             )}
                           </span>
                           {player.username && (
-                            <span className="text-slate-400 font-mono font-semibold text-[9px] truncate">@{player.username}</span>
+                            <span className="text-[var(--text-secondary)] font-mono font-semibold text-[9px] truncate">@{player.username}</span>
                           )}
                         </div>
                       </div>
 
                       {/* Score & Solved Stats */}
                       <div className="flex flex-col items-end flex-shrink-0 pl-2">
-                        <div className="text-white font-black text-sm">
+                        <div className="text-[var(--text-primary)] font-black text-sm">
                           {player.score} <span className="text-[9px] font-bold text-indigo-400">pts</span>
                         </div>
-                        <div className="text-[9px] text-slate-500 font-medium mt-0.5">
+                        <div className="text-[9px] text-[var(--text-muted)] font-medium mt-0.5">
                           {player.solvedCount} solved
                         </div>
                       </div>
