@@ -117,12 +117,7 @@ export default function LeaderboardPage({ user, showToast }) {
             <p className="text-xs text-amber-500 font-bold uppercase tracking-widest animate-pulse">Calculating rankings...</p>
           </div>
         ) : (
-          <div className="relative p-[1.5px] rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-amber-500/5 transition-all duration-300 group">
-            
-            {/* Spinning decorative frame glow */}
-            <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] border-beam-purple animate-border-spin opacity-10 pointer-events-none"></div>
-
-            <div className="relative bg-[var(--bg-secondary)] glass-panel rounded-3xl overflow-hidden border border-[var(--border-color)]/70 shadow-[10px_10px_24px_rgba(15,23,42,0.06),-10px_-10px_24px_#ffffff] dark:shadow-none">
+          <div className="relative bg-[var(--bg-secondary)] glass-panel rounded-3xl overflow-hidden border border-[var(--border-color)]/70 shadow-[10px_10px_24px_rgba(15,23,42,0.06),-10px_-10px_24px_#ffffff] dark:shadow-none hover:shadow-2xl hover:shadow-amber-500/5 transition-all duration-300">
               
               {/* Desktop Table View */}
               <div className="hidden sm:block overflow-x-auto">
@@ -319,7 +314,6 @@ export default function LeaderboardPage({ user, showToast }) {
               </div>
 
             </div>
-          </div>
         )}
 
       </div>
