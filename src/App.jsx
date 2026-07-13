@@ -47,7 +47,9 @@ function AppContent() {
     // Sync theme with DOM document element class
     if (theme === 'light') {
       document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     } else {
+      document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
     }
     localStorage.setItem("codeverse_theme", theme);

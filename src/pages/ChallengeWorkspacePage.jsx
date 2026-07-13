@@ -528,26 +528,26 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
   }
 
   return (
-    <div className="flex-grow flex flex-col lg:flex-row h-[880px] text-white bg-[var(--bg-primary)] overflow-hidden relative">
+    <div className="flex-grow flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-80px)] xl:h-[calc(100vh-70px)] text-white bg-[var(--bg-primary)] overflow-x-hidden overflow-y-auto lg:overflow-hidden relative">
       {/* Background Blur Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
 
       {/* LEFT COLUMN: Problem Details / Output console (40% width) */}
-      <div className="w-full lg:w-[42%] flex flex-col h-full bg-transparent p-4 lg:p-6 lg:pr-3 z-10">
+      <div className="w-full lg:w-[42%] flex flex-col h-auto lg:h-full bg-transparent p-4 lg:p-6 lg:pr-3 z-10">
         
-        <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-2xl transition-all duration-300 ide-neon-border bg-[#0d1321]/30 h-full">
+        <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-2xl transition-all duration-300 ide-neon-border bg-[#0d1321]/30 h-auto lg:h-full">
           
           {/* Workspace Tab headers */}
-          <div className="flex border-b border-[var(--border-color)] bg-[#0d1321]/50 shrink-0">
+          <div className="flex border-b border-[var(--border-color)] bg-[var(--bg-primary)]/50 shrink-0">
             {['description', 'testcases', 'history'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 border-b-2 cursor-pointer ${
                   activeTab === tab
-                    ? 'border-indigo-500 text-indigo-400'
-                    : 'border-transparent text-slate-400 hover:text-white'
+                    ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                    : 'border-transparent text-black dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
                 {tab === 'testcases' ? 'Test Cases' : tab}
@@ -563,7 +563,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
               <div className="text-left space-y-6">
                 <div>
                   <div className="flex items-center justify-between gap-4 mb-2">
-                    <h2 className="text-xl font-black text-white tracking-tight">{challenge.title}</h2>
+                    <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tight">{challenge.title}</h2>
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-0.5 text-[9px] font-extrabold uppercase rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         {challenge.difficulty}
@@ -573,7 +573,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                   </div>
                 </div>
 
-                <div className="bg-slate-950/40 border border-white/5 rounded-2xl p-5 leading-relaxed text-xs text-slate-300">
+                <div className="bg-[var(--bg-primary)]/30 border border-[var(--border-color)]/50 rounded-2xl p-5 leading-relaxed text-xs text-[var(--text-secondary)]">
                   {challenge.description}
                 </div>
 
@@ -583,22 +583,22 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                     <span>Example Walkthrough</span>
                   </h4>
                   {challenge.testCases.filter(t => !t.isHidden).map((tc, idx) => (
-                    <div key={idx} className="bg-slate-900/30 rounded-2xl border border-white/5 p-5 text-xs font-mono space-y-4 mb-4 shadow-inner">
+                    <div key={idx} className="bg-[var(--bg-primary)]/20 rounded-2xl border border-[var(--border-color)]/50 p-5 text-xs font-mono space-y-4 mb-4 shadow-inner">
                       <div>
                         <div className="flex items-center gap-1.5 mb-1.5">
                           <i className="fas fa-arrow-right text-[9px] text-indigo-400"></i>
-                          <span className="text-[10px] text-indigo-400 font-extrabold uppercase tracking-wider">Input</span>
+                          <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-wider">Input</span>
                         </div>
-                        <pre className="bg-[#0b0f19]/60 border border-slate-800/45 border-l-2 border-l-indigo-500/50 p-3 rounded-xl text-slate-300 overflow-x-auto font-mono text-[11px] leading-relaxed">
+                        <pre className="bg-[var(--bg-secondary)] border border-[var(--border-color)]/50 border-l-2 border-l-indigo-500/50 p-3 rounded-xl text-[var(--text-primary)] overflow-x-auto font-mono text-[11px] leading-relaxed">
                           {tc.input}
                         </pre>
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5 mb-1.5">
                           <i className="fas fa-check text-[9px] text-emerald-400"></i>
-                          <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider">Expected Output</span>
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider">Expected Output</span>
                         </div>
-                        <pre className="bg-[#0b0f19]/60 border border-slate-800/45 border-l-2 border-l-emerald-500/50 p-3 rounded-xl text-slate-300 overflow-x-auto font-mono text-[11px] leading-relaxed">
+                        <pre className="bg-[var(--bg-secondary)] border border-[var(--border-color)]/50 border-l-2 border-l-emerald-500/50 p-3 rounded-xl text-[var(--text-primary)] overflow-x-auto font-mono text-[11px] leading-relaxed">
                           {tc.output}
                         </pre>
                       </div>
@@ -613,10 +613,10 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
               <div className="text-left space-y-4">
                 
 
-                <h3 className="text-sm font-bold text-white mb-2">Test Suite Results</h3>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">Test Suite Results</h3>
                 {testResults.length === 0 ? (
-                  <div className="text-center py-12 bg-slate-950/30 border border-dashed border-[var(--border-color)] rounded-xl text-xs text-slate-400">
-                    <i className="fas fa-play text-lg text-slate-500 mb-2 block"></i>
+                  <div className="text-center py-12 bg-[var(--bg-primary)]/40 border border-dashed border-[var(--border-color)] rounded-xl text-xs text-[var(--text-secondary)]">
+                    <i className="fas fa-play text-lg text-[var(--text-muted)] mb-2 block"></i>
                     Write code and click 'Run Code' or 'Submit' to evaluate outputs.
                   </div>
                 ) : (
@@ -624,7 +624,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                     {testResults.map((res, idx) => (
                       <div
                         key={idx}
-                        className={`border rounded-xl p-4 bg-slate-950/30 text-xs transition-all duration-300 ${
+                        className={`border rounded-xl p-4 bg-[var(--bg-primary)]/20 text-xs transition-all duration-300 ${
                           res.isSuccess
                             ? 'border-emerald-500/30 bg-emerald-500/5'
                             : res.isError
@@ -632,8 +632,8 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                             : 'border-[var(--border-color)] animate-pulse'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-4 mb-3 border-b border-white/5 pb-2">
-                          <span className="font-bold text-slate-200">{res.label}</span>
+                        <div className="flex items-center justify-between gap-4 mb-3 border-b border-[var(--border-color)]/50 pb-2">
+                          <span className="font-bold text-[var(--text-primary)]">{res.label}</span>
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             res.isSuccess
                               ? 'bg-emerald-500/20 text-emerald-400'
@@ -677,10 +677,10 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
             {/* TAB 3: PAST SUBMISSIONS HISTORY */}
             {activeTab === 'history' && (
               <div className="text-left space-y-4">
-                <h3 className="text-sm font-bold text-white mb-2">Submission Logs</h3>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] mb-2">Submission Logs</h3>
                 {submissionHistory.length === 0 ? (
-                  <div className="text-center py-12 bg-slate-950/30 border border-dashed border-[var(--border-color)] rounded-xl text-xs text-slate-400">
-                    <i className="fas fa-history text-lg text-slate-500 mb-2 block"></i>
+                  <div className="text-center py-12 bg-[var(--bg-primary)]/40 border border-dashed border-[var(--border-color)] rounded-xl text-xs text-[var(--text-secondary)]">
+                    <i className="fas fa-history text-lg text-[var(--text-muted)] mb-2 block"></i>
                     No submission history found for this challenge.
                   </div>
                 ) : (
@@ -688,7 +688,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                     {submissionHistory.map((sub) => (
                       <div
                         key={sub.id}
-                        className="p-4 rounded-xl border border-[var(--border-color)] bg-slate-950/20 flex items-center justify-between text-xs gap-4 hover:border-indigo-500/30 transition-all duration-200"
+                        className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)]/20 flex items-center justify-between text-xs gap-4 hover:border-indigo-500/30 transition-all duration-200"
                       >
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -699,7 +699,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                             }`}>
                               {sub.status}
                             </span>
-                            <span className="font-bold text-slate-300 uppercase">{sub.languageId}</span>
+                            <span className="font-bold text-[var(--text-primary)] uppercase">{sub.languageId}</span>
                           </div>
                           <p className="text-[10px] text-slate-500">
                             {formatDate(sub.submittedAt)}
@@ -713,7 +713,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                             }
                             showToast("Loaded code template from history log.", "info");
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-[var(--bg-tertiary)] hover:bg-slate-800 text-[10px] font-bold border border-[var(--border-color)] active:scale-95 transition-all duration-200 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-[var(--bg-tertiary)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[10px] font-bold border border-[var(--border-color)] active:scale-95 transition-all duration-200 cursor-pointer shadow-sm"
                         >
                           Load Code
                         </button>
@@ -729,18 +729,18 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
       </div>
 
       {/* RIGHT COLUMN: Code Editor & Exec Controls (60% width) */}
-      <div className="flex-grow flex flex-col h-full bg-transparent p-4 lg:p-6 gap-6 z-10">
+      <div className="flex-grow flex flex-col h-auto lg:h-full bg-transparent p-4 lg:p-6 gap-6 z-10">
         
-        <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-2xl transition-all duration-300 ide-neon-border bg-[#0d1321]/30 h-full">
+        <div className="flex-grow flex flex-col border border-[var(--border-color)] rounded-2xl glass-panel overflow-hidden shadow-2xl transition-all duration-300 ide-neon-border bg-[#0d1321]/30 h-auto lg:h-full">
           
           {/* Editor Settings bar */}
-          <div className="flex items-center justify-between px-6 py-2 border-b border-[var(--border-color)] bg-[#0d1321]/50 shrink-0">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/50 shrink-0">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-400">Environment:</span>
+              <span className="text-xs font-bold text-[var(--text-secondary)]">Environment:</span>
               <select
                 value={selectedLang}
                 onChange={handleLangChange}
-                className="bg-[var(--bg-tertiary)] text-xs font-bold text-white px-3 py-1.5 rounded-lg border border-[var(--border-color)] focus:outline-none focus:border-indigo-500/50 cursor-pointer"
+                className="bg-[var(--bg-tertiary)] text-xs font-bold text-[var(--text-primary)] px-3 py-1.5 rounded-lg border border-[var(--border-color)] focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all duration-200 cursor-pointer"
               >
                 {SUPPORTED_LANGS.map(lang => (
                   <option key={lang.key} value={lang.key}>{lang.name}</option>
@@ -748,24 +748,25 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
               </select>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={() => navigate('/challenges')}
-                className="text-xs text-slate-400 hover:text-white font-bold flex items-center gap-1 cursor-pointer"
+                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-bold flex items-center gap-1 cursor-pointer"
               >
                 <i className="fas fa-arrow-left text-[10px]"></i>
-                <span>Back to Dashboard</span>
+                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="sm:hidden">Dashboard</span>
               </button>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70"></span>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70"></span>
+              <div className="hidden xs:flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-rose-500/70"></span>
+                <span className="w-2 h-2 rounded-full bg-amber-500/70"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500/70"></span>
               </div>
             </div>
           </div>
 
           {/* Monaco Editor Container */}
-          <div className="flex-grow relative bg-[#070a13] min-h-[300px]">
+          <div className="flex-grow relative bg-[#070a13] min-h-[380px] sm:min-h-[480px] lg:min-h-[300px]">
             <div className="absolute inset-0 w-full h-full">
               <Editor
                 language={SUPPORTED_LANGS.find(l => l.key === selectedLang)?.defaultStarter}
@@ -794,15 +795,15 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           </div>
 
           {/* Editor Status bar */}
-          <div className="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-6 text-[10px] text-[var(--text-muted)] font-mono shrink-0 select-none">
+          <div className="h-8 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]/20 flex items-center justify-between px-4 sm:px-6 text-[10px] text-[var(--text-muted)] font-mono shrink-0 select-none">
             <div>Status: Ready to edit</div>
             <div>Shortcut: Ctrl + Enter to run</div>
           </div>
 
           {/* Custom Input Console Drawer */}
-          <div className="border-t border-[var(--border-color)] bg-[#0c101b]/95 px-6 py-3 flex flex-col gap-2 shrink-0">
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer select-none">
+          <div className="border-t border-[var(--border-color)] bg-[var(--bg-primary)] px-4 sm:px-6 py-3 flex flex-col gap-2 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
+              <label className="flex items-center gap-2 text-xs font-bold text-[var(--text-secondary)] cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={useCustomStdin}
@@ -811,33 +812,33 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
                 />
                 <span>Run code with custom test input (stdin)</span>
               </label>
-              <span className="text-[10px] text-slate-500 font-mono">Use for scanf / cin / input()</span>
+              <span className="text-[10px] text-slate-500 font-mono sm:text-right">Use for scanf / cin / input()</span>
             </div>
             
             {useCustomStdin && (
               <textarea
                 value={customStdin}
                 onChange={(e) => setCustomStdin(e.target.value)}
-                className="w-full h-20 p-3 bg-[#0b0f19]/70 text-slate-200 rounded-xl border border-slate-800/80 border-l-2 border-l-indigo-500/50 focus:outline-none focus:border-indigo-500/70 font-mono text-[11px] placeholder:italic placeholder:text-slate-600 resize-none transition-all duration-200 shadow-inner"
+                className="w-full h-20 p-3 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl border border-[var(--border-color)] border-l-2 border-l-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 font-mono text-[11px] placeholder:italic placeholder:[var(--text-muted)]/50 resize-none transition-all duration-200 shadow-inner"
                 placeholder="Enter custom inputs here (e.g. 5 or custom arrays, one per line)..."
               />
             )}
           </div>
 
           {/* Footer controls panel */}
-          <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[#0d1321]/80 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+          <div className="px-4 sm:px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-primary)]/80 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
             <div className="flex items-center gap-2">
               <div className={`w-2.5 h-2.5 rounded-full ${isExecuting ? 'bg-indigo-500 animate-ping' : 'bg-slate-500'}`}></div>
-              <span className="text-xs font-bold text-slate-400">
+              <span className="text-xs font-bold text-[var(--text-secondary)]">
                 {isExecuting ? "Executing code packages..." : "Sandbox system idle."}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 onClick={handleRunCode}
                 disabled={isExecuting}
-                className="flex-grow sm:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-[var(--bg-tertiary)] hover:bg-slate-800 text-slate-300 hover:text-white border border-[var(--border-color)] disabled:opacity-50 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-grow sm:flex-grow-0 px-3 sm:px-5 py-2.5 rounded-xl text-xs font-bold bg-[var(--bg-tertiary)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-color)] disabled:opacity-50 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <i className="fas fa-play text-[10px]"></i>
                 <span>Run Code</span>
@@ -846,7 +847,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
               <button
                 onClick={handleSubmitCode}
                 disabled={isExecuting}
-                className="flex-grow sm:flex-grow-0 px-6 py-2.5 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 disabled:opacity-50 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-grow sm:flex-grow-0 px-4 sm:px-6 py-2.5 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 disabled:opacity-50 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <i className="fas fa-paper-plane text-[10px]"></i>
                 <span>Submit Solution</span>
