@@ -437,22 +437,22 @@ export default function ContactPage({ showToast }) {
 
       {/* Premium Glassmorphic Success Confirmation Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 bg-black/15 flex items-center justify-center p-4 animate-fade-in select-none">
-          <div className="w-full max-w-md rounded-3xl border border-emerald-500/20 bg-[#0d1321]/90 shadow-2xl shadow-emerald-500/5 p-6 md:p-8 animate-scale-up text-center relative overflow-hidden glass-panel">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in select-none">
+          <div className="w-full max-w-md rounded-3xl border border-emerald-500/30 dark:border-emerald-500/20 bg-[var(--bg-secondary)] shadow-2xl shadow-emerald-500/5 p-6 md:p-8 animate-scale-up text-center relative overflow-hidden">
             {/* Ambient Background Glow Orbs */}
             <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none"></div>
             <div className="absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
 
             {/* Glowing Emerald Checkmark Icon */}
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[#08CB00] text-3xl mx-auto mb-5 shadow-lg shadow-emerald-500/10 animate-bounce">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-[#10b981] text-3xl mx-auto mb-5 shadow-lg shadow-emerald-500/10 animate-bounce">
               <i className="fas fa-circle-check"></i>
             </div>
 
             {/* Title & Description */}
-            <h3 className="text-xl font-extrabold text-white mb-2.5 tracking-tight">
+            <h3 className="text-xl font-extrabold text-[var(--text-primary)] mb-2.5 tracking-tight">
               Message Received!
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed mb-6 px-1">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-6 px-1">
               Thank you for reaching out to{" "}
               <span className="text-indigo-400 font-bold">CodeVerse</span>. Your
               developer ticket has been logged successfully and our support crew
