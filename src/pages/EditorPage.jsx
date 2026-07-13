@@ -299,6 +299,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const [langSearchQuery, setLangSearchQuery] = useState("");
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [aiPromptContext, setAiPromptContext] = useState("");
@@ -318,6 +319,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   });
 
   const autoRunTimerRef = useRef(null);
+  const firestoreSaveTimerRef = useRef(null);
   const webPreviewSessionRef = useRef(0);
   const [isAutoRunEnabled, setIsAutoRunEnabled] = useState(() => {
     const saved = localStorage.getItem("codeverse_autorun_web");
@@ -825,6 +827,38 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       }
     };
   }, [user]);
+
+  // Debounced Firestore autosave (runs 1500ms after typing/files change)
+  useEffect(() => {
+    if (!user || user.isGuest) return;
+
+    if (firestoreSaveTimerRef.current) {
+      clearTimeout(firestoreSaveTimerRef.current);
+    }
+
+    firestoreSaveTimerRef.current = setTimeout(() => {
+      const { htmlCode: latestHtml, cssCode: latestCss, jsCode: latestJs, code: latestCode, currentLanguage: latestLang } = latestCodeRef.current;
+      if (latestLang) {
+        if (latestLang === "html") {
+          saveCodeToFirestore("html", {
+            htmlCode: latestHtml,
+            cssCode: latestCss,
+            jsCode: latestJs
+          });
+        } else if (latestLang !== "text") {
+          saveCodeToFirestore(latestLang, {
+            code: latestCode
+          });
+        }
+      }
+    }, 1500);
+
+    return () => {
+      if (firestoreSaveTimerRef.current) {
+        clearTimeout(firestoreSaveTimerRef.current);
+      }
+    };
+  }, [htmlCode, cssCode, jsCode, code, workspaceFiles, user, currentLanguage]);
 
   const handleCreateNote = async () => {
     if (!user || user.isGuest) {
@@ -1919,6 +1953,241 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     };
   }, [workspaceFiles, activeFileName, currentLanguage, isAutoRunEnabled]);
 
+  const handleHardReset = async () => {
+    try {
+      // 1. Remove all code-related variables from localStorage first
+      Object.keys(localStorage).forEach(key => {
+        if (
+          key.startsWith("codeverse_code_") ||
+          key.startsWith("codeverse_files_") ||
+          key.startsWith("codeverse_folders_") ||
+          key.startsWith("codeverse_open_tabs_") ||
+          key.startsWith("codeverse_active_file_") ||
+          key === "codeverse_code_html" ||
+          key === "codeverse_web_css" ||
+          key === "codeverse_web_js" ||
+          key === "codeverse_folders_html" ||
+          key === "codeverse_files_html"
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // 2. Populate localStorage with the default boilerplate values immediately to keep persistence
+      localStorage.setItem("codeverse_code_html", LANGUAGES.html.defaultCode);
+      localStorage.setItem("codeverse_web_css", DEFAULT_WEB_CSS);
+      localStorage.setItem("codeverse_web_js", DEFAULT_WEB_JS);
+      localStorage.setItem("codeverse_files_html", JSON.stringify([
+        { name: "index.html", content: LANGUAGES.html.defaultCode, language: "html" },
+        { name: "style.css", content: DEFAULT_WEB_CSS, language: "css" },
+        { name: "script.js", content: DEFAULT_WEB_JS, language: "javascript" }
+      ]));
+      localStorage.setItem("codeverse_folders_html", JSON.stringify([]));
+
+      Object.keys(LANGUAGES).forEach(lang => {
+        if (lang !== "html" && lang !== "text") {
+          const defCode = LANGUAGES[lang]?.defaultCode || "";
+          localStorage.setItem(`codeverse_code_${lang}`, defCode);
+          const ext = LANGUAGES[lang]?.extension || 'txt';
+          localStorage.setItem(`codeverse_files_${lang}`, JSON.stringify([
+            { name: `main.${ext}`, content: defCode, language: lang }
+          ]));
+          localStorage.setItem(`codeverse_folders_${lang}`, JSON.stringify([]));
+        }
+      });
+
+      // 3. Reset editor states in React back to default templates
+      setHtmlCode(LANGUAGES.html.defaultCode);
+      setCssCode(DEFAULT_WEB_CSS);
+      setJsCode(DEFAULT_WEB_JS);
+      setFolders([]);
+
+      let defaultFiles = [];
+      if (currentLanguage === "html") {
+        defaultFiles = [
+          { name: "index.html", content: LANGUAGES.html.defaultCode, language: "html" },
+          { name: "style.css", content: DEFAULT_WEB_CSS, language: "css" },
+          { name: "script.js", content: DEFAULT_WEB_JS, language: "javascript" }
+        ];
+        setWorkspaceFiles(defaultFiles);
+        setOpenTabs(["index.html", "style.css", "script.js"]);
+        setActiveFileName("index.html");
+      } else {
+        const defaultCode = LANGUAGES[currentLanguage]?.defaultCode || "";
+        setCode(defaultCode);
+
+        const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
+        const defaultName = `main.${ext}`;
+        defaultFiles = [
+          { name: defaultName, content: defaultCode, language: currentLanguage }
+        ];
+        setWorkspaceFiles(defaultFiles);
+        setOpenTabs([defaultName]);
+        setActiveFileName(defaultName);
+      }
+
+      // 4. Update the refs synchronously to avoid unmount save race conditions
+      const defaultCodeVal = currentLanguage === "html" ? "" : (LANGUAGES[currentLanguage]?.defaultCode || "");
+      latestCodeRef.current = {
+        htmlCode: LANGUAGES.html.defaultCode,
+        cssCode: DEFAULT_WEB_CSS,
+        jsCode: DEFAULT_WEB_JS,
+        code: defaultCodeVal,
+        currentLanguage
+      };
+      latestWorkspaceFilesRef.current = defaultFiles;
+      latestFoldersRef.current = [];
+
+      // 5. If logged in, clear their Firestore database workspaces for all languages, then write current default
+      if (user && !user.isGuest) {
+        const workspacesCol = collection(db, "users", user.uid, "code_workspaces");
+        const workspacesSnapshot = await getDocs(workspacesCol);
+        const deletePromises = workspacesSnapshot.docs.map(docSnap => deleteDoc(docSnap.ref));
+        await Promise.all(deletePromises);
+
+        // Write the fresh reset data for the current language directly to Firestore
+        if (currentLanguage === "html") {
+          await saveCodeToFirestore("html", {
+            htmlCode: LANGUAGES.html.defaultCode,
+            cssCode: DEFAULT_WEB_CSS,
+            jsCode: DEFAULT_WEB_JS
+          });
+        } else if (currentLanguage !== "text") {
+          await saveCodeToFirestore(currentLanguage, {
+            code: defaultCodeVal
+          });
+        }
+      }
+
+      showToast("Workspace code reset to default templates", "success");
+      setShowResetModal(false);
+    } catch (e) {
+      console.error("Error doing hard reset:", e);
+      showToast("Failed to reset workspaces", "error");
+    }
+  };
+
+  const handleResetCurrentLanguage = async () => {
+    try {
+      // 1. Remove variables for the current language only from localStorage
+      if (currentLanguage === "html") {
+        localStorage.removeItem("codeverse_code_html");
+        localStorage.removeItem("codeverse_web_css");
+        localStorage.removeItem("codeverse_web_js");
+        localStorage.removeItem("codeverse_files_html");
+        localStorage.removeItem("codeverse_folders_html");
+        localStorage.removeItem("codeverse_open_tabs_html");
+        localStorage.removeItem("codeverse_active_file_html");
+      } else {
+        localStorage.removeItem(`codeverse_code_${currentLanguage}`);
+        localStorage.removeItem(`codeverse_files_${currentLanguage}`);
+        localStorage.removeItem(`codeverse_folders_${currentLanguage}`);
+        localStorage.removeItem(`codeverse_open_tabs_${currentLanguage}`);
+        localStorage.removeItem(`codeverse_active_file_${currentLanguage}`);
+      }
+
+      // 2. Populate localStorage with the default boilerplate values for current language immediately
+      if (currentLanguage === "html") {
+        localStorage.setItem("codeverse_code_html", LANGUAGES.html.defaultCode);
+        localStorage.setItem("codeverse_web_css", DEFAULT_WEB_CSS);
+        localStorage.setItem("codeverse_web_js", DEFAULT_WEB_JS);
+        localStorage.setItem("codeverse_files_html", JSON.stringify([
+          { name: "index.html", content: LANGUAGES.html.defaultCode, language: "html" },
+          { name: "style.css", content: DEFAULT_WEB_CSS, language: "css" },
+          { name: "script.js", content: DEFAULT_WEB_JS, language: "javascript" }
+        ]));
+        localStorage.setItem("codeverse_folders_html", JSON.stringify([]));
+      } else {
+        const defCode = LANGUAGES[currentLanguage]?.defaultCode || "";
+        localStorage.setItem(`codeverse_code_${currentLanguage}`, defCode);
+        const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
+        localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify([
+          { name: `main.${ext}`, content: defCode, language: currentLanguage }
+        ]));
+        localStorage.setItem(`codeverse_folders_${currentLanguage}`, JSON.stringify([]));
+      }
+
+      // 3. Reset editor states in React back to default templates
+      if (currentLanguage === "html") {
+        setHtmlCode(LANGUAGES.html.defaultCode);
+        setCssCode(DEFAULT_WEB_CSS);
+        setJsCode(DEFAULT_WEB_JS);
+        setFolders([]);
+
+        const defaultFiles = [
+          { name: "index.html", content: LANGUAGES.html.defaultCode, language: "html" },
+          { name: "style.css", content: DEFAULT_WEB_CSS, language: "css" },
+          { name: "script.js", content: DEFAULT_WEB_JS, language: "javascript" }
+        ];
+        setWorkspaceFiles(defaultFiles);
+        setOpenTabs(["index.html", "style.css", "script.js"]);
+        setActiveFileName("index.html");
+
+        // Update the refs synchronously
+        latestCodeRef.current = {
+          htmlCode: LANGUAGES.html.defaultCode,
+          cssCode: DEFAULT_WEB_CSS,
+          jsCode: DEFAULT_WEB_JS,
+          code: "",
+          currentLanguage
+        };
+        latestWorkspaceFilesRef.current = defaultFiles;
+        latestFoldersRef.current = [];
+      } else {
+        const defaultCode = LANGUAGES[currentLanguage]?.defaultCode || "";
+        setCode(defaultCode);
+        setFolders([]);
+
+        const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
+        const defaultName = `main.${ext}`;
+        const defaultFiles = [
+          { name: defaultName, content: defaultCode, language: currentLanguage }
+        ];
+        setWorkspaceFiles(defaultFiles);
+        setOpenTabs([defaultName]);
+        setActiveFileName(defaultName);
+
+        // Update the refs synchronously
+        latestCodeRef.current = {
+          htmlCode: LANGUAGES.html.defaultCode,
+          cssCode: DEFAULT_WEB_CSS,
+          jsCode: DEFAULT_WEB_JS,
+          code: defaultCode,
+          currentLanguage
+        };
+        latestWorkspaceFilesRef.current = defaultFiles;
+        latestFoldersRef.current = [];
+      }
+
+      // 4. If logged in, clear and save the reset data to Firestore
+      if (user && !user.isGuest) {
+        // Delete current language document
+        const docRef = doc(db, "users", user.uid, "code_workspaces", currentLanguage);
+        await deleteDoc(docRef);
+
+        // Re-write defaults
+        if (currentLanguage === "html") {
+          await saveCodeToFirestore("html", {
+            htmlCode: LANGUAGES.html.defaultCode,
+            cssCode: DEFAULT_WEB_CSS,
+            jsCode: DEFAULT_WEB_JS
+          });
+        } else if (currentLanguage !== "text") {
+          const defaultCode = LANGUAGES[currentLanguage]?.defaultCode || "";
+          await saveCodeToFirestore(currentLanguage, {
+            code: defaultCode
+          });
+        }
+      }
+
+      showToast(`Reset ${LANGUAGES[currentLanguage]?.name} workspace to default`, "success");
+      setShowResetModal(false);
+    } catch (e) {
+      console.error("Error resetting single language:", e);
+      showToast("Failed to reset language workspace", "error");
+    }
+  };
+
   // --- Toolbar Handlers ---
   const clearConsole = () => {
     if (currentLanguage === "html") {
@@ -2127,8 +2396,13 @@ Explain why this error occurred and how to fix it.`;
     }
   };
 
+  const isAnyModalOpen = showSettings || showResetModal || showLanguageModal || showEditorSettings;
+
   return (
-    <main className="flex-grow w-full px-4 lg:px-6 py-4 flex flex-col gap-4 animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] relative overflow-x-hidden font-sans flex flex-col">
+      <main className={`flex-grow w-full px-4 lg:px-6 py-4 flex flex-col gap-4 animate-fade-in-up transition-all duration-300 relative ${
+        isAnyModalOpen ? 'blur-[8px] pointer-events-none' : ''
+      }`}>
       {/* Background Blur Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] z-0 pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[120px] z-0 pointer-events-none"></div>
@@ -2201,6 +2475,18 @@ Explain why this error occurred and how to fix it.`;
               <i className="fas fa-download text-[11px] sm:text-xs"></i>
               <span className="hidden sm:inline">{currentLanguage === "text" ? "Download Note" : "Download"}</span>
             </button>
+
+            {/* Reset Code Button */}
+            {currentLanguage !== "text" && (
+              <button
+                onClick={() => setShowResetModal(true)}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-rose-400 hover:border-rose-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
+                title="Reset all code templates to default"
+              >
+                <i className="fas fa-rotate-left text-[11px] sm:text-xs"></i>
+                <span className="hidden sm:inline">Reset Code</span>
+              </button>
+            )}
           </div>
 
           {currentLanguage !== "text" && (
@@ -2208,67 +2494,69 @@ Explain why this error occurred and how to fix it.`;
               {/* Separator 1 */}
               <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-color)] mx-1" />
 
-              {/* Group 2: Configurations & AI Tools */}
-              <div className="flex items-center gap-2">
-                {/* Settings Modal Button */}
-                <button
-                  onClick={openSettingsModal}
-                  className="p-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
-                  title="API Credentials Configuration"
-                >
-                  <i className="fas fa-sliders text-xs"></i>
-                </button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Group 2: Configurations & AI Tools */}
+                <div className="flex items-center gap-2">
+                  {/* Settings Modal Button */}
+                  <button
+                    onClick={openSettingsModal}
+                    className="p-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 editor-header-btn"
+                    title="API Credentials Configuration"
+                  >
+                    <i className="fas fa-sliders text-xs"></i>
+                  </button>
 
-                {/* AI Code Assistant Toggle Button */}
-                <button
-                  onClick={() => setShowAIPanel(prev => !prev)}
-                  className={`p-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
-                    showAIPanel
-                      ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
-                      : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] editor-header-btn'
-                  }`}
-                  title="AI Code Assistant"
-                >
-                  <i className="fas fa-brain text-xs text-emerald-400 animate-pulse"></i>
-                </button>
-              </div>
+                  {/* AI Code Assistant Toggle Button */}
+                  <button
+                    onClick={() => setShowAIPanel(prev => !prev)}
+                    className={`p-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                      showAIPanel
+                        ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/10'
+                        : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/30 bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] editor-header-btn'
+                    }`}
+                    title="AI Code Assistant"
+                  >
+                    <i className="fas fa-brain text-xs text-emerald-400 animate-pulse"></i>
+                  </button>
+                </div>
 
-              {/* Separator 2 */}
-              <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-color)] mx-1" />
+                {/* Separator 2 */}
+                <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-color)] mx-1" />
 
-              {/* Group 3: Execution Controls */}
-              <div className="flex items-center gap-3">
-                {currentLanguage === "html" && (
-                  <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-1">
-                    <input
-                      type="checkbox"
-                      checked={isAutoRunEnabled}
-                      onChange={(e) => setIsAutoRunEnabled(e.target.checked)}
-                      className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer accent-indigo-600"
-                    />
-                    <span className="flex items-center gap-1">
-                      <i className={`fas fa-bolt text-[9px] sm:text-[10px] ${isAutoRunEnabled ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'}`}></i>
-                      <span>Auto Preview</span>
-                    </span>
-                  </label>
-                )}
-                <button
-                  onClick={runCode}
-                  disabled={isExecuting}
-                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
-                >
-                  {isExecuting ? (
-                    <>
-                      <div className="spinner"></div>
-                      <span>Compiling...</span>
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-play text-[10px] sm:text-xs"></i>
-                      <span>Run<span className="hidden sm:inline"> Code</span></span>
-                    </>
+                {/* Group 3: Execution Controls */}
+                <div className="flex items-center gap-3">
+                  {currentLanguage === "html" && (
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-1">
+                      <input
+                        type="checkbox"
+                        checked={isAutoRunEnabled}
+                        onChange={(e) => setIsAutoRunEnabled(e.target.checked)}
+                        className="w-3.5 h-3.5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer accent-indigo-600"
+                      />
+                      <span className="flex items-center gap-1">
+                        <i className={`fas fa-bolt text-[9px] sm:text-[10px] ${isAutoRunEnabled ? 'text-amber-400 animate-pulse' : 'text-[var(--text-muted)]'}`}></i>
+                        <span>Auto Preview</span>
+                      </span>
+                    </label>
                   )}
-                </button>
+                  <button
+                    onClick={runCode}
+                    disabled={isExecuting}
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 active:scale-95 transition-all duration-200 btn-premium-glow ${isExecuting ? 'opacity-75' : ''}`}
+                  >
+                    {isExecuting ? (
+                      <>
+                        <div className="spinner"></div>
+                        <span>Compiling...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-play text-[10px] sm:text-xs"></i>
+                        <span>Run<span className="hidden sm:inline"> Code</span></span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -3298,21 +3586,22 @@ Explain why this error occurred and how to fix it.`;
           </div>
         )}
       </div>
+    </main>
 
       {/* ==================== SETTINGS MODAL ==================== */}
       {showSettings && (
         <div
           onClick={() => setShowSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[#121824] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col glass-panel"
+            className="w-full max-w-md max-h-[85vh] rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-hidden shadow-2xl animate-fade-in-up flex flex-col"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[#0f1420]/75 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/50 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/20 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <i className="fas fa-sliders text-sm"></i>
                 </div>
                 <div>
@@ -3321,7 +3610,7 @@ Explain why this error occurred and how to fix it.`;
               </div>
               <button
                 onClick={() => setShowSettings(false)}
-                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 cursor-pointer"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]/50 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer"
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -3336,7 +3625,7 @@ Explain why this error occurred and how to fix it.`;
                   type="text"
                   value={settingsUrlInput}
                   onChange={(e) => setSettingsUrlInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)]/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 font-mono transition-all duration-200 shadow-inner"
                   placeholder="https://ce.judge0.com"
                 />
                 <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">
@@ -3351,7 +3640,7 @@ Explain why this error occurred and how to fix it.`;
                   type="password"
                   value={settingsKeyInput}
                   onChange={(e) => setSettingsKeyInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/50 font-mono transition-all duration-200"
+                  className="w-full px-3 py-2.5 rounded-xl text-xs bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder-[var(--text-muted)]/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 font-mono transition-all duration-200 shadow-inner"
                   placeholder="••••••••••••••••••••••••••••••••"
                 />
                 <span className="text-[10px] text-[var(--text-muted)] leading-relaxed">
@@ -3361,14 +3650,14 @@ Explain why this error occurred and how to fix it.`;
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[#0f1420]/75 flex justify-between items-center shrink-0">
+            <div className="px-6 py-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-primary)]/50 flex justify-between items-center shrink-0">
               <button
                 onClick={() => {
                   setSettingsUrlInput(DEFAULT_API_URL);
                   setSettingsKeyInput("");
                   showToast("Compiler settings reset to defaults", "info");
                 }}
-                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer bg-transparent border-none"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
               >
                 Reset to defaults
               </button>
@@ -3382,6 +3671,80 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
       )}
+      {/* ==================== RESET CONFIRMATION MODAL ==================== */}
+      {showResetModal && (
+        <div 
+          onClick={() => setShowResetModal(false)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in select-none"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-3xl border border-rose-500/30 dark:border-rose-500/20 bg-[var(--bg-secondary)] shadow-2xl shadow-rose-500/5 p-6 md:p-8 animate-scale-up text-center relative overflow-hidden"
+          >
+            {/* Ambient Background Glow Orbs */}
+            <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-rose-500/10 blur-2xl pointer-events-none"></div>
+            <div className="absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
+
+            {/* Warning Icon */}
+            <div className="w-14 h-14 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 text-2xl mx-auto mb-4 shadow-lg shadow-rose-500/10 animate-bounce">
+              <i className="fas fa-triangle-exclamation"></i>
+            </div>
+
+            {/* Title & Description */}
+            <h3 className="text-lg font-extrabold text-[var(--text-primary)] mb-2 tracking-tight">
+              Reset Workspace Code?
+            </h3>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-6 px-1">
+              Choose how you want to reset your workspace. This will <span className="text-rose-400 font-bold">permanently overwrite</span> your custom edits with the default boilerplate templates.
+            </p>
+
+            {/* Action Buttons Option Stack */}
+            <div className="flex flex-col gap-3.5 mb-5">
+              {/* Option 1: Reset Only Current Language */}
+              <button
+                onClick={handleResetCurrentLanguage}
+                className="w-full flex items-center justify-between p-4 rounded-2xl border border-[var(--border-color)] hover:border-indigo-500/40 bg-[var(--bg-tertiary)]/20 hover:bg-indigo-500/5 active:scale-[0.98] transition-all duration-200 cursor-pointer text-left"
+              >
+                <div>
+                  <div className="text-xs font-extrabold text-[var(--text-primary)] flex items-center gap-1.5">
+                    <i className="fas fa-rotate-left text-indigo-400 text-[10px]"></i>
+                    Reset {LANGUAGES[currentLanguage]?.name} Only
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-1">
+                    Clears only the active {LANGUAGES[currentLanguage]?.name} workspace files.
+                  </div>
+                </div>
+                <i className="fas fa-chevron-right text-[10px] text-[var(--text-muted)]"></i>
+              </button>
+
+              {/* Option 2: Reset All Languages */}
+              <button
+                onClick={handleHardReset}
+                className="w-full flex items-center justify-between p-4 rounded-2xl border border-rose-500/20 hover:border-rose-500/40 bg-rose-500/5 hover:bg-rose-500/10 active:scale-[0.98] transition-all duration-200 cursor-pointer text-left"
+              >
+                <div>
+                  <div className="text-xs font-extrabold text-rose-400 flex items-center gap-1.5">
+                    <i className="fas fa-trash-can text-[10px]"></i>
+                    Reset All Languages
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-1">
+                    Resets all workspaces back to new user defaults.
+                  </div>
+                </div>
+                <i className="fas fa-chevron-right text-[10px] text-rose-400"></i>
+              </button>
+            </div>
+
+            {/* Close/Cancel Button */}
+            <button
+              onClick={() => setShowResetModal(false)}
+              className="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white active:scale-[0.98] transition-all duration-200 cursor-pointer shadow-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ==================== LANGUAGE SELECTOR GRID MODAL ==================== */}
       {showLanguageModal && (
@@ -3390,7 +3753,7 @@ Explain why this error occurred and how to fix it.`;
             setShowLanguageModal(false);
             setLangSearchQuery("");
           }}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -3502,7 +3865,7 @@ Explain why this error occurred and how to fix it.`;
       {showEditorSettings && (
         <div
           onClick={() => setShowEditorSettings(false)}
-          className="modal-overlay fixed inset-0 z-50 bg-black/40 flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
+          className="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-start pt-[22vh] sm:pt-[15vh] md:items-center md:pt-0 justify-center p-4 transition-all duration-300"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -3821,6 +4184,6 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }
