@@ -1,0 +1,95 @@
+<div style="font-family: 'Poppins', 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #0b0f19; padding: 35px 10px; margin: 0; width: 100%; box-sizing: border-box;">
+  
+  <!-- CSS Styles -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+    .cta-btn {
+      display: inline-block;
+      padding: 13px 32px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff !important;
+      background-color: #6366f1;
+      border-radius: 12px;
+      text-decoration: none;
+    }
+
+    .cta-btn:hover {
+      color: #ffffff !important;
+      background-color: #6366f1 !important;
+    }
+
+    @media only screen and (max-width: 480px) {
+      .welcome-card {
+        border-radius: 16px !important;
+      }
+      .header-wrapper {
+        padding: 25px 15px 20px 15px !important;
+      }
+      .content-body {
+        padding: 30px 15px !important;
+      }
+      .welcome-title {
+        font-size: 19px !important;
+        margin-bottom: 10px !important;
+      }
+      .welcome-name {
+        font-size: 14px !important;
+      }
+      .welcome-desc {
+        font-size: 12.5px !important;
+        line-height: 1.6 !important;
+        margin-bottom: 20px !important;
+      }
+      .cta-btn {
+        padding: 10px 24px !important;
+        font-size: 13px !important;
+      }
+    }
+  </style>
+
+  <!-- Main Card Container -->
+  <div class="welcome-card" style="max-width: 500px; margin: 0 auto; background-color: #1e293b; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);">
+    
+    <!-- Header -->
+    <div class="header-wrapper" style="text-align: center; background-color: #0f172a; padding: 30px 20px 25px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+      <img src="https://i.postimg.cc/bJNBQ6hL/image.png" alt="CodeVerse Header" style="max-width: 100%; width: 440px; height: auto; display: block; margin: 0 auto; border-radius: 12px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);" />
+    </div>
+    
+    <!-- Email Body -->
+    <div class="content-body" style="padding: 40px 30px; color: #f1f5f9; text-align: center; line-height: 1.7; box-sizing: border-box;">
+      
+      <h2 class="welcome-title" style="font-family: 'Poppins', 'Segoe UI', sans-serif; color: #ffffff; font-size: 22px; font-weight: 800; margin-top: 0; margin-bottom: 15px; letter-spacing: -0.5px;">
+        Welcome to CodeVerse!
+      </h2>
+
+      <p class="welcome-name" style="font-family: 'Poppins', 'Segoe UI', sans-serif; font-size: 15px; margin-bottom: 20px; color: #ffffff;">
+        Hi <strong style="color: #38bdf8; font-size: 16px;">{{to_name}}</strong>,
+      </p>
+      
+      <p class="welcome-desc" style="font-family: 'Poppins', 'Segoe UI', sans-serif; font-size: 14px; color: #cbd5e1; margin-top: 0; margin-bottom: 25px; padding: 0 5px;">
+        Your CodeVerse compiler workspace is now fully active! You can write, execute, and compile code in real-time across multiple languages, write compiler notes, and manage your setups securely.
+      </p>
+
+      <!-- CTA Button -->
+      <a class="cta-btn" href="https://code-verse-online.vercel.app/" target="_blank">
+        Start Coding Now
+      </a>
+
+      <p class="welcome-desc" style="font-family: 'Poppins', 'Segoe UI', sans-serif; font-size: 12px; color: #94a3b8; margin-top: 35px; margin-bottom: 0;">
+        If you have any questions or feedback, feel free to reply to this email. We're here to help you build awesome things!
+      </p>
+
+    </div>
+    
+    <!-- Footer -->
+    <div style="background-color: #0b1329; padding: 20px 25px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.04);">
+      <p style="font-family: 'Poppins', 'Segoe UI', sans-serif; color: #64748b; font-size: 10px; margin: 0; letter-spacing: 0.5px;">
+        &copy; 2026 CodeVerse Online Compiler. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</div>
