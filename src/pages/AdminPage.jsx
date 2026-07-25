@@ -26,6 +26,14 @@ export default function AdminPage({ user, showToast }) {
   const [order, setOrder] = useState(1);
   const [testCases, setTestCases] = useState([{ input: '', output: '', isHidden: false }]);
 
+  // Custom confirmation modal state
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: null
+  });
+
   // Load data on mount
   useEffect(() => {
     fetchChallenges();
@@ -78,18 +86,22 @@ export default function AdminPage({ user, showToast }) {
     }
   };
 
-  const handleDeleteUser = async (uid, name) => {
-    if (!window.confirm(`Are you sure you want to permanently delete user "${name || 'Developer'}" from the database? This will remove them from the Leaderboard.`)) {
-      return;
-    }
-    try {
-      await deleteDoc(doc(db, "users", uid));
-      setUsers(prev => prev.filter(u => u.uid !== uid));
-      showToast("User deleted from database successfully", "success");
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      showToast("Failed to delete user from database", "error");
-    }
+  const handleDeleteUser = (uid, name) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Confirm User Deletion",
+      message: `Are you sure you want to permanently delete user "${name || 'Developer'}" from the database? This action cannot be undone and will remove them from the Leaderboard.`,
+      onConfirm: async () => {
+        try {
+          await deleteDoc(doc(db, "users", uid));
+          setUsers(prev => prev.filter(u => u.uid !== uid));
+          showToast("User deleted from database successfully", "success");
+        } catch (err) {
+          console.error("Error deleting user:", err);
+          showToast("Failed to delete user from database", "error");
+        }
+      }
+    });
   };
 
 
@@ -113,16 +125,22 @@ export default function AdminPage({ user, showToast }) {
     }
   };
 
-  const handleDeleteContact = async (contactId) => {
-    if (!window.confirm("Are you sure you want to permanently delete this message?")) return;
-    try {
-      await deleteDoc(doc(db, "contacts", contactId));
-      setContacts(prev => prev.filter(c => c.id !== contactId));
-      showToast("Message deleted successfully", "success");
-    } catch (err) {
-      console.error("Error deleting message:", err);
-      showToast("Failed to delete message", "error");
-    }
+  const handleDeleteContact = (contactId) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Contact Message",
+      message: "Are you sure you want to permanently delete this contact message? This action cannot be undone.",
+      onConfirm: async () => {
+        try {
+          await deleteDoc(doc(db, "contacts", contactId));
+          setContacts(prev => prev.filter(c => c.id !== contactId));
+          showToast("Message deleted successfully", "success");
+        } catch (err) {
+          console.error("Error deleting message:", err);
+          showToast("Failed to delete message", "error");
+        }
+      }
+    });
   };
 
   const fetchChallenges = async () => {
@@ -188,19 +206,22 @@ export default function AdminPage({ user, showToast }) {
   };
 
   // Delete challenge from Firestore
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to permanently delete this challenge? This action cannot be undone.")) {
-      return;
-    }
-
-    try {
-      await deleteDoc(doc(db, "challenges", id));
-      showToast("Challenge deleted successfully", "success");
-      fetchChallenges();
-    } catch (err) {
-      console.error("Error deleting challenge: ", err);
-      showToast("Failed to delete challenge", "error");
-    }
+  const handleDelete = (id) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Challenge",
+      message: "Are you sure you want to permanently delete this challenge? This action cannot be undone.",
+      onConfirm: async () => {
+        try {
+          await deleteDoc(doc(db, "challenges", id));
+          showToast("Challenge deleted successfully", "success");
+          fetchChallenges();
+        } catch (err) {
+          console.error("Error deleting challenge: ", err);
+          showToast("Failed to delete challenge", "error");
+        }
+      }
+    });
   };
 
   // Add a new blank testcase field row
@@ -818,6 +839,45 @@ export default function AdminPage({ user, showToast }) {
 
             </form>
 
+          </div>
+        </div>
+      )}
+
+      {/* Custom Confirmation Modal Overlay */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-[150] flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => e.stopPropagation()} onMouseMove={(e) => e.stopPropagation()} onMouseUp={(e) => e.stopPropagation()}>
+          <div className="border border-slate-200 dark:border-[var(--border-color)] bg-white dark:bg-[#0d1321] rounded-2xl w-full max-w-sm p-6 shadow-2xl relative overflow-hidden animate-scale-up text-center flex flex-col gap-4">
+            <div className="mx-auto w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 text-lg mb-1 animate-bounce">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-slate-100">
+              {confirmModal.title}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              {confirmModal.message}
+            </p>
+            <div className="flex items-center gap-3 mt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
+                className="flex-1 py-2 bg-slate-100 dark:bg-[var(--bg-secondary)] border border-slate-200 dark:border-[var(--border-color)] hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer focus:outline-none"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const onConfirmAction = confirmModal.onConfirm;
+                  setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+                  if (onConfirmAction) {
+                    await onConfirmAction();
+                  }
+                }}
+                className="flex-1 py-2 bg-rose-600 hover:bg-rose-500 border border-rose-500 hover:border-rose-400 rounded-xl text-xs font-bold text-white transition-all duration-200 cursor-pointer shadow-md active:scale-95 focus:outline-none"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

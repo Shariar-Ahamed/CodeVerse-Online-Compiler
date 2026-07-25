@@ -182,7 +182,7 @@ export default function LeaderboardPage({ user, showToast }) {
                                   )}
                                 </div>
                                 {player.lastSeen && (Date.now() - new Date(player.lastSeen).getTime() < 300000) && (
-                                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400">
+                                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400 z-20">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                   </span>
                                 )}
@@ -192,7 +192,7 @@ export default function LeaderboardPage({ user, showToast }) {
                                   <span>{player.name}</span>
                                   {player.isVerified && (
                                     <span className="text-xs" style={{ color: '#1D9BF0' }} title="Verified Creator">
-                                      <i className="fas fa-circle-check animate-pulse"></i>
+                                      <i className="fas fa-circle-check"></i>
                                     </span>
                                   )}
                                   {isCurrentUser && (
@@ -274,7 +274,7 @@ export default function LeaderboardPage({ user, showToast }) {
                              )}
                            </div>
                           {player.lastSeen && (Date.now() - new Date(player.lastSeen).getTime() < 300000) && (
-                            <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400"></span>
+                            <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-[var(--bg-secondary)] bg-emerald-400 z-20"></span>
                           )}
                         </div>
 
