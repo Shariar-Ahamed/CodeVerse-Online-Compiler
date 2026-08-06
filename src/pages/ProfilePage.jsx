@@ -786,8 +786,8 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
               </h3>
 
               {/* Avatar Upload Preview */}
-              <div className="flex flex-col items-center gap-2 mb-3 relative group">
-                <div className="w-20 h-20 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800">
+              <div className="flex flex-col items-center gap-2 mb-3 relative">
+                <label className="w-20 h-20 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800 cursor-pointer group">
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xl select-none">
                     {(inputs.name || 'U').charAt(0).toUpperCase()}
                   </span>
@@ -801,17 +801,17 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
                     />
                   )}
                   {/* File selection cover overlay */}
-                  <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 text-white text-[10px] gap-1 select-none">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-200 text-white text-[10px] gap-1 select-none z-20">
                     <i className="fas fa-camera text-sm animate-pulse"></i>
                     <span>Upload</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
                 <span className="text-[9px] text-[var(--text-secondary)] font-medium">Click photo to upload</span>
               </div>
 
