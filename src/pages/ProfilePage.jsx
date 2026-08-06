@@ -190,14 +190,14 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             
             // Auto-repair missing username/name in database
             if (!data.username || !data.name) {
-              const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
-              const finalUsername = data.username || `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
-              const finalName = data.name || user.name || baseUsername;
+              const fallbackUsername = (user.email ? user.email.split('@')[0] : (user.name || 'user')).toLowerCase().replace(/[^a-z0-9_]/g, "");
+              const finalUsername = data.username || `${fallbackUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+              const finalName = data.name || user.name || fallbackUsername;
               
               await setDoc(docRef, {
                 name: finalName,
                 username: finalUsername,
-                email: user.email.toLowerCase()
+                email: (user.email || '').toLowerCase()
               }, { merge: true });
               
               data.name = finalName;
@@ -228,12 +228,12 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             fetchFollowStats(user.uid);
           } else {
             // Document doesn't exist, set from auth state
-            const baseUsername = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
-            const finalUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+            const fallbackUsername = (user.email ? user.email.split('@')[0] : (user.name || 'user')).toLowerCase().replace(/[^a-z0-9_]/g, "");
+            const finalUsername = `${fallbackUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
             
             await setDoc(docRef, {
-              name: user.name || baseUsername,
-              email: user.email.toLowerCase(),
+              name: user.name || fallbackUsername,
+              email: (user.email || '').toLowerCase(),
               username: finalUsername,
               role: 'user',
               score: 0,

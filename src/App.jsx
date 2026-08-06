@@ -122,9 +122,9 @@ function AppContent() {
         // Authenticated Firebase User
         const userData = {
           uid: firebaseUser.uid,
-          name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
-          email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
+          name: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Developer'),
+          email: firebaseUser.email || '',
+          photoURL: firebaseUser.photoURL || '',
           isGuest: false,
           role: 'user',
           username: ''
@@ -139,15 +139,15 @@ function AppContent() {
           );
 
           let data = docSnap.exists() ? docSnap.data() : null;
-          const baseUsername = firebaseUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
-          const finalUsername = (data && data.username) || `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+          const fallbackUsername = (firebaseUser.email ? firebaseUser.email.split('@')[0] : (firebaseUser.displayName || 'user')).toLowerCase().replace(/[^a-z0-9_]/g, "");
+          const finalUsername = (data && data.username) || `${fallbackUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
           const assignedRole = isAdminEmail ? 'admin' : ((data && data.role) || 'user');
 
           if (!docSnap.exists() || !data.email || !data.username) {
             // Document doesn't exist or is incomplete, write/merge it!
             await setDoc(userDocRef, {
-              name: (data && data.name) || firebaseUser.displayName || baseUsername,
-              email: firebaseUser.email.toLowerCase(),
+              name: (data && data.name) || firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Developer'),
+              email: (firebaseUser.email || '').toLowerCase(),
               username: finalUsername,
               role: assignedRole,
               photoURL: (data && data.photoURL) || firebaseUser.photoURL || "",

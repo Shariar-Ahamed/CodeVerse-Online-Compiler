@@ -53,7 +53,7 @@ export default function AIPanel({
   // Dynamically update greeting when Auth state resolves
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      const name = user ? (user.displayName || user.email.split('@')[0]) : '';
+      const name = user ? (user.displayName || (user.email ? user.email.split('@')[0] : 'Developer')) : '';
       const welcomeName = name ? `, **${name}**` : '';
       
       setMessages([
