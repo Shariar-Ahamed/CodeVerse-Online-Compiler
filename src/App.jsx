@@ -119,12 +119,18 @@ function AppContent() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        // Resolve profile photo URL (use direct graph API type=large for Facebook to bypass permission token expires)
+        const facebookProviderData = firebaseUser.providerData?.find(p => p.providerId === 'facebook.com');
+        const resolvedPhotoURL = facebookProviderData 
+          ? `https://graph.facebook.com/${facebookProviderData.uid}/picture?type=large` 
+          : (firebaseUser.photoURL || '');
+
         // Authenticated Firebase User
         const userData = {
           uid: firebaseUser.uid,
           name: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Developer'),
           email: firebaseUser.email || '',
-          photoURL: firebaseUser.photoURL || '',
+          photoURL: resolvedPhotoURL,
           isGuest: false,
           role: 'user',
           username: ''
@@ -150,7 +156,7 @@ function AppContent() {
               email: (firebaseUser.email || '').toLowerCase(),
               username: finalUsername,
               role: assignedRole,
-              photoURL: (data && data.photoURL) || firebaseUser.photoURL || "",
+              photoURL: (data && data.photoURL) || resolvedPhotoURL || "",
               score: (data && data.score) || 0,
               solvedChallenges: (data && data.solvedChallenges) || [],
               createdAt: (data && data.createdAt) || new Date().toISOString()
@@ -158,17 +164,17 @@ function AppContent() {
 
             userData.role = assignedRole;
             userData.username = finalUsername;
-            userData.photoURL = (data && data.photoURL) || firebaseUser.photoURL || "";
+            userData.photoURL = (data && data.photoURL) || resolvedPhotoURL || "";
           } else {
             userData.role = assignedRole;
             userData.username = finalUsername;
 
-            // Auto-sync Google photoURL if missing in Firestore but present in Firebase Auth
-            if (!data.photoURL && firebaseUser.photoURL) {
-              await setDoc(userDocRef, { photoURL: firebaseUser.photoURL }, { merge: true });
-              userData.photoURL = firebaseUser.photoURL;
+            // Auto-sync photoURL if missing in Firestore but present in Firebase Auth
+            if (!data.photoURL && resolvedPhotoURL) {
+              await setDoc(userDocRef, { photoURL: resolvedPhotoURL }, { merge: true });
+              userData.photoURL = resolvedPhotoURL;
             } else {
-              userData.photoURL = data.photoURL || firebaseUser.photoURL || "";
+              userData.photoURL = data.photoURL || resolvedPhotoURL || "";
             }
 
             if (data.name) userData.name = data.name;

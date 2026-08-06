@@ -231,11 +231,18 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             const fallbackUsername = (user.email ? user.email.split('@')[0] : (user.name || 'user')).toLowerCase().replace(/[^a-z0-9_]/g, "");
             const finalUsername = `${fallbackUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
             
+            // Resolve Facebook photoURL to type=large
+            const facebookProviderData = auth.currentUser?.providerData?.find(p => p.providerId === 'facebook.com');
+            const resolvedPhotoURL = facebookProviderData 
+              ? `https://graph.facebook.com/${facebookProviderData.uid}/picture?type=large` 
+              : (user.photoURL || '');
+
             await setDoc(docRef, {
               name: user.name || fallbackUsername,
               email: (user.email || '').toLowerCase(),
               username: finalUsername,
               role: 'user',
+              photoURL: resolvedPhotoURL,
               score: 0,
               solvedChallenges: [],
               createdAt: new Date().toISOString()
@@ -245,13 +252,13 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
             localStorage.setItem("codeverse_user", JSON.stringify(user));
 
             setProfileData({
-              name: user.name || baseUsername,
+              name: user.name || fallbackUsername,
               username: finalUsername,
               email: user.email,
               title: 'Premium Developer',
               bio: '',
               skills: ['JavaScript', 'React', 'C++'],
-              photoURL: user.photoURL || '',
+              photoURL: resolvedPhotoURL,
               github: '',
               linkedin: '',
               website: '',
