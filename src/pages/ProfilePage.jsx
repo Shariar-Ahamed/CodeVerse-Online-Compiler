@@ -780,7 +780,7 @@ export default function ProfilePage({ user, onLogout, onUserUpdate, showToast })
 
               {/* Avatar Upload Preview */}
               <div className="flex flex-col items-center gap-2 mb-3 relative group">
-                <div className="w-18 h-18 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800">
+                <div className="w-20 h-20 rounded-full border border-[var(--border-color)] text-white text-xs font-bold flex items-center justify-center shadow-md relative overflow-hidden bg-slate-800">
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-xl select-none">
                     {(inputs.name || 'U').charAt(0).toUpperCase()}
                   </span>
