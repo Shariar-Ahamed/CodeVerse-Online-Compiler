@@ -101,12 +101,24 @@ export default function Header({ user, onLogout, toggleTheme, theme }) {
         <div className="flex items-center gap-3">
           {/* Theme Toggle Switch */}
           <button
-            id="theme-toggle"
             onClick={toggleTheme}
-            className="p-2 rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-tertiary)]/50 hover:bg-[var(--bg-tertiary)] transition-all duration-200 focus:outline-none"
+            className="theme-switch-container cursor-pointer focus:outline-none"
             title="Toggle Light/Dark Theme"
+            aria-label="Toggle Theme"
           >
-            <i id="theme-icon" className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'} text-sm`}></i>
+            <div className={`theme-switch-slot ${theme === 'dark' ? 'theme-switch-dark' : 'theme-switch-light'}`}>
+              <div className="theme-switch-cloud theme-switch-cloud-1"></div>
+              <div className="theme-switch-cloud theme-switch-cloud-2"></div>
+              <div className="theme-switch-cloud theme-switch-cloud-3"></div>
+              <div className="theme-switch-button">
+                <div className="theme-switch-crater theme-switch-crater-1"></div>
+                <div className="theme-switch-crater theme-switch-crater-2"></div>
+                <div className="theme-switch-crater theme-switch-crater-3"></div>
+              </div>
+              <div className="theme-switch-star theme-switch-star-1"></div>
+              <div className="theme-switch-star theme-switch-star-2"></div>
+              <div className="theme-switch-star theme-switch-star-3"></div>
+            </div>
           </button>
 
           {/* Authentication Container */}

@@ -1816,3 +1816,177 @@ input:-webkit-autofill:active {
 .light .marquee-lang-card {
   box-shadow: 5px 5px 12px rgba(15, 23, 42, 0.06), -5px -5px 12px #ffffff !important;
 }
+
+/* Custom Premium Theme Toggle Switch Styles */
+.theme-switch-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  vertical-align: middle;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  touch-action: manipulation;
+}
+
+.theme-switch-slot {
+  position: relative;
+  height: 24px;
+  width: 48px;
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+  transition: background-color 300ms, border-color 300ms;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Day/Night background colors */
+.theme-switch-slot.theme-switch-light {
+  background-color: #83d8ff;
+  border: 1.5px solid #62c2f0;
+}
+
+.theme-switch-slot.theme-switch-dark {
+  background-color: #385994;
+  border: 1.5px solid #233e70;
+}
+
+/* Knob */
+.theme-switch-button {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  transition: background-color 300ms, box-shadow 300ms, transform 300ms cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Sun state */
+.theme-switch-slot.theme-switch-light .theme-switch-button {
+  background-color: #ffbb52;
+  box-shadow: 0 0 4px #ffc266, inset -1px -1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateX(0px);
+}
+
+/* Moon state */
+.theme-switch-slot.theme-switch-dark .theme-switch-button {
+  background-color: #ffeccf;
+  box-shadow: 0 0 4px #ffffff, inset -1px -1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateX(26px);
+}
+
+/* Moon Craters */
+.theme-switch-crater {
+  position: absolute;
+  background-color: #e8cca2;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.theme-switch-slot.theme-switch-dark .theme-switch-crater {
+  opacity: 1;
+}
+
+.theme-switch-crater-1 {
+  top: 3px;
+  left: 10px;
+  width: 5px;
+  height: 5px;
+}
+
+.theme-switch-crater-2 {
+  top: 10px;
+  left: 8px;
+  width: 4px;
+  height: 4px;
+}
+
+.theme-switch-crater-3 {
+  top: 7px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
+}
+
+/* Clouds (Light Mode) */
+.theme-switch-cloud {
+  position: absolute;
+  background-color: white;
+  border-radius: 10px;
+  opacity: 1;
+  transform: translateX(0px);
+  transition: opacity 250ms ease, transform 250ms ease;
+  z-index: 5;
+}
+
+.theme-switch-slot.theme-switch-dark .theme-switch-cloud {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.theme-switch-cloud-1 {
+  top: 4px;
+  right: 6px;
+  width: 14px;
+  height: 3px;
+}
+
+.theme-switch-cloud-2 {
+  top: 10px;
+  right: 3px;
+  width: 18px;
+  height: 4px;
+}
+
+.theme-switch-cloud-3 {
+  top: 16px;
+  right: 8px;
+  width: 12px;
+  height: 3px;
+}
+
+/* Stars (Dark Mode) */
+.theme-switch-star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 250ms ease, transform 250ms ease;
+  z-index: 5;
+}
+
+.theme-switch-slot.theme-switch-dark .theme-switch-star {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+.theme-switch-star-1 {
+  top: 5px;
+  left: 16px;
+  width: 2.5px;
+  height: 2.5px;
+  transition-delay: 50ms;
+}
+
+.theme-switch-star-2 {
+  top: 11px;
+  left: 10px;
+  width: 3.5px;
+  height: 3.5px;
+  transition-delay: 100ms;
+}
+
+.theme-switch-star-3 {
+  top: 17px;
+  left: 14px;
+  width: 2px;
+  height: 2px;
+  transition-delay: 150ms;
+}
