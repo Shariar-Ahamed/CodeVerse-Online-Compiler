@@ -422,8 +422,8 @@ Respond in clean markdown format. When providing code fixes or optimized version
             disabled={!input.trim()}
             className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
               !input.trim()
-                ? 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] border border-[var(--border-color)]/30 opacity-70 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/20 shadow-[0_4px_12px_rgba(99,102,241,0.25)] hover:shadow-[0_4px_20px_rgba(99,102,241,0.45)] hover:scale-105 active:scale-95'
+                ? 'bg-indigo-600 text-white/50 border border-indigo-500/20 opacity-60 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/20 shadow-[0_4px_12px_rgba(99,102,241,0.25)] hover:shadow-[0_4px_20px_rgba(99,102,241,0.45)] hover:scale-105 active:scale-95 cursor-pointer'
             }`}
           >
             <i className="fas fa-paper-plane text-xs text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.8)]"></i>
