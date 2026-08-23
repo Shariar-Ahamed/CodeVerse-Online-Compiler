@@ -1681,7 +1681,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
           source_code: encodeBase64(codeToCompile),
           language_id: LANGUAGES[currentLanguage].id,
           stdin: encodeBase64(stdin),
-          redirect_stderr_to_stdout: true
+          redirect_stderr_to_stdout: false
         })
       }, 10000);
 

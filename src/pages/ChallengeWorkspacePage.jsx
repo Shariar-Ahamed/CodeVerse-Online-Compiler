@@ -251,7 +251,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           source_code: encodeBase64(codeToCompile),
           language_id: langConfig.id,
           stdin: encodeBase64(sampleCase.input),
-          redirect_stderr_to_stdout: true
+          redirect_stderr_to_stdout: false
         })
       }, 10000);
 
