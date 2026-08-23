@@ -134,7 +134,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'groq/compound',
           messages: apiMessages,
           temperature: 0.5,
           max_tokens: 1024
