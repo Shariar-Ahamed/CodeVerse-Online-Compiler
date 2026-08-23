@@ -1327,16 +1327,14 @@ export default function LandingPage({ showToast, theme }) {
           {/* Backlight Glow Aura (Spread of Light) */}
           <div className={`absolute inset-0 rounded-full blur-xl transition-all duration-300 z-0 pointer-events-none ${
             showHomeAI
-              ? 'bg-rose-500/40 animate-pulse-slow'
+              ? 'bg-rose-500/10'
               : 'bg-emerald-500/40 group-hover:bg-emerald-400/50 animate-pulse-slow'
           }`}></div>
           
           {/* Radiating Ripple Ring (Spreading Light Ray) */}
-          <div className={`absolute -inset-1 rounded-full blur-sm animate-ping z-0 pointer-events-none transition-all duration-300 ${
-            showHomeAI ? 'bg-rose-500/35' : 'bg-emerald-500/35'
-          }`}></div>
+          <div className={`absolute -inset-1 rounded-full blur-sm z-0 pointer-events-none transition-all duration-300 ${showHomeAI ? 'hidden bg-rose-500/0' : 'animate-ping bg-emerald-500/35'}`}></div>
           <div className={`absolute -inset-2 rounded-full blur-md z-0 pointer-events-none transition-all duration-300 ${
-            showHomeAI ? 'bg-rose-500/15 animate-pulse-slow' : 'bg-emerald-500/15 animate-pulse-slow'
+            showHomeAI ? 'bg-rose-500/5' : 'bg-emerald-500/15 animate-pulse-slow'
           }`}></div>
 
           {/* Main Button */}
