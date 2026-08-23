@@ -377,7 +377,7 @@ end program hello`
     badgeClass: "bg-blue-500/10 border-blue-500/20 text-blue-400",
     icon: "fas fa-code",
     categories: ["programming"],
-    defaultCode: `#import <Foundation/Foundation.h>\n\nint main() {\n    NSLog(@"Hello, World!");\n    return 0;\n}`
+    defaultCode: `#import <Foundation/Foundation.h>\n\nint main() {\n    @autoreleasepool {\n        NSLog(@"Hello, World!");\n    }\n    return 0;\n}`
   },
   ocaml: {
     id: 65,
