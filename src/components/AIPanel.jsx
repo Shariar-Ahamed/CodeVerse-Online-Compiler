@@ -389,7 +389,7 @@ Respond in clean markdown format. When providing code fixes or optimized version
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-150"></span>
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-300"></span>
             </div>
-            <span className="text-[10px] font-mono">Llama is thinking...</span>
+            <span className="text-[10px] font-mono">CodeVerse AI is thinking...</span>
           </div>
         )}
       </div>
@@ -433,3 +433,4 @@ Respond in clean markdown format. When providing code fixes or optimized version
     </div>
   );
 }
+
