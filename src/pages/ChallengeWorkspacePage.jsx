@@ -5,6 +5,33 @@ import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy
 import { db } from '../firebase';
 import { LANGUAGES } from '../utils/languages';
 
+// Helper to filter out JVM internal warnings from terminal stdout/stderr
+const filterSystemWarnings = (text) => {
+  if (!text) return "";
+  const lines = text.split('\n');
+  const filteredLines = lines.filter(line => {
+    const l = line.trim();
+    if (l.includes("sun.misc.Unsafe") || l.includes("terminally deprecated method in sun.misc.Unsafe")) {
+      return false;
+    }
+    if (l.includes("scala.runtime.LazyVals$")) {
+      return false;
+    }
+    if (l.includes("illegal reflective access") || l.includes("reflective access operation")) {
+      return false;
+    }
+    if (l.includes("Please consider reporting this to the maintainers")) {
+      return false;
+    }
+    if (l.includes("All illegal access operations") || l.includes("Use --illegal-access=warn")) {
+      return false;
+    }
+    return true;
+  });
+  return filteredLines.join('\n');
+};
+
+
 import { INITIAL_CHALLENGES } from '../utils/challenges';
 
 const DEFAULT_API_URL = "https://ce.judge0.com";
@@ -251,7 +278,7 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           source_code: encodeBase64(codeToCompile),
           language_id: langConfig.id,
           stdin: encodeBase64(sampleCase.input),
-          redirect_stderr_to_stdout: false
+          redirect_stderr_to_stdout: true
         })
       }, 10000);
 
@@ -288,9 +315,22 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           clearInterval(pollInterval);
           setIsExecuting(false);
 
-          const stdout = result.stdout ? decodeBase64(result.stdout).trim() : "";
-          const stderr = result.stderr ? decodeBase64(result.stderr).trim() : "";
-          const compileOutput = result.compile_output ? decodeBase64(result.compile_output).trim() : "";
+          const rawStdout = result.stdout ? decodeBase64(result.stdout).trim() : "";
+
+
+          const rawStderr = result.stderr ? decodeBase64(result.stderr).trim() : "";
+
+
+          const rawCompileOutput = result.compile_output ? decodeBase64(result.compile_output).trim() : "";
+
+
+          const stdout = filterSystemWarnings(rawStdout);
+
+
+          const stderr = filterSystemWarnings(rawStderr);
+
+
+          const compileOutput = filterSystemWarnings(rawCompileOutput);
 
           const isAccepted = isCustomRun 
             ? statusId === 3 
@@ -423,9 +463,17 @@ export default function ChallengeWorkspacePage({ user, theme, showToast }) {
           let allPassed = true;
           const processedResults = submissionsResults.map((result, idx) => {
             const expectedOutput = challenge.testCases[idx].output.trim();
-            const stdout = result.stdout ? decodeBase64(result.stdout).trim() : "";
-            const stderr = result.stderr ? decodeBase64(result.stderr).trim() : "";
-            const compileOutput = result.compile_output ? decodeBase64(result.compile_output).trim() : "";
+            const rawStdout = result.stdout ? decodeBase64(result.stdout).trim() : "";
+
+            const rawStderr = result.stderr ? decodeBase64(result.stderr).trim() : "";
+
+            const rawCompileOutput = result.compile_output ? decodeBase64(result.compile_output).trim() : "";
+
+            const stdout = filterSystemWarnings(rawStdout);
+
+            const stderr = filterSystemWarnings(rawStderr);
+
+            const compileOutput = filterSystemWarnings(rawCompileOutput);
 
             const isPassed = result.status?.id === 3 && stdout === expectedOutput;
             if (!isPassed) allPassed = false;

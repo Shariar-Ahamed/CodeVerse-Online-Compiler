@@ -7,6 +7,33 @@ import { LANGUAGES, DEFAULT_WEB_CSS, DEFAULT_WEB_JS } from '../utils/languages';
 import { doc, collection, setDoc, deleteDoc, getDocs, onSnapshot, increment, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import AIPanel from '../components/AIPanel';
+
+// Helper to filter out JVM internal warnings from terminal stdout/stderr
+const filterSystemWarnings = (text) => {
+  if (!text) return "";
+  const lines = text.split('\n');
+  const filteredLines = lines.filter(line => {
+    const l = line.trim();
+    if (l.includes("sun.misc.Unsafe") || l.includes("terminally deprecated method in sun.misc.Unsafe")) {
+      return false;
+    }
+    if (l.includes("scala.runtime.LazyVals$")) {
+      return false;
+    }
+    if (l.includes("illegal reflective access") || l.includes("reflective access operation")) {
+      return false;
+    }
+    if (l.includes("Please consider reporting this to the maintainers")) {
+      return false;
+    }
+    if (l.includes("All illegal access operations") || l.includes("Use --illegal-access=warn")) {
+      return false;
+    }
+    return true;
+  });
+  return filteredLines.join('\n');
+};
+
 const draculaTheme = {
   base: 'vs-dark',
   inherit: true,
@@ -1681,7 +1708,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
           source_code: encodeBase64(codeToCompile),
           language_id: LANGUAGES[currentLanguage].id,
           stdin: encodeBase64(stdin),
-          redirect_stderr_to_stdout: false
+          redirect_stderr_to_stdout: true
         })
       }, 10000);
 
@@ -1757,9 +1784,12 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const displayExecutionResult = (result, codeToCompile) => {
-    const stdout = result.stdout ? decodeBase64(result.stdout) : "";
-    const stderr = result.stderr ? decodeBase64(result.stderr) : "";
-    const compileOutput = result.compile_output ? decodeBase64(result.compile_output) : "";
+    const rawStdout = result.stdout ? decodeBase64(result.stdout) : "";
+    const rawStderr = result.stderr ? decodeBase64(result.stderr) : "";
+    const rawCompileOutput = result.compile_output ? decodeBase64(result.compile_output) : "";
+    const stdout = filterSystemWarnings(rawStdout);
+    const stderr = filterSystemWarnings(rawStderr);
+    const compileOutput = filterSystemWarnings(rawCompileOutput);
     const status = result.status || {};
 
     setStatusBadge({
