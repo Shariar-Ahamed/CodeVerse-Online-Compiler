@@ -1034,7 +1034,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
         jsCode: jsCode
       };
     } else if (currentLanguage !== "text") {
-      draftCode = editorRef.current ? editorRef.current.getValue() : code;
+      draftCode = getEditorValue();
     } else {
       showToast("Cannot save a text note as a draft. Try downloading as txt instead!", "warning");
       return;
@@ -1418,6 +1418,10 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
 
   const handleWorkspaceCodeChange = (val) => {
     setWorkspaceFiles(prev => {
+      const activeFile = prev.find(f => f.name === activeFileName);
+      if (activeFile && activeFile.language !== currentLanguage) {
+        return prev;
+      }
       const updated = prev.map(f => {
         if (f.name === activeFileName) {
           return { ...f, content: val || "" };
@@ -1649,6 +1653,19 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     }
   };
 
+  const getEditorValue = () => {
+    if (editorRef.current && !isMobile && settingsEditorEngine !== "Ace") {
+      return editorRef.current.getValue();
+    }
+    const activeFile = workspaceFiles.find(f => f.name === activeFileName);
+    if (activeFile) return activeFile.content;
+    
+    if (currentLanguage === "html") {
+      return activeWebTab === "html" ? htmlCode : (activeWebTab === "css" ? cssCode : jsCode);
+    }
+    return code;
+  };
+
   // Run Code logic
   const runCode = async () => {
     if (currentLanguage === "html") {
@@ -1658,7 +1675,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
 
     if (isExecuting) return;
 
-    const codeToCompile = editorRef.current ? editorRef.current.getValue() : code;
+    const codeToCompile = getEditorValue();
     if (!codeToCompile.trim()) {
       showToast("Please enter some code first!", "error");
       return;
@@ -2237,7 +2254,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const copyCodeToClipboard = () => {
-    const editorVal = editorRef.current ? editorRef.current.getValue() : (currentLanguage === "html" ? (activeWebTab === "html" ? htmlCode : activeWebTab === "css" ? cssCode : jsCode) : code);
+    const editorVal = getEditorValue();
     if (!editorVal.trim()) {
       showToast("Editor is empty!", "error");
       return;
@@ -2252,7 +2269,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const downloadCodeFile = () => {
-    const editorVal = editorRef.current ? editorRef.current.getValue() : (currentLanguage === "html" ? (activeWebTab === "html" ? htmlCode : activeWebTab === "css" ? cssCode : jsCode) : code);
+    const editorVal = getEditorValue();
     if (!editorVal.trim()) {
       showToast("Nothing to download!", "error");
       return;
