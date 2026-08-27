@@ -208,6 +208,11 @@ const VanillaAceEditor = ({ mode, theme, value, onChange, fontSize, wordWrap, di
   const containerRef = useRef(null);
   const editorRef = useRef(null);
   const isSettingValueRef = useRef(false);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -233,8 +238,8 @@ const VanillaAceEditor = ({ mode, theme, value, onChange, fontSize, wordWrap, di
     editor.on('change', () => {
       if (isSettingValueRef.current) return;
       const currentVal = editor.getValue();
-      if (onChange) {
-        onChange(currentVal);
+      if (onChangeRef.current) {
+        onChangeRef.current(currentVal);
       }
     });
 
@@ -248,9 +253,12 @@ const VanillaAceEditor = ({ mode, theme, value, onChange, fontSize, wordWrap, di
     if (editorRef.current) {
       const currentVal = editorRef.current.getValue();
       if (currentVal !== value) {
-        isSettingValueRef.current = true;
-        editorRef.current.setValue(value || "", -1);
-        isSettingValueRef.current = false;
+        try {
+          isSettingValueRef.current = true;
+          editorRef.current.setValue(value || "", -1);
+        } finally {
+          isSettingValueRef.current = false;
+        }
       }
     }
   }, [value]);
@@ -288,6 +296,12 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const navigate = useNavigate();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [searchParams] = useSearchParams();
+  const [debugLogs, setDebugLogs] = useState([]);
+  const [showDebugOverlay, setShowDebugOverlay] = useState(false);
+  
+  const addDebugLog = (msg) => {
+    setDebugLogs(prev => [...prev.slice(-30), `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  };
   const queryLang = searchParams.get('lang');
   
   const [currentLanguage, setCurrentLanguage] = useState(() => {
@@ -434,6 +448,92 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
     latestFoldersRef.current = folders;
   }, [folders]);
 
+  const repairWorkspaceFiles = (files, langId) => {
+    if (!files || !Array.isArray(files) || files.length === 0) {
+      if (langId === "html") {
+        return {
+          repaired: [
+            { name: "index.html", content: LANGUAGES.html.defaultCode, language: "html" },
+            { name: "style.css", content: DEFAULT_WEB_CSS, language: "css" },
+            { name: "script.js", content: DEFAULT_WEB_JS, language: "javascript" }
+          ],
+          needsRepair: true
+        };
+      } else {
+        const ext = LANGUAGES[langId]?.extension || 'txt';
+        const defaultName = `main.${ext}`;
+        const defaultCode = LANGUAGES[langId]?.defaultCode || "";
+        return {
+          repaired: [
+            { name: defaultName, content: defaultCode, language: langId }
+          ],
+          needsRepair: true
+        };
+      }
+    }
+
+    let needsRepair = false;
+    let repaired = [];
+
+    // Filter out files that don't match the current language's extension (for non-html, non-text)
+    if (langId !== "html" && langId !== "text") {
+      const ext = LANGUAGES[langId]?.extension;
+      repaired = files.filter(file => {
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        if (fileExt !== ext) {
+          needsRepair = true;
+          return false;
+        }
+        return true;
+      });
+    } else {
+      repaired = [...files];
+    }
+
+    repaired = repaired.map(file => {
+      // If it's a default single file named main.txt but the active language is NOT text/html
+      if (
+        langId !== "text" && 
+        langId !== "html" && 
+        file.name === "main.txt" && 
+        (file.language === "text" || !file.language)
+      ) {
+        needsRepair = true;
+        const ext = LANGUAGES[langId]?.extension || 'txt';
+        return {
+          ...file,
+          name: `main.${ext}`,
+          language: langId
+        };
+      }
+      
+      // General repair: if file language doesn't match extension resolution
+      const detected = detectLanguageByExtension(file.name);
+      if (file.language !== detected) {
+        needsRepair = true;
+        return {
+          ...file,
+          language: detected
+        };
+      }
+      
+      return file;
+    });
+
+    // If repaired workspace is empty, initialize with default file
+    if (repaired.length === 0 && langId !== "html" && langId !== "text") {
+      needsRepair = true;
+      const ext = LANGUAGES[langId]?.extension || 'txt';
+      const defaultName = `main.${ext}`;
+      const defaultCode = LANGUAGES[langId]?.defaultCode || "";
+      repaired = [
+        { name: defaultName, content: defaultCode, language: langId }
+      ];
+    }
+
+    return { repaired, needsRepair };
+  };
+
   // Sync workspace files when language changes
   useEffect(() => {
     let savedFiles = localStorage.getItem(`codeverse_files_${currentLanguage}`);
@@ -498,37 +598,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
 
     // Auto-repair logic for old/stuck workspaces in localStorage
     if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-      let needsRepair = false;
-      const repaired = parsed.map(file => {
-        // If it's a default single file named main.txt but the active language is NOT text/html
-        if (
-          currentLanguage !== "text" && 
-          currentLanguage !== "html" && 
-          file.name === "main.txt" && 
-          (file.language === "text" || !file.language)
-        ) {
-          needsRepair = true;
-          const ext = LANGUAGES[currentLanguage]?.extension || 'txt';
-          return {
-            ...file,
-            name: `main.${ext}`,
-            language: currentLanguage
-          };
-        }
-        
-        // General repair: if file language doesn't match extension resolution
-        const detected = detectLanguageByExtension(file.name);
-        if (file.language !== detected) {
-          needsRepair = true;
-          return {
-            ...file,
-            language: detected
-          };
-        }
-        
-        return file;
-      });
-
+      const { repaired, needsRepair } = repairWorkspaceFiles(parsed, currentLanguage);
       if (needsRepair) {
         setWorkspaceFiles(repaired);
         localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(repaired));
@@ -557,6 +627,7 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
       ];
     }
     setWorkspaceFiles(defaultFiles);
+    localStorage.setItem(`codeverse_files_${currentLanguage}`, JSON.stringify(defaultFiles));
     syncOpenTabs(defaultFiles);
   }, [currentLanguage]);
 
@@ -680,8 +751,9 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
             
             // Sync with workspaceFiles (use cloud list if present, otherwise fall back to mapping local files)
             if (data.workspaceFiles) {
-              setWorkspaceFiles(data.workspaceFiles);
-              localStorage.setItem("codeverse_files_html", JSON.stringify(data.workspaceFiles));
+              const { repaired } = repairWorkspaceFiles(data.workspaceFiles, "html");
+              setWorkspaceFiles(repaired);
+              localStorage.setItem("codeverse_files_html", JSON.stringify(repaired));
             } else {
               setWorkspaceFiles(prev => {
                 const files = (prev && prev.length > 0) ? prev : [
@@ -715,10 +787,11 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
             }
 
             if (data.workspaceFiles) {
+              const { repaired } = repairWorkspaceFiles(data.workspaceFiles, langId);
               if (currentLanguage === langId) {
-                setWorkspaceFiles(data.workspaceFiles);
+                setWorkspaceFiles(repaired);
               }
-              localStorage.setItem(`codeverse_files_${langId}`, JSON.stringify(data.workspaceFiles));
+              localStorage.setItem(`codeverse_files_${langId}`, JSON.stringify(repaired));
             } else if (data.code) {
               // Sync with workspaceFiles
               setWorkspaceFiles(prev => {
@@ -1417,10 +1490,16 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const handleWorkspaceCodeChange = (val) => {
+    addDebugLog(`handleWorkspaceCodeChange: file=${activeFileName}, len=${val ? val.length : 0}`);
     setWorkspaceFiles(prev => {
       const activeFile = prev.find(f => f.name === activeFileName);
       if (activeFile && activeFile.language !== currentLanguage) {
-        return prev;
+        const detected = detectLanguageByExtension(activeFile.name);
+        if (detected === currentLanguage) {
+          activeFile.language = currentLanguage;
+        } else {
+          return prev;
+        }
       }
       const updated = prev.map(f => {
         if (f.name === activeFileName) {
@@ -1654,15 +1733,25 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const getEditorValue = () => {
+    addDebugLog(`getEditorValue: start, Monaco=${!!editorRef.current}, isMobile=${isMobile}, activeFileName=${activeFileName}, currentLanguage=${currentLanguage}`);
     if (editorRef.current && !isMobile && settingsEditorEngine !== "Ace") {
-      return editorRef.current.getValue();
+      const monacoVal = editorRef.current.getValue();
+      addDebugLog(`getEditorValue: returning Monaco value, len=${monacoVal.length}`);
+      return monacoVal;
     }
     const activeFile = workspaceFiles.find(f => f.name === activeFileName);
-    if (activeFile) return activeFile.content;
+    addDebugLog(`getEditorValue: activeFile found = ${activeFile ? `${activeFile.name}(len=${activeFile.content.length})` : 'none'}`);
+    if (activeFile) {
+      addDebugLog(`getEditorValue: returning activeFile content`);
+      return activeFile.content;
+    }
     
     if (currentLanguage === "html") {
-      return activeWebTab === "html" ? htmlCode : (activeWebTab === "css" ? cssCode : jsCode);
+      const htmlVal = activeWebTab === "html" ? htmlCode : (activeWebTab === "css" ? cssCode : jsCode);
+      addDebugLog(`getEditorValue: returning htmlVal`);
+      return htmlVal;
     }
+    addDebugLog(`getEditorValue: returning code fallback`);
     return code;
   };
 
@@ -4231,6 +4320,40 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
       )}
+      
+      {/* Floating Debug Button & Overlay */}
+      <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
+        <button
+          onClick={() => setShowDebugOverlay(prev => !prev)}
+          className="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all cursor-pointer"
+          title="Toggle Debug Console"
+        >
+          <i className="fas fa-bug"></i>
+        </button>
+        
+        {showDebugOverlay && (
+          <div className="w-80 max-h-60 overflow-y-auto bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-[10px] font-mono text-slate-300 shadow-2xl flex flex-col gap-1 backdrop-blur-md">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5 shrink-0">
+              <span className="font-bold text-rose-400">Debug Console</span>
+              <button 
+                onClick={() => setDebugLogs([])} 
+                className="text-[9px] text-slate-500 hover:text-slate-300 font-sans cursor-pointer"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="flex-grow overflow-y-auto flex flex-col gap-1">
+              {debugLogs.length === 0 ? (
+                <div className="text-slate-600 text-center py-4">No logs recorded yet. Type or Run code to log.</div>
+              ) : (
+                debugLogs.map((log, idx) => (
+                  <div key={idx} className="whitespace-pre-wrap break-all leading-normal border-b border-slate-900/50 pb-1">{log}</div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
