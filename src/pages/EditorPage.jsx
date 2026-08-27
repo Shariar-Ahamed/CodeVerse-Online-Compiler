@@ -296,12 +296,6 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   const navigate = useNavigate();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const [debugLogs, setDebugLogs] = useState([]);
-  const [showDebugOverlay, setShowDebugOverlay] = useState(false);
-  
-  const addDebugLog = (msg) => {
-    setDebugLogs(prev => [...prev.slice(-30), `[${new Date().toLocaleTimeString()}] ${msg}`]);
-  };
   const queryLang = searchParams.get('lang');
   
   const [currentLanguage, setCurrentLanguage] = useState(() => {
@@ -1490,7 +1484,6 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const handleWorkspaceCodeChange = (val) => {
-    addDebugLog(`handleWorkspaceCodeChange: file=${activeFileName}, len=${val ? val.length : 0}`);
     setWorkspaceFiles(prev => {
       const activeFile = prev.find(f => f.name === activeFileName);
       if (activeFile && activeFile.language !== currentLanguage) {
@@ -1733,25 +1726,19 @@ export default function EditorPage({ user, onLogout, theme, toggleTheme, showToa
   };
 
   const getEditorValue = () => {
-    addDebugLog(`getEditorValue: start, Monaco=${!!editorRef.current}, isMobile=${isMobile}, activeFileName=${activeFileName}, currentLanguage=${currentLanguage}`);
     if (editorRef.current && !isMobile && settingsEditorEngine !== "Ace") {
       const monacoVal = editorRef.current.getValue();
-      addDebugLog(`getEditorValue: returning Monaco value, len=${monacoVal.length}`);
       return monacoVal;
     }
     const activeFile = workspaceFiles.find(f => f.name === activeFileName);
-    addDebugLog(`getEditorValue: activeFile found = ${activeFile ? `${activeFile.name}(len=${activeFile.content.length})` : 'none'}`);
     if (activeFile) {
-      addDebugLog(`getEditorValue: returning activeFile content`);
       return activeFile.content;
     }
     
     if (currentLanguage === "html") {
       const htmlVal = activeWebTab === "html" ? htmlCode : (activeWebTab === "css" ? cssCode : jsCode);
-      addDebugLog(`getEditorValue: returning htmlVal`);
       return htmlVal;
     }
-    addDebugLog(`getEditorValue: returning code fallback`);
     return code;
   };
 
@@ -4320,40 +4307,6 @@ Explain why this error occurred and how to fix it.`;
           </div>
         </div>
       )}
-      
-      {/* Floating Debug Button & Overlay */}
-      <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
-        <button
-          onClick={() => setShowDebugOverlay(prev => !prev)}
-          className="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all cursor-pointer"
-          title="Toggle Debug Console"
-        >
-          <i className="fas fa-bug"></i>
-        </button>
-        
-        {showDebugOverlay && (
-          <div className="w-80 max-h-60 overflow-y-auto bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-[10px] font-mono text-slate-300 shadow-2xl flex flex-col gap-1 backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5 shrink-0">
-              <span className="font-bold text-rose-400">Debug Console</span>
-              <button 
-                onClick={() => setDebugLogs([])} 
-                className="text-[9px] text-slate-500 hover:text-slate-300 font-sans cursor-pointer"
-              >
-                Clear
-              </button>
-            </div>
-            <div className="flex-grow overflow-y-auto flex flex-col gap-1">
-              {debugLogs.length === 0 ? (
-                <div className="text-slate-600 text-center py-4">No logs recorded yet. Type or Run code to log.</div>
-              ) : (
-                debugLogs.map((log, idx) => (
-                  <div key={idx} className="whitespace-pre-wrap break-all leading-normal border-b border-slate-900/50 pb-1">{log}</div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
